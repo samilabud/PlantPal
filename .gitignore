@@ -1,0 +1,40 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# env & secrets (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.key
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# build output
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+.turbo/
+
+# expo
+.expo/
+web-build/
+expo-env.d.ts
+apps/mobile/ios/
+apps/mobile/android/
+
+# vercel
+.vercel/
+
+# os / editor
+.DS_Store
+*.log
+.idea/
