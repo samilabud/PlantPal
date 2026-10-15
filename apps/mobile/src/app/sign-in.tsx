@@ -11,7 +11,7 @@ import {
   signInWithApple,
   signInWithGoogle,
 } from '@/auth';
-import { Button, spacing, Text, useColors } from '@/ui';
+import { Button, Logo, spacing, Text, useColors } from '@/ui';
 
 type Provider = 'apple' | 'google' | 'dev';
 
@@ -40,10 +40,10 @@ export default function SignInScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text variant="title" accessibilityRole="header">
-          PlantPal
+        <Logo variant="stacked" height={200} />
+        <Text muted accessibilityRole="header">
+          Never forget to water a plant again.
         </Text>
-        <Text muted>Never forget to water a plant again.</Text>
       </View>
 
       <View style={styles.actions}>
@@ -93,7 +93,7 @@ export default function SignInScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, padding: spacing.lg, justifyContent: 'space-between' },
-  header: { marginTop: spacing.xl, gap: spacing.sm },
+  header: { marginTop: spacing.xl, gap: spacing.md, alignItems: 'center' },
   actions: { gap: spacing.md },
   appleButton: { height: 48, width: '100%' },
   legal: { textAlign: 'center' },

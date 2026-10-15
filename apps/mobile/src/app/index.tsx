@@ -10,7 +10,7 @@ import { listPlants, waterPlant, type PlantListItem } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
 import { canAddPlant, usePremium } from '@/purchases/limits';
 import { syncNow, useSyncStore } from '@/sync/sync-manager';
-import { Button, radius, spacing, Text, useColors } from '@/ui';
+import { Button, Logo, radius, spacing, Text, useColors } from '@/ui';
 
 export default function PlantsScreen() {
   const colors = useColors();
@@ -33,7 +33,8 @@ export default function PlantsScreen() {
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
-          title: 'My plants',
+          title: 'My plants', // still used as the back-button label on child screens
+          headerTitle: () => <Logo variant="horizontal" height={30} />,
           headerRight: () => (
             <Link href="/settings" accessibilityLabel="Open settings" testID="open-settings">
               <Text style={{ color: colors.primary }}>Settings</Text>
@@ -56,9 +57,17 @@ export default function PlantsScreen() {
           keyExtractor={(p) => p.id}
           renderItem={({ item }) => <PlantRow plant={item} />}
           contentContainerStyle={styles.list}
+          ListHeaderComponent={
+            plants?.length ? (
+              <Text variant="heading" accessibilityRole="header">
+                My plants ({plants.length})
+              </Text>
+            ) : null
+          }
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
           ListEmptyComponent={
             <View style={styles.empty}>
+              <Logo variant="stacked" height={150} />
               <Text variant="heading">No plants yet</Text>
               <Text muted>
                 Add your first plant and PlantPal will remind you when it needs water.

@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { getPhotoViewUrl } from '@/api';
 import { localFileExists } from '@/photos/capture';
-import { Text, useColors } from '@/ui';
+import { useColors } from '@/ui';
 
 type Props = { photoId: string | null; localUri?: string | null; size: number; label: string };
 
@@ -34,7 +34,11 @@ export function PlantPhoto({ photoId, localUri, size, label }: Props) {
   if (!photoId || !uri) {
     return (
       <View style={[styles.placeholder, box]} accessibilityLabel={label} accessible>
-        <Text style={{ fontSize: size / 2.5 }}>🪴</Text>
+        <Image
+          source={require('../../assets/images/logo-mark.png')}
+          style={{ width: size * 0.6, height: size * 0.6 }}
+          contentFit="contain"
+        />
       </View>
     );
   }
