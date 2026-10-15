@@ -1,21 +1,45 @@
 import { useQuery } from '@tanstack/react-query';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Link, Stack } from 'expo-router';
+import { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { getHealth } from '@/api';
+import { getHealth, getMe } from '@/api';
+import { useAuthStore } from '@/auth';
+import { tokenStore } from '@/auth/token-store';
 import { env } from '@/config/env';
-import { radius, Screen, spacing, Text, useColors } from '@/ui';
+import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 
-/** M1 home screen: proves the app, the typed API client and the backend talk to each other. */
 export default function HomeScreen() {
   const colors = useColors();
+  const user = useAuthStore((s) => s.user);
   const health = useQuery({ queryKey: ['health'], queryFn: getHealth });
+  // Re-read the profile on open (plan may have changed); this also exercises the auth client.
+  const me = useQuery({ queryKey: ['me'], queryFn: getMe });
+
+  useEffect(() => {
+    if (me.data) {
+      useAuthStore.getState().setUser(me.data);
+      tokenStore.setUser(me.data);
+    }
+  }, [me.data]);
 
   return (
     <Screen>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <Link href="/settings" accessibilityLabel="Open settings" testID="open-settings">
+              <Text style={{ color: colors.primary }}>Settings</Text>
+            </Link>
+          ),
+        }}
+      />
       <Text variant="title" accessibilityRole="header">
-        PlantPal
+        Hello{user?.email ? `, ${user.email}` : ''}
       </Text>
-      <Text muted>Foundation build ({env.appVariant})</Text>
+      <Text muted testID="plan-label">
+        Plan: {user?.plan ?? '…'} · build: {env.appVariant}
+      </Text>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <Text variant="heading">Backend</Text>
@@ -33,13 +57,12 @@ export default function HomeScreen() {
             Could not reach the API: {health.error.message}
           </Text>
         )}
-        <Pressable
-          accessibilityRole="button"
+        <Button
+          label="Check again"
           accessibilityLabel="Check backend again"
           onPress={() => health.refetch()}
-          style={[styles.button, { backgroundColor: colors.primary }]}>
-          <Text style={{ color: colors.onPrimary }}>Check again</Text>
-        </Pressable>
+          style={styles.button}
+        />
       </View>
     </Screen>
   );
@@ -47,12 +70,5 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   card: { padding: spacing.md, borderRadius: radius.md, gap: spacing.sm },
-  button: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.sm,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
+  button: { alignSelf: 'flex-start' },
 });

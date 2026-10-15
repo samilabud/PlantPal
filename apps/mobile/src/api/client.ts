@@ -16,11 +16,21 @@ export class ApiError extends Error {
 
 type RequestOptions<T> = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  /** Send the access token. Defaults to true when the client has auth hooks. */
+  auth?: boolean;
   body?: unknown;
   /** Zod schema the response must match. The return type comes from it. */
   schema: z.ZodType<T>;
   timeoutMs?: number;
   headers?: Record<string, string>;
+};
+
+/** How the client gets tokens. Kept as hooks so the client knows nothing about storage. */
+export type AuthHooks = {
+  /** A valid access token, refreshing first if it is about to expire. Null when signed out. */
+  getAccessToken: () => Promise<string | null>;
+  /** Force a refresh after a 401. Null means the session is over. */
+  refreshAccessToken: () => Promise<string | null>;
 };
 
 export type ApiClient = {
@@ -30,59 +40,77 @@ export type ApiClient = {
 /**
  * A small typed fetch wrapper. Every response is validated with Zod, so a server change
  * that breaks the contract shows up as a clear error instead of `undefined` in the UI.
- * Auth headers and token refresh get added in M2.
+ * With auth hooks it adds `Authorization: Bearer`, and on a 401 refreshes once and retries once.
  */
 export function createApiClient(config: {
   baseUrl: string;
   fetchFn?: typeof fetch;
   defaultTimeoutMs?: number;
+  auth?: AuthHooks;
 }): ApiClient {
   const fetchFn = config.fetchFn ?? fetch;
 
+  async function send<T>(path: string, options: RequestOptions<T>, token: string | null) {
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      options.timeoutMs ?? config.defaultTimeoutMs ?? 10_000,
+    );
+
+    let response: Response;
+    try {
+      response = await fetchFn(`${config.baseUrl}${path}`, {
+        method: options.method ?? 'GET',
+        headers: {
+          Accept: 'application/json',
+          ...(options.body !== undefined && { 'Content-Type': 'application/json' }),
+          ...(token && { Authorization: `Bearer ${token}` }),
+          ...options.headers,
+        },
+        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (controller.signal.aborted) throw new ApiError('timeout', 'The request timed out');
+      throw new ApiError('network', error instanceof Error ? error.message : 'Network error');
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    return response;
+  }
+
+  async function parse<T>(path: string, response: Response, schema: z.ZodType<T>): Promise<T> {
+    const json: unknown = await response.json().catch(() => undefined);
+
+    if (!response.ok) {
+      const parsed = ApiErrorBody.safeParse(json);
+      throw new ApiError(
+        'http',
+        parsed.success ? parsed.data.error.message : `Request failed with ${response.status}`,
+        response.status,
+        parsed.success ? parsed.data.error.code : undefined,
+      );
+    }
+
+    const parsed = schema.safeParse(json);
+    if (!parsed.success) {
+      throw new ApiError('invalid_response', `Unexpected response from ${path}`, response.status);
+    }
+    return parsed.data;
+  }
+
   return {
     async request<T>(path: string, options: RequestOptions<T>): Promise<T> {
-      const controller = new AbortController();
-      const timeout = setTimeout(
-        () => controller.abort(),
-        options.timeoutMs ?? config.defaultTimeoutMs ?? 10_000,
-      );
+      const useAuth = Boolean(config.auth) && options.auth !== false;
+      const token = useAuth ? await config.auth!.getAccessToken() : null;
+      let response = await send(path, options, token);
 
-      let response: Response;
-      try {
-        response = await fetchFn(`${config.baseUrl}${path}`, {
-          method: options.method ?? 'GET',
-          headers: {
-            Accept: 'application/json',
-            ...(options.body !== undefined && { 'Content-Type': 'application/json' }),
-            ...options.headers,
-          },
-          body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
-          signal: controller.signal,
-        });
-      } catch (error) {
-        if (controller.signal.aborted) throw new ApiError('timeout', 'The request timed out');
-        throw new ApiError('network', error instanceof Error ? error.message : 'Network error');
-      } finally {
-        clearTimeout(timeout);
+      if (response.status === 401 && useAuth) {
+        const fresh = await config.auth!.refreshAccessToken();
+        if (fresh) response = await send(path, options, fresh);
       }
-
-      const json: unknown = await response.json().catch(() => undefined);
-
-      if (!response.ok) {
-        const parsed = ApiErrorBody.safeParse(json);
-        throw new ApiError(
-          'http',
-          parsed.success ? parsed.data.error.message : `Request failed with ${response.status}`,
-          response.status,
-          parsed.success ? parsed.data.error.code : undefined,
-        );
-      }
-
-      const parsed = options.schema.safeParse(json);
-      if (!parsed.success) {
-        throw new ApiError('invalid_response', `Unexpected response from ${path}`, response.status);
-      }
-      return parsed.data;
+      return parse(path, response, options.schema);
     },
   };
 }

@@ -82,3 +82,59 @@ describe('createApiClient', () => {
     });
   });
 });
+
+describe('createApiClient with auth hooks', () => {
+  const ok = () => jsonResponse({ ok: true });
+  const unauthorized = () => jsonResponse({ error: { code: 'unauthorized', message: 'no' } }, 401);
+  const authHeader = (fetchFn: jest.Mock, call: number) =>
+    (fetchFn.mock.calls[call][1] as RequestInit).headers as Record<string, string>;
+
+  it('sends the bearer token', async () => {
+    const fetchFn = jest.fn().mockResolvedValue(ok());
+    const client = createApiClient({
+      baseUrl: 'http://api.test',
+      fetchFn,
+      auth: { getAccessToken: async () => 'token-1', refreshAccessToken: async () => null },
+    });
+    await client.request('/x', { schema: Schema });
+    expect(authHeader(fetchFn, 0).Authorization).toBe('Bearer token-1');
+  });
+
+  it('on 401 refreshes once and retries with the new token', async () => {
+    const fetchFn = jest.fn().mockResolvedValueOnce(unauthorized()).mockResolvedValueOnce(ok());
+    const refreshAccessToken = jest.fn(async () => 'token-2');
+    const client = createApiClient({
+      baseUrl: 'http://api.test',
+      fetchFn,
+      auth: { getAccessToken: async () => 'token-1', refreshAccessToken },
+    });
+
+    await expect(client.request('/x', { schema: Schema })).resolves.toEqual({ ok: true });
+    expect(refreshAccessToken).toHaveBeenCalledTimes(1);
+    expect(authHeader(fetchFn, 1).Authorization).toBe('Bearer token-2');
+  });
+
+  it('gives up with the 401 when the refresh fails (no retry loop)', async () => {
+    const fetchFn = jest.fn().mockResolvedValue(unauthorized());
+    const client = createApiClient({
+      baseUrl: 'http://api.test',
+      fetchFn,
+      auth: { getAccessToken: async () => 'token-1', refreshAccessToken: async () => null },
+    });
+    await expect(client.request('/x', { schema: Schema })).rejects.toMatchObject({ status: 401 });
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips auth for public endpoints', async () => {
+    const fetchFn = jest.fn().mockResolvedValue(ok());
+    const getAccessToken = jest.fn(async () => 'token-1');
+    const client = createApiClient({
+      baseUrl: 'http://api.test',
+      fetchFn,
+      auth: { getAccessToken, refreshAccessToken: async () => null },
+    });
+    await client.request('/x', { schema: Schema, auth: false });
+    expect(getAccessToken).not.toHaveBeenCalled();
+    expect(authHeader(fetchFn, 0).Authorization).toBeUndefined();
+  });
+});

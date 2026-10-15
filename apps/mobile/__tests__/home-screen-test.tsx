@@ -10,12 +10,17 @@ jest.mock('@/config/env', () => ({
 jest.mock('@/api', () => ({
   ...jest.requireActual('@/api/client'),
   getHealth: jest.fn(),
+  getMe: jest.fn(() => new Promise(() => {})),
 }));
+jest.mock('expo-secure-store', () => require('../test/utils').mockSecureStore());
+jest.mock('expo-router', () => ({ Link: () => null, Stack: { Screen: () => null } }));
 
 const mockedGetHealth = jest.mocked(getHealth);
 
 async function renderWithQuery() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+  });
   return render(
     <QueryClientProvider client={client}>
       <HomeScreen />

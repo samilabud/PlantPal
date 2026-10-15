@@ -21,6 +21,9 @@ const VARIANTS: Record<Variant, { name: string; id: string; scheme: string }> = 
 
 const current = VARIANTS[variant];
 
+/** "com.googleusercontent.apps.<id>": the reversed iOS client id from Google Cloud. Not secret. */
+const googleIosUrlScheme = process.env.GOOGLE_IOS_URL_SCHEME;
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: current.name,
@@ -33,6 +36,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     bundleIdentifier: current.id,
     supportsTablet: false,
+    usesAppleSignIn: true,
   },
   android: {
     package: current.id,
@@ -47,6 +51,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   plugins: [
     'expo-router',
     'expo-dev-client',
+    'expo-apple-authentication',
+    'expo-secure-store',
+    // Without Firebase this plugin only adds the iOS URL scheme, so it is added once the
+    // iOS OAuth client exists. Android needs no plugin (the SHA-1 is registered in Google Cloud).
+    ...(googleIosUrlScheme
+      ? [
+          ['@react-native-google-signin/google-signin', { iosUrlScheme: googleIosUrlScheme }] as [
+            string,
+            object,
+          ],
+        ]
+      : []),
     [
       'expo-splash-screen',
       {

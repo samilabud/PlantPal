@@ -23,8 +23,12 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U plantpal" --health-interval 2s --health-timeout 3s --health-retries 15
     env:
-      # Test-only credentials for the throwaway CI container. Not a secret.
-      DATABASE_URL: postgres://plantpal:plantpal@localhost:5432/plantpal
+      # Test-only values for the throwaway CI container. Not secrets.
+      DATABASE_URL: postgres://plantpal:plantpal@localhost:5432/plantpal_test
+      JWT_SECRET: test-only-secret-not-used-anywhere-real-0123456789
+      APPLE_CLIENT_IDS: com.samilabud.plantpal.dev
+      GOOGLE_CLIENT_IDS: test-web-client.apps.googleusercontent.com
+      ALLOW_DEV_AUTH: 'true'
     steps:
       - uses: actions/checkout@v5
         with:
