@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: plantpal
+          POSTGRES_PASSWORD: plantpal
+          POSTGRES_DB: plantpal
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U plantpal" --health-interval 2s --health-timeout 3s --health-retries 15
+    env:
+      # Test-only credentials for the throwaway CI container. Not a secret.
+      DATABASE_URL: postgres://plantpal:plantpal@localhost:5432/plantpal
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Scan for committed secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
