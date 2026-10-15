@@ -11,10 +11,12 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "env:pull": "vercel env pull .env.development.local --environment=development --yes"
   },
   "dependencies": {
     "@plantpal/shared": "workspace:*",
+    "@vercel/blob": "^2.8.2",
     "drizzle-orm": "^0.45.4",
     "jose": "^6.2.12",
     "next": "16.4.1",

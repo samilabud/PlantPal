@@ -29,6 +29,7 @@ pnpm install
 docker compose up -d --wait            # local Postgres on :5433
 cp apps/api/.env.example apps/api/.env.local
 cp apps/api/.env.test.example apps/api/.env.test.local
+pnpm --filter @plantpal/api env:pull   # Blob credentials (needs `vercel login`); the OIDC token expires, re-run when uploads fail with 401/403
 pnpm --filter @plantpal/api db:migrate # no tables yet in M1
 pnpm --filter @plantpal/api dev        # API on http://localhost:4000
 
