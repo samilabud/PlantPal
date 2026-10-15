@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { PlantForm } from '@/components/plant-form';
 import { mutate } from '@/data/mutations';
 import { addPhoto, createPlant } from '@/data/plants';
+import { softAskForReminders } from '@/notifications/soft-ask';
 import { Screen } from '@/ui';
 
 export default function NewPlantScreen() {
@@ -17,6 +18,7 @@ export default function NewPlantScreen() {
             if (photo) await addPhoto(db, id, photo.photoId, photo.uri);
           });
           router.back();
+          softAskForReminders(name);
         }}
       />
     </Screen>

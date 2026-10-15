@@ -7,6 +7,9 @@ import { env } from '@/config/env';
 import { useAuthStore } from './auth-store';
 import { appleCredential } from './providers/apple';
 import { googleIdToken, googleSignOut } from './providers/google';
+import { cancelAllReminders } from '@/notifications/notifications';
+import { unregisterFromPush } from '@/notifications/push-registration';
+
 import { deleteAccountOnServer, signInWithServer, signOutOfServer } from './session';
 
 export { useAuthStore } from './auth-store';
@@ -44,6 +47,9 @@ export async function signInDev(name = 'dev'): Promise<boolean> {
 
 export async function signOut() {
   await googleSignOut({ revoke: false });
+  // While the access token still works: stop server pushes to this phone for this account.
+  await unregisterFromPush();
+  await cancelAllReminders().catch(() => undefined);
   await signOutOfServer();
 }
 
@@ -68,5 +74,6 @@ export async function deleteAccount(): Promise<boolean> {
     body,
   );
   if (providers.includes('google')) await googleSignOut({ revoke: true });
+  await cancelAllReminders().catch(() => undefined); // devices rows were deleted with the account
   return true;
 }

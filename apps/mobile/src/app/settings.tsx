@@ -4,6 +4,7 @@ import { Alert, StyleSheet, View } from 'react-native';
 
 import { getHealth } from '@/api';
 import { deleteAccount, signOut, useAuthStore } from '@/auth';
+import { RemindersCard } from '@/components/reminders-card';
 import { env } from '@/config/env';
 import { requestSync, useSyncStore } from '@/sync/sync-manager';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
@@ -67,6 +68,8 @@ export default function SettingsScreen() {
         <Text muted>Signed in with: {user?.providers.join(', ')}</Text>
         <Text muted>Plan: {user?.plan}</Text>
       </View>
+
+      <RemindersCard />
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <Text variant="heading">Sync</Text>

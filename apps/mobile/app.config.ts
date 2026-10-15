@@ -54,6 +54,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-apple-authentication',
     'expo-secure-store',
     'expo-sqlite',
+    ['expo-notifications', { color: '#2E7D32', defaultChannel: 'reminders' }],
     [
       'expo-image-picker',
       {
@@ -86,7 +87,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
     reactCompiler: true,
   },
+  owner: 'samilabud',
   extra: {
     appVariant: variant,
+    // The EAS project (expo.dev/@samilabud/plantpal). Push tokens are issued per project.
+    eas: { projectId: '795e7f59-ea67-44c6-bd7a-d0ab622042d2' },
   },
 });

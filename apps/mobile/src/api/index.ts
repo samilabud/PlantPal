@@ -1,6 +1,8 @@
 import {
   HealthResponse,
   Me,
+  OkResponse,
+  PushSendResult,
   SignedUrlResponse,
   SyncResponse,
   type SyncRequest,
@@ -48,3 +50,17 @@ export async function putPhotoFile(url: string, uri: string) {
   });
   if (!response.ok) throw new Error(`Photo upload failed (${response.status})`);
 }
+
+export const registerDevice = (expoPushToken: string, platform: 'ios' | 'android') =>
+  api.request('/api/devices', {
+    method: 'POST',
+    body: { expoPushToken, platform },
+    schema: OkResponse,
+  });
+
+export const unregisterDevice = (expoPushToken: string) =>
+  api.request('/api/devices', { method: 'DELETE', body: { expoPushToken }, schema: OkResponse });
+
+/** Development only: ask the server to push to my devices (the server refuses in production). */
+export const sendTestPush = (plantId?: string) =>
+  api.request('/api/push/test', { method: 'POST', body: { plantId }, schema: PushSendResult });

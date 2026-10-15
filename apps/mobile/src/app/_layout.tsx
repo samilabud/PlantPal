@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { restoreSession, useAuthStore } from '@/auth';
+import '@/notifications/notifications'; // sets the foreground notification handler
+import { useNotificationNavigation, useReminderScheduler } from '@/notifications/use-notifications';
 import { startSyncTriggers } from '@/sync/sync-manager';
 import { createQueryClient } from '@/query-client';
 
@@ -19,6 +21,9 @@ export default function RootLayout() {
   useEffect(() => {
     restoreSession();
   }, []);
+
+  useNotificationNavigation(status === 'signedIn');
+  useReminderScheduler(status === 'signedIn');
 
   // Sync runs only while signed in: at start, on reconnect and when the app comes to the front.
   useEffect(() => {

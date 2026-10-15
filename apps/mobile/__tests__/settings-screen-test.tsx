@@ -14,6 +14,7 @@ jest.mock('@/sync/sync-manager', () => ({
   useSyncStore: () => ({ status: 'idle', pending: mockPending, lastSyncedAt: null, error: null }),
 }));
 jest.mock('@/api', () => ({ getHealth: jest.fn(() => new Promise(() => {})) }));
+jest.mock('@/components/reminders-card', () => ({ RemindersCard: () => null }));
 jest.mock('@/config/env', () => ({
   env: { apiUrl: 'http://api.test', appVariant: 'development' },
 }));
