@@ -1,0 +1,7 @@
+# Reviewed findings that are NOT secrets. Each line is one exact finding (commit:file:rule:line);
+# any new occurrence still fails the scan.
+#
+# Firebase's Android API key in google-services.json is a public identifier that ships inside
+# every Android build (Firebase + Expo docs: safe to commit). It is protected by restricting the
+# key to the app's package + SHA-1 in Google Cloud (M7 checklist), not by hiding it.
+f8fe95ec2aba893124b0f48af55dfa0c4debcdb1:apps/mobile/google-services.json:gcp-api-key:18
