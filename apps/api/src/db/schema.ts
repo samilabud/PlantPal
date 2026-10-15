@@ -1,4 +1,15 @@
-import { index, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  index,
+  integer,
+  pgEnum,
+  pgSequence,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -57,4 +68,71 @@ export const refreshTokens = pgTable(
     ...timestamps,
   },
   (t) => [index().on(t.familyId), index().on(t.userId)],
+);
+
+/**
+ * One global counter for every synced write. Each insert/update takes the next number, so
+ * "everything after version N" is one indexed query per table, and a device only needs to
+ * remember a single number (its cursor).
+ */
+export const syncVersionSeq = pgSequence('sync_version_seq');
+
+const syncColumns = {
+  /** The phone's clock at the edit. Used for last-write-wins. */
+  clientUpdatedAt: timestamp('client_updated_at', { withTimezone: true }).notNull(),
+  /** Server-assigned, increasing. Used as the pull cursor. */
+  serverVersion: bigint('server_version', { mode: 'number' }).notNull(),
+  /** Tombstone: deletes sync like any other change. */
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  ...timestamps,
+};
+
+/** Ids come from the phone (UUIDs), so rows can be created offline. No defaultRandom(). */
+export const plants = pgTable(
+  'plants',
+  {
+    id: uuid('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    wateringIntervalDays: integer('watering_interval_days').notNull(),
+    coverPhotoId: uuid('cover_photo_id'),
+    ...syncColumns,
+  },
+  (t) => [index().on(t.userId, t.serverVersion)],
+);
+
+/** Append-only: two phones watering offline never conflict, both events are kept. */
+export const wateringEvents = pgTable(
+  'watering_events',
+  {
+    id: uuid('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    plantId: uuid('plant_id')
+      .notNull()
+      .references(() => plants.id, { onDelete: 'cascade' }),
+    wateredAt: timestamp('watered_at', { withTimezone: true }).notNull(),
+    ...syncColumns,
+  },
+  (t) => [index().on(t.userId, t.serverVersion), index().on(t.plantId)],
+);
+
+/** The file lives in Blob storage at users/<userId>/photos/<id>.jpg (derived, never sent). */
+export const plantPhotos = pgTable(
+  'plant_photos',
+  {
+    id: uuid('id').primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    plantId: uuid('plant_id')
+      .notNull()
+      .references(() => plants.id, { onDelete: 'cascade' }),
+    takenAt: timestamp('taken_at', { withTimezone: true }).notNull(),
+    ...syncColumns,
+  },
+  (t) => [index().on(t.userId, t.serverVersion), index().on(t.plantId)],
 );

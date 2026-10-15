@@ -1,5 +1,5 @@
 import { Me, RefreshResponse, SessionResponse } from '@plantpal/shared';
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { jwks, sha256Hex } from '@/auth/id-tokens';
 import { authIdentities, refreshTokens, users } from '@/db/schema';
@@ -12,6 +12,10 @@ import { POST as devSignIn } from './dev/route';
 import { POST as googleSignIn } from './google/route';
 import { POST as logout } from './logout/route';
 import { POST as refresh } from './refresh/route';
+
+import { deleteUserPhotos } from '@/storage/photos';
+
+vi.mock('@/storage/photos', () => ({ deleteUserPhotos: vi.fn(async () => undefined) }));
 
 const post = (body: unknown, headers: Record<string, string> = {}) =>
   new Request('http://test/api', {
@@ -115,6 +119,7 @@ describe.skipIf(!hasDb)('auth routes (integration)', () => {
       }),
     );
     expect(await res.json()).toEqual({ deleted: true, appleRevoked: false });
+    expect(deleteUserPhotos).toHaveBeenCalledWith(session.user.id);
 
     const { db } = testDb();
     expect(await db.select().from(users)).toHaveLength(0);

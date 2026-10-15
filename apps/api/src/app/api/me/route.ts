@@ -8,6 +8,7 @@ import { getMe } from '@/auth/session';
 import { db } from '@/db';
 import { users } from '@/db/schema';
 import { json, parseBody, withErrors } from '@/lib/http';
+import { deleteUserPhotos } from '@/storage/photos';
 
 /** GET /api/me: the signed-in user's profile and plan. */
 export const GET = withErrors(async (request) => {
@@ -17,8 +18,8 @@ export const GET = withErrors(async (request) => {
 
 /**
  * DELETE /api/me: permanent account deletion (App Store guideline 5.1.1(v)).
- * Deleting the user row cascades to identities and refresh tokens; later milestones add their
- * tables with ON DELETE CASCADE too, plus photo cleanup in storage.
+ * Deleting the user row cascades to identities, tokens, plants, waterings and photo rows.
+ * Photo files are removed from Blob storage first, so nothing is left behind if that fails.
  */
 export const DELETE = withErrors(async (request) => {
   const userId = await requireUserId(request);
@@ -36,6 +37,7 @@ export const DELETE = withErrors(async (request) => {
     });
   }
 
+  await deleteUserPhotos(userId);
   await db().delete(users).where(eq(users.id, userId));
   const response: DeleteAccountResponse = { deleted: true, appleRevoked };
   return json(response);
