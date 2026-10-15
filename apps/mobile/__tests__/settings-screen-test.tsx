@@ -26,7 +26,12 @@ jest.mock('@/auth', () => ({
 }));
 
 const render = (ui: ReactElement) =>
-  rtlRender(<QueryClientProvider client={new QueryClient()}>{ui}</QueryClientProvider>);
+  rtlRender(
+    <QueryClientProvider
+      client={new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity } } })}>
+      {ui}
+    </QueryClientProvider>,
+  );
 
 describe('SettingsScreen', () => {
   beforeEach(() => {

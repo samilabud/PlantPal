@@ -29,7 +29,12 @@ export async function uploadPendingPhotos(db: SqlDb, deps: PhotoUploadDeps) {
   let uploaded = 0;
   for (const photo of pending) {
     const size = photo.localUri ? deps.fileSize(photo.localUri) : 0;
-    if (!photo.localUri || size === 0) continue; // file missing: nothing we can upload
+    if (!photo.localUri || size === 0) {
+      // The file is gone (e.g. the OS cleared it): it can never be uploaded, so drop the photo
+      // instead of leaving it "waiting" forever, and stop using it as the cover.
+      await dropMissingPhoto(db, photo.id, photo.plantId);
+      continue;
+    }
 
     const url = await deps.getUploadUrl(photo.id, size);
     await deps.putFile(url, photo.localUri);
@@ -51,4 +56,30 @@ export async function uploadPendingPhotos(db: SqlDb, deps: PhotoUploadDeps) {
     uploaded++;
   }
   return uploaded;
+}
+
+async function dropMissingPhoto(db: SqlDb, photoId: string, plantId: string) {
+  const now = new Date().toISOString();
+  await db.withExclusiveTransactionAsync(async (tx) => {
+    await tx.runAsync('DELETE FROM plant_photos WHERE id = ?', [photoId]);
+    const plant = await tx.getFirstAsync<{ name: string; interval: number; cover: string | null }>(
+      'SELECT name, watering_interval_days AS interval, cover_photo_id AS cover FROM plants WHERE id = ?',
+      [plantId],
+    );
+    if (plant?.cover !== photoId) return;
+    await tx.runAsync(
+      'UPDATE plants SET cover_photo_id = NULL, client_updated_at = ? WHERE id = ?',
+      [now, plantId],
+    );
+    await enqueue(
+      tx,
+      {
+        kind: 'plant.upsert',
+        id: plantId,
+        clientUpdatedAt: now,
+        data: { name: plant.name, wateringIntervalDays: plant.interval, coverPhotoId: null },
+      },
+      now,
+    );
+  });
 }

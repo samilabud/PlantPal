@@ -72,6 +72,7 @@ describe('plant repository (real SQLite)', () => {
     await addPhoto(db, id, 'photo-1', 'file:///photos/photo-1.jpg');
     expect(await listPhotos(db, id)).toMatchObject([{ id: 'photo-1', uploadState: 'pending' }]);
     expect((await getPlant(db, id))!.coverPhotoId).toBe('photo-1');
+    expect((await listPlants(db))[0]!.coverLocalUri).toBe('file:///photos/photo-1.jpg');
     expect((await outbox(db)).map((r) => r.kind)).toEqual(['plant.upsert']); // the cover change only
   });
 });

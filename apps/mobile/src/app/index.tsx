@@ -26,7 +26,6 @@ export default function PlantsScreen() {
       <Stack.Screen
         options={{
           title: 'My plants',
-          headerLeft: () => <SyncBadge />,
           headerRight: () => (
             <Link href="/settings" accessibilityLabel="Open settings" testID="open-settings">
               <Text style={{ color: colors.primary }}>Settings</Text>
@@ -34,6 +33,10 @@ export default function PlantsScreen() {
           ),
         }}
       />
+      {/* Its own row, not the header: long states like "Offline · 3 to sync" never collide with the title. */}
+      <View style={[styles.statusRow, { borderColor: colors.border }]}>
+        <SyncBadge />
+      </View>
       {error ? (
         <Text accessibilityRole="alert" style={[styles.center, { color: colors.danger }]}>
           Could not read your plants: {error.message}
@@ -76,7 +79,12 @@ function PlantRow({ plant }: { plant: PlantListItem }) {
         accessibilityRole="button"
         accessibilityLabel={`${plant.name}. ${statusText}. Open details.`}
         onPress={() => router.push({ pathname: '/plants/[id]', params: { id: plant.id } })}>
-        <PlantPhoto photoId={plant.coverPhotoId} size={56} label={`Photo of ${plant.name}`} />
+        <PlantPhoto
+          photoId={plant.coverPhotoId}
+          localUri={plant.coverLocalUri}
+          size={56}
+          label={`Photo of ${plant.name}`}
+        />
         <View style={styles.rowText}>
           <Text variant="heading" numberOfLines={1}>
             {plant.name}
@@ -96,6 +104,12 @@ function PlantRow({ plant }: { plant: PlantListItem }) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
+  statusRow: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    alignItems: 'flex-end',
+  },
   list: { padding: spacing.md, gap: spacing.sm, flexGrow: 1 },
   row: {
     flexDirection: 'row',

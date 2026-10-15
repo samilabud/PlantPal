@@ -164,4 +164,15 @@ describe('uploadPendingPhotos', () => {
     );
     expect(queued).toEqual([{ entity_id: 'photo-ok' }]);
   });
+
+  it('drops a pending photo whose file is gone and resets the cover', async () => {
+    const plantId = await createPlant(db, { name: 'Ivy', wateringIntervalDays: 4 });
+    await addPhoto(db, plantId, 'photo-gone', 'file:///gone.jpg');
+    const getUploadUrl = jest.fn();
+    await uploadPendingPhotos(db, { fileSize: () => 0, getUploadUrl, putFile: jest.fn() });
+
+    expect(getUploadUrl).not.toHaveBeenCalled();
+    expect(await db.getAllAsync('SELECT id FROM plant_photos', [])).toEqual([]);
+    expect((await getPlant(db, plantId))!.coverPhotoId).toBeNull();
+  });
 });

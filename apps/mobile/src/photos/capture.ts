@@ -41,9 +41,10 @@ export async function capturePhoto(source: 'camera' | 'library'): Promise<Captur
   const dir = photosDirectory();
   dir.create({ intermediates: true, idempotent: true });
   const photoId = newId();
-  const file = new File(saved.uri);
-  file.move(new File(dir, `${photoId}.jpg`));
-  return { photoId, uri: file.uri };
+  // Keep our own reference to the destination: don't rely on move() updating the source's uri.
+  const destination = new File(dir, `${photoId}.jpg`);
+  new File(saved.uri).move(destination);
+  return { photoId, uri: destination.uri };
 }
 
 export const localFileSize = (uri: string) => {

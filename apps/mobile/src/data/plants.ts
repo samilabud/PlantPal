@@ -10,6 +10,8 @@ export type PlantListItem = {
   name: string;
   wateringIntervalDays: number;
   coverPhotoId: string | null;
+  /** The cover's file on this device, if it has one (photos from other devices don't). */
+  coverLocalUri: string | null;
   lastWateredAt: string | null;
 };
 
@@ -27,6 +29,7 @@ const nowIso = () => new Date().toISOString();
 const PLANT_COLUMNS = `
   p.id, p.name, p.watering_interval_days AS wateringIntervalDays,
   p.cover_photo_id AS coverPhotoId, p.client_updated_at AS clientUpdatedAt,
+  (SELECT ph.local_uri FROM plant_photos ph WHERE ph.id = p.cover_photo_id) AS coverLocalUri,
   (SELECT MAX(w.watered_at) FROM watering_events w
     WHERE w.plant_id = p.id AND w.deleted_at IS NULL) AS lastWateredAt`;
 
