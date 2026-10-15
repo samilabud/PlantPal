@@ -1,10 +1,12 @@
 import { Link, router, Stack } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 
 import { PlantPhoto } from '@/components/plant-photo';
 import { SyncBadge } from '@/components/sync-badge';
+import { hasSeen } from '@/data/first-run';
 import { useLiveQuery } from '@/data/live';
+import { getDb } from '@/db/database';
 import { mutate } from '@/data/mutations';
 import { listPlants, waterPlant, type PlantListItem } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
@@ -18,6 +20,14 @@ export default function PlantsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const premium = usePremium();
   const limitNotice = useSyncStore((s) => s.limitNotice);
+
+  // First time on this phone for this account: show what the app can do, once.
+  useEffect(() => {
+    getDb()
+      .then((db) => hasSeen(db, 'seenGuide'))
+      .then((seen) => !seen && router.push('/guide'))
+      .catch(() => undefined);
+  }, []);
 
   function addPlant() {
     if (canAddPlant(premium, plants?.length ?? 0)) router.push('/plants/new');

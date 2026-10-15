@@ -22,6 +22,8 @@ jest.mock('@/sync/sync-manager', () => ({
 }));
 jest.mock('@/purchases/limits', () => ({ usePremium: () => false, canAddPlant: () => true }));
 jest.mock('@/components/plant-photo', () => ({ PlantPhoto: () => null }));
+jest.mock('@/db/database', () => ({ getDb: jest.fn(async () => ({})) }));
+jest.mock('@/data/first-run', () => ({ hasSeen: jest.fn(async () => true) }));
 
 const mockedLive = jest.mocked(useLiveQuery);
 const daysAgo = (d: number) => new Date(Date.now() - d * 86_400_000).toISOString();

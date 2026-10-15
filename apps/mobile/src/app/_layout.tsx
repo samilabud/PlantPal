@@ -62,6 +62,10 @@ export default function RootLayout() {
             <Stack.Screen name="plants/[id]/edit" options={{ title: 'Edit plant' }} />
             <Stack.Screen name="settings" options={{ title: 'Settings' }} />
             <Stack.Screen name="paywall" options={{ title: 'Premium', presentation: 'modal' }} />
+            <Stack.Screen
+              name="guide"
+              options={{ title: 'How PlantPal works', presentation: 'modal' }}
+            />
           </Stack.Protected>
         </Stack>
         <StatusBar style="auto" />

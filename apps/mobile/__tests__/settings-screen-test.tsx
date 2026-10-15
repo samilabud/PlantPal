@@ -8,6 +8,8 @@ import SettingsScreen from '@/app/settings';
 
 import { testUser } from '../test/utils';
 
+jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
+
 let mockPending = 0;
 jest.mock('@/sync/sync-manager', () => ({
   requestSync: jest.fn(),
@@ -44,6 +46,13 @@ describe('SettingsScreen', () => {
   it('shows the account', async () => {
     await render(<SettingsScreen />);
     expect(screen.getByTestId('account-email')).toHaveTextContent(testUser.email);
+  });
+
+  it('opens the guide', async () => {
+    const { router } = jest.requireMock('expo-router');
+    await render(<SettingsScreen />);
+    await fireEvent.press(screen.getByTestId('open-guide'));
+    expect(router.push).toHaveBeenCalledWith('/guide');
   });
 
   it('signs out', async () => {

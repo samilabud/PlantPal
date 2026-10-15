@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
@@ -69,6 +70,13 @@ export default function SettingsScreen() {
         <Text muted>Signed in with: {user?.providers.join(', ')}</Text>
         <Text muted>Plan: {user?.plan}</Text>
       </View>
+
+      <Button
+        testID="open-guide"
+        label="How PlantPal works"
+        variant="secondary"
+        onPress={() => router.push('/guide')}
+      />
 
       <PlanCard />
 
