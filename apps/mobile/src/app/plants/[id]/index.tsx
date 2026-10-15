@@ -15,6 +15,7 @@ import {
 } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
 import { capturePhoto } from '@/photos/capture';
+import { canAddPhoto, usePremium } from '@/purchases/limits';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 const formatDate = (iso: string) =>
@@ -26,6 +27,7 @@ export default function PlantDetailScreen() {
   const { data: plant, loading } = useLiveQuery((db) => getPlant(db, id), [id]);
   const { data: waterings } = useLiveQuery((db) => listWaterings(db, id), [id]);
   const { data: photos } = useLiveQuery((db) => listPhotos(db, id), [id]);
+  const premium = usePremium();
 
   if (loading) return null;
   if (!plant) {
@@ -41,6 +43,10 @@ export default function PlantDetailScreen() {
   const cover = photos?.find((p) => p.id === plant.coverPhotoId);
 
   async function addPhotoFrom(source: 'camera' | 'library') {
+    if (!canAddPhoto(premium, photos?.length ?? 0)) {
+      router.push({ pathname: '/paywall', params: { reason: 'photos' } });
+      return;
+    }
     try {
       const captured = await capturePhoto(source);
       if (captured) await mutate((db) => addPhoto(db, id, captured.photoId, captured.uri));

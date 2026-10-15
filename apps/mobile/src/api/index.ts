@@ -64,3 +64,7 @@ export const unregisterDevice = (expoPushToken: string) =>
 /** Development only: ask the server to push to my devices (the server refuses in production). */
 export const sendTestPush = (plantId?: string) =>
   api.request('/api/push/test', { method: 'POST', body: { plantId }, schema: PushSendResult });
+
+/** Ask the server to re-read my entitlement from RevenueCat (after a purchase or restore). */
+export const syncSubscription = () =>
+  api.request('/api/subscription/sync', { method: 'POST', schema: Me, timeoutMs: 20_000 });

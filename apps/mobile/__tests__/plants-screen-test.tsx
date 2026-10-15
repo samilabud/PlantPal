@@ -15,8 +15,12 @@ jest.mock('@/data/plants', () => ({ listPlants: jest.fn(), waterPlant: jest.fn()
 jest.mock('@/sync/sync-manager', () => ({
   syncNow: jest.fn(async () => undefined),
   requestSync: jest.fn(),
-  useSyncStore: () => ({ status: 'offline', pending: 2 }),
+  useSyncStore: (select?: (s: object) => unknown) => {
+    const state = { status: 'offline', pending: 2, limitNotice: false };
+    return select ? select(state) : state;
+  },
 }));
+jest.mock('@/purchases/limits', () => ({ usePremium: () => false, canAddPlant: () => true }));
 jest.mock('@/components/plant-photo', () => ({ PlantPhoto: () => null }));
 
 const mockedLive = jest.mocked(useLiveQuery);

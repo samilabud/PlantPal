@@ -9,6 +9,7 @@ import { appleCredential } from './providers/apple';
 import { googleIdToken, googleSignOut } from './providers/google';
 import { cancelAllReminders } from '@/notifications/notifications';
 import { unregisterFromPush } from '@/notifications/push-registration';
+import { stopPurchases } from '@/purchases/purchases';
 
 import { deleteAccountOnServer, signInWithServer, signOutOfServer } from './session';
 
@@ -50,6 +51,7 @@ export async function signOut() {
   // While the access token still works: stop server pushes to this phone for this account.
   await unregisterFromPush();
   await cancelAllReminders().catch(() => undefined);
+  await stopPurchases();
   await signOutOfServer();
 }
 
@@ -75,5 +77,6 @@ export async function deleteAccount(): Promise<boolean> {
   );
   if (providers.includes('google')) await googleSignOut({ revoke: true });
   await cancelAllReminders().catch(() => undefined); // devices rows were deleted with the account
+  await stopPurchases();
   return true;
 }

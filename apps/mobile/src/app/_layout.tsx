@@ -8,6 +8,7 @@ import { useColorScheme } from 'react-native';
 import { restoreSession, useAuthStore } from '@/auth';
 import '@/notifications/notifications'; // sets the foreground notification handler
 import { useNotificationNavigation, useReminderScheduler } from '@/notifications/use-notifications';
+import { startPurchases } from '@/purchases/purchases';
 import { startSyncTriggers } from '@/sync/sync-manager';
 import { createQueryClient } from '@/query-client';
 
@@ -21,6 +22,11 @@ export default function RootLayout() {
   useEffect(() => {
     restoreSession();
   }, []);
+
+  const userId = useAuthStore((s) => s.user?.id);
+  useEffect(() => {
+    if (status === 'signedIn' && userId) startPurchases(userId).catch(() => undefined);
+  }, [status, userId]);
 
   useNotificationNavigation(status === 'signedIn');
   useReminderScheduler(status === 'signedIn');
@@ -55,6 +61,7 @@ export default function RootLayout() {
             <Stack.Screen name="plants/[id]/index" options={{ title: 'Plant' }} />
             <Stack.Screen name="plants/[id]/edit" options={{ title: 'Edit plant' }} />
             <Stack.Screen name="settings" options={{ title: 'Settings' }} />
+            <Stack.Screen name="paywall" options={{ title: 'Premium', presentation: 'modal' }} />
           </Stack.Protected>
         </Stack>
         <StatusBar style="auto" />

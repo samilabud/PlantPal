@@ -107,6 +107,19 @@ describe('syncOnce (real SQLite, fake server)', () => {
     expect(await listPlants(db)).toHaveLength(1);
   });
 
+  it('a "limit" rejection removes the new plant the server refused (and its children)', async () => {
+    const keep = await createPlant(db, { name: 'Synced before', wateringIntervalDays: 7 });
+    await syncOnce(db, async () => empty(1, { plants: [plantRecord(keep, 'Synced before', 1)] }));
+    const refused = await createPlant(db, { name: 'Fourth plant', wateringIntervalDays: 7 });
+
+    const result = await syncOnce(db, async () =>
+      empty(2, { rejected: [{ id: refused, kind: 'plant.upsert', reason: 'limit' as const }] }),
+    );
+    expect(result.overLimit).toBe(1);
+    expect((await listPlants(db)).map((p) => p.name)).toEqual(['Synced before']);
+    expect(await outboxCount(db)).toBe(0);
+  });
+
   it('a stale rejection drops the local change and takes the server winner', async () => {
     const id = await createPlant(db, { name: 'Mine (older)', wateringIntervalDays: 7 });
     const send = jest.fn(async () =>

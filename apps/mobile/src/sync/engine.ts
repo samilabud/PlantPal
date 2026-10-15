@@ -13,7 +13,14 @@ import type { SqlDb } from '@/db/types';
 
 export type SyncTransport = (request: SyncRequest) => Promise<SyncResponse>;
 
-export type SyncResult = { pushed: number; pulled: number; rejected: number; rounds: number };
+export type SyncResult = {
+  pushed: number;
+  pulled: number;
+  rejected: number;
+  rounds: number;
+  /** Rows the server refused because of the free plan (the app normally blocks these first). */
+  overLimit: number;
+};
 
 const MAX_ROUNDS = 20;
 
@@ -32,7 +39,7 @@ async function getCursor(db: SqlDb) {
  * treats repeats as no-ops).
  */
 export async function syncOnce(db: SqlDb, send: SyncTransport): Promise<SyncResult> {
-  const result: SyncResult = { pushed: 0, pulled: 0, rejected: 0, rounds: 0 };
+  const result: SyncResult = { pushed: 0, pulled: 0, rejected: 0, rounds: 0, overLimit: 0 };
 
   while (result.rounds < MAX_ROUNDS) {
     result.rounds++;
@@ -47,6 +54,9 @@ export async function syncOnce(db: SqlDb, send: SyncTransport): Promise<SyncResu
       // was in flight, that edit has a NEW seq, survives here and goes in the next round.
       for (const row of outbox) await tx.runAsync('DELETE FROM outbox WHERE seq = ?', [row.seq]);
 
+      for (const r of response.rejected)
+        if (r.reason === 'limit') await dropOverLimit(tx, r.kind, r.id);
+
       for (const p of response.plants) await applyPlant(tx, p);
       for (const e of response.wateringEvents) await applyEvent(tx, e);
       for (const ph of response.plantPhotos) await applyPhoto(tx, ph);
@@ -59,6 +69,7 @@ export async function syncOnce(db: SqlDb, send: SyncTransport): Promise<SyncResu
 
     result.pushed += outbox.length - response.rejected.length;
     result.rejected += response.rejected.length;
+    result.overLimit += response.rejected.filter((r) => r.reason === 'limit').length;
     result.pulled +=
       response.plants.length + response.wateringEvents.length + response.plantPhotos.length;
 
@@ -123,4 +134,24 @@ async function applyPhoto(tx: SqlDb, ph: PlantPhotoRecord) {
        deleted_at = excluded.deleted_at`,
     [ph.id, ph.plantId, ph.takenAt, ph.clientUpdatedAt, ph.serverVersion, ph.deletedAt],
   );
+}
+
+/**
+ * The server refused a new plant/photo because of the free plan (only possible if the app's own
+ * check was bypassed, e.g. two offline phones). The row never existed on the server, so keeping
+ * it locally would show data that can't sync: remove it, and the UI explains why.
+ */
+async function dropOverLimit(tx: SqlDb, kind: string, id: string) {
+  if (kind === 'plant.upsert') {
+    await tx.runAsync('DELETE FROM watering_events WHERE plant_id = ?', [id]);
+    await tx.runAsync('DELETE FROM plant_photos WHERE plant_id = ?', [id]);
+    await tx.runAsync(
+      'DELETE FROM outbox WHERE entity_id IN (SELECT id FROM watering_events WHERE plant_id = ?)',
+      [id],
+    );
+    await tx.runAsync('DELETE FROM plants WHERE id = ?', [id]);
+  } else if (kind === 'plantPhoto.upsert') {
+    await tx.runAsync('UPDATE plants SET cover_photo_id = NULL WHERE cover_photo_id = ?', [id]);
+    await tx.runAsync('DELETE FROM plant_photos WHERE id = ?', [id]);
+  }
 }

@@ -17,6 +17,8 @@ type SyncState = {
   lastSyncedAt: string | null;
   pending: number;
   error: string | null;
+  /** Set when the server refused new items because of the free plan. */
+  limitNotice: boolean;
 };
 
 export const useSyncStore = create<SyncState>()(() => ({
@@ -24,6 +26,7 @@ export const useSyncStore = create<SyncState>()(() => ({
   lastSyncedAt: null,
   pending: 0,
   error: null,
+  limitNotice: false,
 }));
 
 const DEBOUNCE_MS = 1500;
@@ -81,8 +84,12 @@ async function run() {
       getUploadUrl: getPhotoUploadUrl,
       putFile: putPhotoFile,
     });
-    await syncOnce(db, postSync);
-    set({ status: 'idle', lastSyncedAt: new Date().toISOString() });
+    const result = await syncOnce(db, postSync);
+    set({
+      status: 'idle',
+      lastSyncedAt: new Date().toISOString(),
+      ...(result.overLimit && { limitNotice: true }),
+    });
   } catch (error) {
     const offline =
       error instanceof ApiError && (error.kind === 'network' || error.kind === 'timeout');

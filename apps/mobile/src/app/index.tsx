@@ -8,13 +8,21 @@ import { useLiveQuery } from '@/data/live';
 import { mutate } from '@/data/mutations';
 import { listPlants, waterPlant, type PlantListItem } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
-import { syncNow } from '@/sync/sync-manager';
+import { canAddPlant, usePremium } from '@/purchases/limits';
+import { syncNow, useSyncStore } from '@/sync/sync-manager';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 export default function PlantsScreen() {
   const colors = useColors();
   const { data: plants, loading, error } = useLiveQuery(listPlants, []);
   const [refreshing, setRefreshing] = useState(false);
+  const premium = usePremium();
+  const limitNotice = useSyncStore((s) => s.limitNotice);
+
+  function addPlant() {
+    if (canAddPlant(premium, plants?.length ?? 0)) router.push('/plants/new');
+    else router.push({ pathname: '/paywall', params: { reason: 'plants' } });
+  }
 
   async function refresh() {
     setRefreshing(true);
@@ -60,7 +68,12 @@ export default function PlantsScreen() {
         />
       )}
       <View style={styles.footer}>
-        <Button testID="add-plant" label="Add plant" onPress={() => router.push('/plants/new')} />
+        {limitNotice && (
+          <Text accessibilityRole="alert" style={{ color: colors.danger }}>
+            {"Some new items weren't saved: the free plan limit was reached on another device."}
+          </Text>
+        )}
+        <Button testID="add-plant" label="Add plant" onPress={addPlant} />
       </View>
     </View>
   );

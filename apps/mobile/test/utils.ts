@@ -14,5 +14,6 @@ export const testUser = {
   id: '6f1c1d36-58a1-4a7e-9c2a-1f9f0b1f6b7e',
   email: 'dev@dev.plantpal.test',
   plan: 'free' as const,
+  planExpiresAt: null,
   providers: ['dev' as const],
 };
