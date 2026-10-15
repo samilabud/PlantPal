@@ -100,7 +100,7 @@ describe('PaywallScreen', () => {
   });
 
   it('restore tells the user what happened', async () => {
-    jest.mocked(restore).mockResolvedValue({ ...testUser, plan: 'free' });
+    jest.mocked(restore).mockResolvedValue(false);
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
     await renderPaywall();
     await fireEvent.press(screen.getByRole('button', { name: 'Restore purchases' }));

@@ -74,11 +74,20 @@ export async function getPackages(): Promise<PurchasesPackage[]> {
   return offerings.current?.availablePackages ?? [];
 }
 
-/** After any purchase/restore, the server re-checks RevenueCat itself and returns the profile. */
+/**
+ * After any purchase/restore, the server re-checks RevenueCat itself and returns the profile.
+ * If that call fails (offline for a moment, server hiccup) the purchase still happened: the
+ * device already shows Premium, and the server catches up via the webhook or the next /me.
+ * So a failure here is never reported as "purchase failed".
+ */
 async function confirmWithServer() {
-  const me = await syncSubscription();
-  useAuthStore.getState().setUser(me);
-  return me;
+  try {
+    const me = await syncSubscription();
+    useAuthStore.getState().setUser(me);
+    return me;
+  } catch {
+    return null;
+  }
 }
 
 /** Returns false when the user cancels; throws on real errors. */
@@ -95,7 +104,10 @@ export async function buy(pkg: PurchasesPackage): Promise<boolean> {
   return true;
 }
 
-export async function restore() {
-  onCustomerInfo(await Purchases.restorePurchases());
-  return confirmWithServer();
+/** Returns whether Premium is active after restoring (server answer, else the device's). */
+export async function restore(): Promise<boolean> {
+  const info = await Purchases.restorePurchases();
+  onCustomerInfo(info);
+  const me = await confirmWithServer();
+  return me ? me.plan === 'premium' : Boolean(info.entitlements.active[PREMIUM_ENTITLEMENT]);
 }
