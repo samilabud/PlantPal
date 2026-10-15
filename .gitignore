@@ -12,8 +12,10 @@ node_modules/
 *.key
 *.jks
 *.keystore
-google-services.json
-GoogleService-Info.plist
+# Firebase *service account* keys are secret (they can send pushes as us). Never commit them.
+# (google-services.json is NOT secret per Expo/Firebase docs and is committed for EAS builds.)
+*firebase-adminsdk*.json
+*service-account*.json
 
 # build output
 dist/

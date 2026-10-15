@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 /**
@@ -21,6 +23,11 @@ const VARIANTS: Record<Variant, { name: string; id: string; scheme: string }> = 
 
 const current = VARIANTS[variant];
 
+/** Firebase config for FCM (Android push). Public identifiers only; used once the file exists. */
+const googleServicesFile = existsSync('./google-services.json')
+  ? './google-services.json'
+  : undefined;
+
 /** "com.googleusercontent.apps.<id>": the reversed iOS client id from Google Cloud. Not secret. */
 const googleIosUrlScheme = process.env.GOOGLE_IOS_URL_SCHEME;
 
@@ -40,6 +47,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     package: current.id,
+    googleServicesFile,
     adaptiveIcon: {
       backgroundColor: '#E8F5E9',
       foregroundImage: './assets/images/android-icon-foreground.png',
