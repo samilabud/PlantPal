@@ -46,12 +46,9 @@ export default function PaywallScreen() {
   async function onRestore() {
     setBusy('restore');
     try {
-      const me = await restore();
-      Alert.alert(
-        'Restore',
-        me.plan === 'premium' ? 'Premium restored.' : 'No active subscription found.',
-      );
-      if (me.plan === 'premium') router.back();
+      const premium = await restore();
+      Alert.alert('Restore', premium ? 'Premium restored.' : 'No active subscription found.');
+      if (premium) router.back();
     } catch (e) {
       Alert.alert('Restore failed', e instanceof Error ? e.message : 'Please try again.');
     } finally {
