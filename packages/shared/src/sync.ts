@@ -66,8 +66,9 @@ export type SyncRequest = z.infer<typeof SyncRequest>;
 export const SyncRejection = z.object({
   id: z.uuid(),
   kind: z.string(),
-  /** stale: the server has a newer edit; forbidden: not your row; invalid: e.g. unknown plant. */
-  reason: z.enum(['stale', 'forbidden', 'invalid']),
+  /** stale: the server has a newer edit; forbidden: not your row; invalid: e.g. unknown plant;
+   *  limit: the free plan's limit (plants or photos) was reached. */
+  reason: z.enum(['stale', 'forbidden', 'invalid', 'limit']),
 });
 export type SyncRejection = z.infer<typeof SyncRejection>;
 

@@ -8,10 +8,11 @@ import {
   type SyncResponse,
   type WateringEventRecord,
 } from '@plantpal/shared';
-import { and, asc, eq, gt, inArray, isNull, lt, sql } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, isNull, lt, sql } from 'drizzle-orm';
 
 import type { Db } from '@/db';
-import { plantPhotos, plants, wateringEvents } from '@/db/schema';
+import { effectivePlan, limitsFor } from '@/billing/plan';
+import { plantPhotos, plants, users, wateringEvents } from '@/db/schema';
 
 type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 
@@ -46,9 +47,15 @@ export async function runSync(
   return db.transaction(async (tx) => {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${userId}, 0))`);
 
+    // Plan limits are enforced here, on the server: a modified app can't bypass them.
+    const [user] = await tx.select().from(users).where(eq(users.id, userId));
+    const limits = limitsFor(user ? effectivePlan(user, now) : 'free');
+
     const rejected: SyncRejection[] = [];
     for (const change of request.changes) {
-      const reason = await applyChange(tx, userId, change, now);
+      const reason =
+        (await overLimit(tx, userId, change, limits)) ??
+        (await applyChange(tx, userId, change, now));
       if (reason) rejected.push({ id: change.id, kind: change.kind, reason });
     }
 
@@ -60,6 +67,45 @@ export async function runSync(
 
     return { ...page, rejected };
   });
+}
+
+/**
+ * Only *new* rows count against the free plan: editing, watering or deleting existing ones is
+ * always allowed, so nobody loses access to data after a Premium subscription ends.
+ */
+async function overLimit(
+  tx: Tx,
+  userId: string,
+  change: SyncChange,
+  limits: ReturnType<typeof limitsFor>,
+): Promise<'limit' | null> {
+  if (change.kind === 'plant.upsert' && Number.isFinite(limits.plants)) {
+    const [existing] = await tx
+      .select({ deletedAt: plants.deletedAt })
+      .from(plants)
+      .where(eq(plants.id, change.id));
+    if (existing && !existing.deletedAt) return null; // an edit
+    const [{ n }] = (await tx
+      .select({ n: count() })
+      .from(plants)
+      .where(and(eq(plants.userId, userId), isNull(plants.deletedAt)))) as [{ n: number }];
+    return n >= limits.plants ? 'limit' : null;
+  }
+  if (change.kind === 'plantPhoto.upsert' && Number.isFinite(limits.photosPerPlant)) {
+    const [existing] = await tx
+      .select({ id: plantPhotos.id })
+      .from(plantPhotos)
+      .where(eq(plantPhotos.id, change.id));
+    if (existing) return null;
+    const [{ n }] = (await tx
+      .select({ n: count() })
+      .from(plantPhotos)
+      .where(and(eq(plantPhotos.plantId, change.data.plantId), isNull(plantPhotos.deletedAt)))) as [
+      { n: number },
+    ];
+    return n >= limits.photosPerPlant ? 'limit' : null;
+  }
+  return null;
 }
 
 async function applyChange(

@@ -6,7 +6,9 @@ export type AuthProvider = z.infer<typeof AuthProvider>;
 export const Me = z.object({
   id: z.uuid(),
   email: z.string().nullable(),
+  /** The plan the server enforces right now (an expired Premium is already 'free' here). */
   plan: z.enum(['free', 'premium']),
+  planExpiresAt: z.iso.datetime().nullable(),
   providers: z.array(AuthProvider),
 });
 export type Me = z.infer<typeof Me>;

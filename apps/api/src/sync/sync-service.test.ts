@@ -1,6 +1,8 @@
 import { SYNC_MAX_CHANGES, SYNC_PAGE_SIZE, type SyncChange } from '@plantpal/shared';
+import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { users } from '@/db/schema';
 import { hasDb, resetDb, testDb } from '@/test/db';
 import { createUser, uuid } from '@/test/users';
 
@@ -174,6 +176,8 @@ describe.skipIf(!hasDb)('runSync (integration)', () => {
   });
 
   it('pages through large pulls without losing rows', async () => {
+    // Premium: the free plan would stop at 3 plants (see limits.test.ts).
+    await testDb().db.update(users).set({ plan: 'premium' }).where(eq(users.id, user.id));
     const total = SYNC_PAGE_SIZE + 10;
     const ids = Array.from({ length: total }, () => uuid());
     for (let i = 0; i < total; i += SYNC_MAX_CHANGES) {

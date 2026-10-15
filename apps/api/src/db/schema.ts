@@ -165,3 +165,17 @@ export const pushTickets = pgTable('push_tickets', {
   expoPushToken: text('expo_push_token').notNull(),
   ...timestamps,
 });
+
+/**
+ * Every RevenueCat webhook event we have seen, by its id. RevenueCat delivers "at least once"
+ * and retries reuse the same id, so this table makes processing idempotent.
+ */
+export const webhookEvents = pgTable('webhook_events', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(),
+  appUserId: text('app_user_id'),
+  environment: text('environment'),
+  receivedAt: timestamp('received_at', { withTimezone: true }).notNull().defaultNow(),
+  /** Null until processing finished: a crash mid-way lets the retry process it again. */
+  processedAt: timestamp('processed_at', { withTimezone: true }),
+});

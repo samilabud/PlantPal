@@ -2,6 +2,7 @@ import type { AuthProvider, Me, SessionResponse } from '@plantpal/shared';
 import { and, eq } from 'drizzle-orm';
 
 import type { Db } from '@/db';
+import { effectivePlan } from '@/billing/plan';
 import { authIdentities, users } from '@/db/schema';
 import { unauthorized } from '@/lib/errors';
 
@@ -58,7 +59,8 @@ export async function getMe(db: Db, userId: string): Promise<Me> {
   return {
     id: user.id,
     email: user.email,
-    plan: user.plan,
+    plan: effectivePlan(user),
+    planExpiresAt: user.planExpiresAt ? user.planExpiresAt.toISOString() : null,
     providers: identities.map((i) => i.provider),
   };
 }
