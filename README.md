@@ -8,7 +8,7 @@ release engineering, testing and analytics.
 > I (Samil Abud) reviewed every change and can explain every file.
 > Subscriptions run in **sandbox mode only**. There are no production users and no revenue.
 
-**Status:** M2 (auth) done. See [docs/M0_PLAN.md](docs/M0_PLAN.md) for the full plan and
+**Status:** M3 (core features + offline sync) done. See [docs/M0_PLAN.md](docs/M0_PLAN.md) for the full plan and
 [docs/evidence/](docs/evidence/) for proof of each capability.
 
 ## Repo layout
@@ -30,7 +30,7 @@ docker compose up -d --wait            # local Postgres on :5433
 cp apps/api/.env.example apps/api/.env.local
 cp apps/api/.env.test.example apps/api/.env.test.local
 pnpm --filter @plantpal/api env:pull   # Blob credentials (needs `vercel login`); the OIDC token expires, re-run when uploads fail with 401/403
-pnpm --filter @plantpal/api db:migrate # no tables yet in M1
+pnpm --filter @plantpal/api db:migrate
 pnpm --filter @plantpal/api dev        # API on http://localhost:4000
 
 # in another terminal
