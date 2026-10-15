@@ -49,7 +49,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: current.id,
     googleServicesFile,
     adaptiveIcon: {
-      backgroundColor: '#E8F5E9',
+      backgroundColor: '#EAF6E6', // matches the icon background (docs/brand/plantpal-logo.png)
       foregroundImage: './assets/images/android-icon-foreground.png',
       backgroundImage: './assets/images/android-icon-background.png',
       monochromeImage: './assets/images/android-icon-monochrome.png',
@@ -85,9 +85,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#2E7D32',
+        backgroundColor: '#EAF6E6',
         image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        imageWidth: 160,
       },
     ],
   ],
