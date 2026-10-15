@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { restoreSession, useAuthStore } from '@/auth';
+import { startSyncTriggers } from '@/sync/sync-manager';
 import { createQueryClient } from '@/query-client';
 
 SplashScreen.preventAutoHideAsync();
@@ -18,6 +19,11 @@ export default function RootLayout() {
   useEffect(() => {
     restoreSession();
   }, []);
+
+  // Sync runs only while signed in: at start, on reconnect and when the app comes to the front.
+  useEffect(() => {
+    if (status === 'signedIn') return startSyncTriggers();
+  }, [status]);
 
   useEffect(() => {
     if (status !== 'loading') SplashScreen.hideAsync();
@@ -39,7 +45,10 @@ export default function RootLayout() {
             <Stack.Screen name="sign-in" options={{ headerShown: false }} />
           </Stack.Protected>
           <Stack.Protected guard={signedIn}>
-            <Stack.Screen name="index" options={{ title: 'PlantPal' }} />
+            <Stack.Screen name="index" options={{ title: 'My plants' }} />
+            <Stack.Screen name="plants/new" options={{ title: 'New plant' }} />
+            <Stack.Screen name="plants/[id]/index" options={{ title: 'Plant' }} />
+            <Stack.Screen name="plants/[id]/edit" options={{ title: 'Edit plant' }} />
             <Stack.Screen name="settings" options={{ title: 'Settings' }} />
           </Stack.Protected>
         </Stack>

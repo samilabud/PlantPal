@@ -53,6 +53,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-dev-client',
     'expo-apple-authentication',
     'expo-secure-store',
+    'expo-sqlite',
+    [
+      'expo-image-picker',
+      {
+        photosPermission: 'PlantPal uses your photos so you can add a picture of your plant.',
+        cameraPermission: 'PlantPal uses the camera so you can take a picture of your plant.',
+        // We never record video, so don't even ask for the microphone.
+        microphonePermission: false,
+      },
+    ],
     // Without Firebase this plugin only adds the iOS URL scheme, so it is added once the
     // iOS OAuth client exists. Android needs no plugin (the SHA-1 is registered in Google Cloud).
     ...(googleIosUrlScheme

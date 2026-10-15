@@ -9,6 +9,7 @@ import {
 
 import { ApiError } from '@/api/client';
 import { publicApi } from '@/api/http';
+import { getDb, wipeLocalData } from '@/db/database';
 
 import { useAuthStore } from './auth-store';
 import { tokenStore } from './token-store';
@@ -16,16 +17,35 @@ import { tokenStore } from './token-store';
 /** Refresh this long before expiry, so a request never leaves with an almost-dead token. */
 const EXPIRY_MARGIN_MS = 60_000;
 
+/**
+ * Local data belongs to one user. If a different account signs in on this phone (or a sign-out
+ * was interrupted), wipe before showing anything.
+ */
+async function ensureLocalDataOwner(userId: string) {
+  const db = await getDb();
+  const row = await db.getFirstAsync<{ value: string }>(
+    "SELECT value FROM sync_state WHERE key = 'owner'",
+    [],
+  );
+  if (row && row.value !== userId) await wipeLocalData();
+  await db.runAsync(
+    "INSERT INTO sync_state (key, value) VALUES ('owner', ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value",
+    [userId],
+  );
+}
+
 async function saveSession(tokens: AuthTokens, user: Me) {
+  await ensureLocalDataOwner(user.id);
   await Promise.all([tokenStore.setRefreshToken(tokens.refreshToken), tokenStore.setUser(user)]);
   useAuthStore
     .getState()
     .setSignedIn(user, { token: tokens.accessToken, expiresAt: tokens.accessTokenExpiresAt });
 }
 
-/** Signs out on this device only. Safe to call many times. */
+/** Signs out on this device only: tokens AND the previous user's local data. Safe to repeat. */
 export async function clearLocalSession() {
   await tokenStore.clear();
+  await wipeLocalData().catch(() => undefined);
   useAuthStore.getState().setSignedOut();
 }
 
