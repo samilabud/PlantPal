@@ -8,7 +8,7 @@ release engineering, testing and analytics.
 > I (Samil Abud) reviewed every change and can explain every file.
 > Subscriptions run in **sandbox mode only**. There are no production users and no revenue.
 
-**Status:** M1 (foundation) done. See [docs/M0_PLAN.md](docs/M0_PLAN.md) for the full plan and
+**Status:** M2 (auth) done. See [docs/M0_PLAN.md](docs/M0_PLAN.md) for the full plan and
 [docs/evidence/](docs/evidence/) for proof of each capability.
 
 ## Repo layout
