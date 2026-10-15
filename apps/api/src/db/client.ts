@@ -18,7 +18,13 @@ export function getDb(): { sql: postgres.Sql; db: Db } | null {
   if (cached) return cached;
   const url = process.env.DATABASE_URL;
   if (!url) return null;
-  const sql = postgres(url, { prepare: false, max: 5, idle_timeout: 20, connect_timeout: 5 });
+  const sql = postgres(url, {
+    prepare: false,
+    max: 5,
+    idle_timeout: 20,
+    connect_timeout: 5,
+    onnotice: () => {}, // NOTICE messages (e.g. truncate cascades) aren't errors
+  });
   cached = { sql, db: drizzle({ client: sql, schema }) };
   return cached;
 }
