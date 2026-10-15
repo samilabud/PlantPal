@@ -136,3 +136,32 @@ export const plantPhotos = pgTable(
   },
   (t) => [index().on(t.userId, t.serverVersion), index().on(t.plantId)],
 );
+
+export const platformEnum = pgEnum('device_platform', ['ios', 'android']);
+
+/** One row per installed app that can receive push. A token belongs to one user at a time. */
+export const devices = pgTable(
+  'devices',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    expoPushToken: text('expo_push_token').notNull().unique(),
+    platform: platformEnum('platform').notNull(),
+    lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps,
+  },
+  (t) => [index().on(t.userId)],
+);
+
+/**
+ * Expo answers a send with "tickets"; whether the phone really got it is only known later from
+ * "receipts" (check after ~15 min, kept 24 h). We keep ticket ids until the next cron run reads
+ * their receipts and removes tokens that are no longer registered.
+ */
+export const pushTickets = pgTable('push_tickets', {
+  id: text('id').primaryKey(),
+  expoPushToken: text('expo_push_token').notNull(),
+  ...timestamps,
+});

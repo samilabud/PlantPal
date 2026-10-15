@@ -29,6 +29,7 @@ jobs:
       APPLE_CLIENT_IDS: com.samilabud.plantpal.dev
       GOOGLE_CLIENT_IDS: test-web-client.apps.googleusercontent.com
       ALLOW_DEV_AUTH: 'true'
+      CRON_SECRET: test-only-cron-secret-0123456789
     steps:
       - uses: actions/checkout@v5
         with:

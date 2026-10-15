@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node scripts/migrate-on-deploy.mjs && next build"
+  "buildCommand": "node scripts/migrate-on-deploy.mjs && next build",
+  "crons": [
+    {
+      "path": "/api/cron/reminders",
+      "schedule": "0 14 * * *"
+    }
+  ]
 }
