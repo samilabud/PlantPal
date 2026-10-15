@@ -16,6 +16,7 @@
   "dependencies": {
     "@plantpal/shared": "workspace:*",
     "drizzle-orm": "^0.45.4",
+    "jose": "^6.2.12",
     "next": "16.4.1",
     "postgres": "^3.4.9",
     "react": "19.3.0",
