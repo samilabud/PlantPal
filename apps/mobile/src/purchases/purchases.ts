@@ -28,19 +28,22 @@ function apiKey(): string | null {
 export const isPurchasesAvailable = () => apiKey() !== null;
 
 /** What the device's RevenueCat SDK says, updated live (instant after a purchase). */
+// The expiry is kept too: CustomerInfo can be a cached copy, and "active" in a cached copy says
+// nothing about whether the subscription has ended since (see isPremium).
 export const usePremiumStore = create<{
   devicePremium: boolean | null;
+  deviceExpiresAt: number | null;
   managementUrl: string | null;
-}>()(() => ({
-  devicePremium: null,
-  managementUrl: null,
-}));
+}>()(() => ({ devicePremium: null, deviceExpiresAt: null, managementUrl: null }));
 
-const onCustomerInfo = (info: CustomerInfo) =>
+const onCustomerInfo = (info: CustomerInfo) => {
+  const ent = info.entitlements.active[PREMIUM_ENTITLEMENT];
   usePremiumStore.setState({
-    devicePremium: Boolean(info.entitlements.active[PREMIUM_ENTITLEMENT]),
+    devicePremium: Boolean(ent),
+    deviceExpiresAt: ent?.expirationDate ? Date.parse(ent.expirationDate) : null,
     managementUrl: info.managementURL,
   });
+};
 
 let configuredFor: string | null = null;
 
@@ -66,7 +69,7 @@ export async function stopPurchases() {
   if (!configuredFor) return;
   await Purchases.logOut().catch(() => undefined); // throws if already anonymous: nothing to undo
   configuredFor = null;
-  usePremiumStore.setState({ devicePremium: null, managementUrl: null });
+  usePremiumStore.setState({ devicePremium: null, deviceExpiresAt: null, managementUrl: null });
 }
 
 export async function getPackages(): Promise<PurchasesPackage[]> {

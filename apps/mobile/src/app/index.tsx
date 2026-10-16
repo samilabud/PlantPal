@@ -2,6 +2,7 @@ import { Link, router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 
+import { LimitNotice } from '@/components/limit-notice';
 import { PlantPhoto } from '@/components/plant-photo';
 import { SyncBadge } from '@/components/sync-badge';
 import { hasSeen } from '@/data/first-run';
@@ -11,7 +12,7 @@ import { mutate } from '@/data/mutations';
 import { listPlants, waterPlant, type PlantListItem } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
 import { canAddPlant, usePremium } from '@/purchases/limits';
-import { syncNow, useSyncStore } from '@/sync/sync-manager';
+import { syncNow } from '@/sync/sync-manager';
 import { Button, Logo, radius, spacing, Text, useColors } from '@/ui';
 
 export default function PlantsScreen() {
@@ -19,7 +20,6 @@ export default function PlantsScreen() {
   const { data: plants, loading, error } = useLiveQuery(listPlants, []);
   const [refreshing, setRefreshing] = useState(false);
   const premium = usePremium();
-  const limitNotice = useSyncStore((s) => s.limitNotice);
 
   // First time on this phone for this account: show what the app can do, once.
   useEffect(() => {
@@ -87,11 +87,7 @@ export default function PlantsScreen() {
         />
       )}
       <View style={styles.footer}>
-        {limitNotice && (
-          <Text accessibilityRole="alert" style={{ color: colors.danger }}>
-            {"Some new items weren't saved: the free plan limit was reached on another device."}
-          </Text>
-        )}
+        <LimitNotice />
         <Button testID="add-plant" label="Add plant" onPress={addPlant} />
       </View>
     </View>

@@ -2,7 +2,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { AppState } from 'react-native';
 import { create } from 'zustand';
 
-import { ApiError, getPhotoUploadUrl, postSync, putPhotoFile } from '@/api';
+import { ApiError, getMe, getPhotoUploadUrl, postSync, putPhotoFile } from '@/api';
 import { useAuthStore } from '@/auth/auth-store';
 import { notifyDataChanged } from '@/data/live';
 import { pendingCount } from '@/data/outbox';
@@ -17,8 +17,8 @@ type SyncState = {
   lastSyncedAt: string | null;
   pending: number;
   error: string | null;
-  /** Set when the server refused new items because of the free plan. */
-  limitNotice: boolean;
+  /** How many new items the server refused because of the free plan (0 = nothing to show). */
+  refusedByLimit: number;
 };
 
 export const useSyncStore = create<SyncState>()(() => ({
@@ -26,7 +26,7 @@ export const useSyncStore = create<SyncState>()(() => ({
   lastSyncedAt: null,
   pending: 0,
   error: null,
-  limitNotice: false,
+  refusedByLimit: 0,
 }));
 
 const DEBOUNCE_MS = 1500;
@@ -85,11 +85,8 @@ async function run() {
       putFile: putPhotoFile,
     });
     const result = await syncOnce(db, postSync);
-    set({
-      status: 'idle',
-      lastSyncedAt: new Date().toISOString(),
-      ...(result.overLimit && { limitNotice: true }),
-    });
+    set({ status: 'idle', lastSyncedAt: new Date().toISOString() });
+    if (result.overLimit) recordLimitRefusals(result.overLimit);
   } catch (error) {
     const offline =
       error instanceof ApiError && (error.kind === 'network' || error.kind === 'timeout');
@@ -129,4 +126,17 @@ export function startSyncTriggers() {
     appState.remove();
     if (timer) clearTimeout(timer);
   };
+}
+
+export const dismissLimitNotice = () => useSyncStore.setState({ refusedByLimit: 0 });
+
+/**
+ * The server refused new items because of the free plan. Count them for the notice, and
+ * refresh the profile: the refusal means our cached plan is out of date.
+ */
+export function recordLimitRefusals(count: number) {
+  useSyncStore.setState((s) => ({ refusedByLimit: s.refusedByLimit + count }));
+  getMe()
+    .then((me) => useAuthStore.getState().setUser(me))
+    .catch(() => undefined);
 }

@@ -53,10 +53,25 @@ describe('limits', () => {
   });
 
   it('premium if the server says so or the device just bought it', () => {
-    expect(isPremium({ ...testUser, plan: 'premium' }, null)).toBe(true);
-    expect(isPremium(testUser, true)).toBe(true);
-    expect(isPremium(testUser, false)).toBe(false);
-    expect(isPremium(null, null)).toBe(false);
+    const none = { active: null, expiresAt: null };
+    expect(isPremium({ ...testUser, plan: 'premium' }, none)).toBe(true);
+    expect(isPremium(testUser, { active: true, expiresAt: null })).toBe(true);
+    expect(isPremium(testUser, { active: false, expiresAt: null })).toBe(false);
+    expect(isPremium(null, none)).toBe(false);
+  });
+
+  it('a cached copy stops counting after its expiry date (the bug seen on a real phone)', () => {
+    const now = Date.parse('2026-10-15T22:02:00Z');
+    const ended = Date.parse('2026-10-15T21:52:07Z');
+    const cachedServer = {
+      ...testUser,
+      plan: 'premium' as const,
+      planExpiresAt: new Date(ended).toISOString(),
+    };
+    const cachedDevice = { active: true, expiresAt: ended };
+    expect(isPremium(cachedServer, { active: null, expiresAt: null }, now)).toBe(false);
+    expect(isPremium(testUser, cachedDevice, now)).toBe(false);
+    expect(isPremium(cachedServer, cachedDevice, ended - 1000)).toBe(true); // before it ended
   });
 });
 

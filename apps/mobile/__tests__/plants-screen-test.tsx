@@ -16,11 +16,12 @@ jest.mock('@/sync/sync-manager', () => ({
   syncNow: jest.fn(async () => undefined),
   requestSync: jest.fn(),
   useSyncStore: (select?: (s: object) => unknown) => {
-    const state = { status: 'offline', pending: 2, limitNotice: false };
+    const state = { status: 'offline', pending: 2, refusedByLimit: 0 };
     return select ? select(state) : state;
   },
 }));
 jest.mock('@/purchases/limits', () => ({ usePremium: () => false, canAddPlant: () => true }));
+jest.mock('@/components/limit-notice', () => ({ LimitNotice: () => null }));
 jest.mock('@/components/plant-photo', () => ({ PlantPhoto: () => null }));
 jest.mock('@/db/database', () => ({ getDb: jest.fn(async () => ({})) }));
 jest.mock('@/data/first-run', () => ({ hasSeen: jest.fn(async () => true) }));
