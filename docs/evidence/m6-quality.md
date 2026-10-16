@@ -9,8 +9,8 @@ Produced by `pnpm test:ci` (the same command CI runs; CI also writes this table 
 |---|---|---|---|---|---|
 | packages/shared | 2 | 0 | n/a | n/a | Vitest |
 | apps/api | 82 | 0 | 87.3% | 75.7% | Vitest + real Postgres |
-| apps/mobile | 92 | 0 | ~53% | ~48% | Jest + React Native Testing Library + real SQLite |
-| **Total** | **176** | **0** | | | |
+| apps/mobile | 91 | 0 | 52.5% | 47.8% | Jest + React Native Testing Library + real SQLite |
+| **Total** | **175** | **0** | | | |
 
 Mobile line coverage is lower because screens are covered end-to-end by Maestro (below), and native-module wrappers (camera, notifications, purchases) are exercised on the device.
 
