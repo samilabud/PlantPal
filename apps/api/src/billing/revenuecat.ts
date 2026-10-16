@@ -44,6 +44,23 @@ export async function fetchEntitlement(
   return { active: !expiresAt || expiresAt > now, expiresAt };
 }
 
+/**
+ * Account deletion: ask RevenueCat to delete its customer record (permanent, queued on their
+ * side). 404 means there was nothing to delete, which is also success.
+ * Docs: revenuecat.com/docs/api-v1/customers (DELETE /subscribers/{app_user_id}).
+ */
+export async function deleteCustomer(
+  appUserId: string,
+  secretKey: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<boolean> {
+  const res = await fetchFn(
+    `https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(appUserId)}`,
+    { method: 'DELETE', headers: { Authorization: `Bearer ${secretKey}` } },
+  );
+  return res.ok || res.status === 404;
+}
+
 export async function applyEntitlement(db: Db, userId: string, ent: Entitlement) {
   await db
     .update(users)

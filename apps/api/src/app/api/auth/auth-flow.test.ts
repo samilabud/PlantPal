@@ -2,7 +2,7 @@ import { Me, RefreshResponse, SessionResponse } from '@plantpal/shared';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { jwks, sha256Hex } from '@/auth/id-tokens';
-import { authIdentities, refreshTokens, users } from '@/db/schema';
+import { authIdentities, refreshTokens, users, webhookEvents } from '@/db/schema';
 import { hasDb, resetDb, testDb } from '@/test/db';
 import { fakeIdp } from '@/test/keys';
 
@@ -107,10 +107,16 @@ describe.skipIf(!hasDb)('auth routes (integration)', () => {
     });
   });
 
-  it('account deletion wipes the user, identities and tokens', async () => {
+  it('account deletion wipes the user, identities, tokens, webhook log and RevenueCat customer', async () => {
     const session = SessionResponse.parse(
       await (await devSignIn(post({ name: 'to-delete' }))).json(),
     );
+    vi.stubEnv('REVENUECAT_SECRET_KEY', 'sk_test_only');
+    const fetchSpy = vi.fn(async () => new Response(null, { status: 404 })); // 404 = nothing to delete
+    vi.stubGlobal('fetch', fetchSpy);
+    await testDb()
+      .db.insert(webhookEvents)
+      .values({ id: 'evt-1', type: 'RENEWAL', appUserId: session.user.id });
     const res = await deleteMe(
       new Request('http://test/api/me', {
         method: 'DELETE',
@@ -120,16 +126,50 @@ describe.skipIf(!hasDb)('auth routes (integration)', () => {
     );
     expect(await res.json()).toEqual({ deleted: true, appleRevoked: false });
     expect(deleteUserPhotos).toHaveBeenCalledWith(session.user.id);
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `https://api.revenuecat.com/v1/subscribers/${session.user.id}`,
+      expect.objectContaining({ method: 'DELETE' }),
+    );
 
     const { db } = testDb();
     expect(await db.select().from(users)).toHaveLength(0);
     expect(await db.select().from(authIdentities)).toHaveLength(0);
     expect(await db.select().from(refreshTokens)).toHaveLength(0);
+    expect(await db.select().from(webhookEvents)).toHaveLength(0);
 
     // The still-unexpired access token no longer maps to a user.
     const me = await getMe(
       new Request('http://test', { headers: bearer(session.tokens.accessToken) }),
     );
     expect(me.status).toBe(401);
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it('account deletion still succeeds when RevenueCat is down', async () => {
+    const session = SessionResponse.parse(
+      await (await devSignIn(post({ name: 'rc-down' }))).json(),
+    );
+    vi.stubEnv('REVENUECAT_SECRET_KEY', 'sk_test_only');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        throw new Error('network');
+      }),
+    );
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const res = await deleteMe(
+      new Request('http://test/api/me', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', ...bearer(session.tokens.accessToken) },
+        body: '{}',
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(await testDb().db.select().from(users)).toHaveLength(0);
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 });
