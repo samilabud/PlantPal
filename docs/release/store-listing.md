@@ -46,7 +46,9 @@ Payment is charged to your Apple ID or Google account at confirmation of purchas
 Store builds only offer Sign in with Apple and Sign in with Google, so reviewers sign in with their own Apple ID or Google account, which is normal for apps with only social sign-in. No demo account is needed. To test Premium, reviewers use the stores' sandbox purchases (no real charge).
 
 ## Screenshots
+Alt text (≤ 140 characters): "Plant list showing which plants need water today", "Guide listing everything PlantPal can do", "Monstera detail with its watering history".
+
 | Store | Required | Status |
 |---|---|---|
-| Google Play (phone) | 2–8, 9:16, at least 1080 px on the short side for promotion | Captured from the Android emulator (1440 × 3120), see `docs/release/screenshots/` |
+| Google Play (phone) | 2–8; max side ≤ 2 × min side; no alpha; 4+ at 9:16 ≥ 1080 px for promotion | **3 ready** in `docs/release/screenshots/` (list, guide, detail): captured on the emulator with a clean demo status bar, fitted onto a 1440 × 2560 (9:16) brand-colored canvas because the raw 1440 × 3120 captures exceed 2:1. One more needed for promotion: the paywall, retaken from a store build (the dev build shows "Test purchases only") |
 | App Store (6.9" iPhone, 1320 × 2868) | 1–10 | **Not yet:** needs an iOS build, which needs Xcode ≥ 26.4 (this Mac has 26.2) or an EAS cloud build installed on a simulator |
