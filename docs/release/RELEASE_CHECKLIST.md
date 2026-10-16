@@ -9,7 +9,7 @@ Status as of 2026-10-16. ✅ done and verified · 🟡 done in code, waiting on 
 |---|---|---|
 | ⚠️ | FCM service-account key `cc8cb68d13…` was pasted in a chat. **Owner's decision (2026-10-16): keep it** for this portfolio app. Accepted risk: anyone with it could send push notifications to PlantPal users. Rotate before real users (Google Cloud > IAM > Service accounts > Keys, then `npx eas-cli@latest credentials`) | you |
 | ⬜ | Restrict the Firebase Android API key to the app ids and SHA-1s (Google Cloud > Credentials) | you |
-| ⬜ | Swap `REVENUECAT_SECRET_KEY` on Vercel (Production and Preview) from the public `test_` key to a secret `sk_` key. Account deletion and the webhook re-check need it | you |
+| ✅ | `REVENUECAT_SECRET_KEY` is now a secret `sk_` key (local and Vercel Production; verified: authenticated 404 on a non-existent customer). Preview has none; nothing uses Preview deployments yet | you |
 | ✅ | `CONTACT_EMAIL` set on Vercel (Production); the pages show it after the next deploy | you |
 | ✅ | No secrets in the repo: gitleaks scans the full history on every push | me |
 
@@ -31,8 +31,8 @@ Status as of 2026-10-16. ✅ done and verified · 🟡 done in code, waiting on 
 | ✅ | EAS Update configured: fingerprint runtime, `staging` channel for preview builds, `production` for store builds (`docs/evidence/m7-release.md`) | me |
 | ✅ | Version / channel / update id visible on sign-in and in Settings | me |
 | ✅ | Preview and store variants build without Firebase registration (config verified per variant) | me |
-| ⬜ | `eas build --profile preview --platform android` (APK, staging channel). Free plan build credit, no charge | me, after your OK |
-| ⬜ | `eas update --channel staging --environment preview`, then prove the APK picks it up (the version line changes) | me, after your OK |
+| ✅ | `eas build --profile preview --platform android`: build `dd82c614…`, APK on the staging channel | me |
+| ✅ | `eas update --channel staging --environment preview`: update `01a14699…` reached the APK (version line changed; `docs/evidence/m7-release.md`). `APP_VARIANT` is an EAS environment variable, so updates and builds share the config | me |
 | ⬜ | iOS build: a simulator build needs no Apple credentials; a TestFlight build needs `eas credentials` with your Apple login (interactive) | you + me |
 | ⬜ | Production builds: `eas build --profile production --platform all` | me, after your OK |
 | ⬜ | Google Play internal testing: create the app in Play Console and a service account key (uploaded to EAS); then `eas submit --platform android` creates the first internal-testing release. The app stays a draft until the listing and policy forms are complete (docs.expo.dev/submit/android) | you + me |
