@@ -1,0 +1,16 @@
+# Fresh start: wipe app data (signed out, empty local DB), then open the development build
+# pointed at Metro. 10.0.2.2 is the Android emulator's address for the host Mac.
+appId: com.samilabud.plantpal.dev
+---
+- launchApp:
+    clearState: true
+    stopApp: true
+- openLink: exp+plantpal://expo-development-client/?url=${METRO_URL || "http%3A%2F%2F10.0.2.2%3A8081"}
+# The dev client shows a one-time "developer menu" intro after a fresh install.
+- tapOn:
+    text: Continue
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: dev-sign-in
+    timeout: 90000

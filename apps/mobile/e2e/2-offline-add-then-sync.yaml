@@ -1,0 +1,37 @@
+# Flow 2: go offline, add a plant (works locally, waits in the outbox), come back online,
+# watch it sync, then prove the SERVER has it: wipe the app, sign in again, the plant is
+# pulled back down.
+appId: com.samilabud.plantpal.dev
+name: Add a plant offline, then sync
+---
+- evalScript: ${output.user = 'offline-' + Date.now()}
+- runFlow: subflows/launch-clean.yaml
+- runFlow:
+    file: subflows/sign-in.yaml
+    env:
+      USER: ${output.user}
+- setAirplaneMode: enabled
+- extendedWaitUntil:
+    visible: Offline
+    timeout: 20000
+- runFlow:
+    file: subflows/add-plant.yaml
+    env:
+      PLANT: Maestro Basil
+- assertVisible: Offline · 1 to sync
+- takeScreenshot: e2e/screenshots/2-offline-pending
+- setAirplaneMode: disabled
+- extendedWaitUntil:
+    visible: Synced
+    timeout: 45000
+- takeScreenshot: e2e/screenshots/2-synced
+# Server check: fresh install state, same user -> the plant comes back from the server.
+- runFlow: subflows/launch-clean.yaml
+- runFlow:
+    file: subflows/sign-in.yaml
+    env:
+      USER: ${output.user}
+- extendedWaitUntil:
+    visible: Maestro Basil
+    timeout: 30000
+- takeScreenshot: e2e/screenshots/2-pulled-from-server

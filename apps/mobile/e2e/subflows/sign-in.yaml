@@ -1,0 +1,19 @@
+# Signs in as ${USER} with the dev-only test sign-in, and closes the first-run guide.
+appId: com.samilabud.plantpal.dev
+---
+- tapOn:
+    id: dev-user-name
+- eraseText: 40
+- inputText: ${USER}
+- hideKeyboard
+- tapOn:
+    id: dev-sign-in
+# First sign-in on this install: the "How PlantPal works" guide opens once.
+- extendedWaitUntil:
+    visible: Here is everything you can do with PlantPal.
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      id: guide-done
+- tapOn:
+    id: guide-done

@@ -1,0 +1,16 @@
+# Adds a plant called ${PLANT} from the plant list (no photo).
+appId: com.samilabud.plantpal.dev
+---
+- tapOn:
+    id: add-plant
+- tapOn:
+    id: plant-name-input
+- inputText: ${PLANT}
+- hideKeyboard
+- tapOn:
+    id: plant-submit
+# The first plant triggers the "Get watering reminders?" question once.
+- tapOn:
+    text: Not now
+    optional: true
+- assertVisible: ${PLANT}

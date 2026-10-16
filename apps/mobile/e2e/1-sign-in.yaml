@@ -1,0 +1,26 @@
+# Flow 1: sign in, see an empty account, sign out.
+appId: com.samilabud.plantpal.dev
+name: Sign in and out
+---
+- evalScript: ${output.user = 'signin-' + Date.now()}
+- runFlow: subflows/launch-clean.yaml
+- assertVisible: Never forget to water a plant again.
+- runFlow:
+    file: subflows/sign-in.yaml
+    env:
+      USER: ${output.user}
+- assertVisible: No plants yet
+- takeScreenshot: e2e/screenshots/1-signed-in
+- tapOn:
+    id: open-settings
+- assertVisible: ${output.user + '@dev.plantpal.test'}
+- scrollUntilVisible:
+    element:
+      id: sign-out
+- tapOn:
+    id: sign-out
+- extendedWaitUntil:
+    visible:
+      id: dev-sign-in
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/1-signed-out

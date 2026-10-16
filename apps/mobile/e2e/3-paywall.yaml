@@ -1,0 +1,46 @@
+# Flow 3: the free plan stops at 3 plants -> paywall -> Test Store purchase -> a 4th plant
+# can be added. (RevenueCat Test Store: sandbox, no money.)
+appId: com.samilabud.plantpal.dev
+name: Free limit, paywall, purchase
+---
+- evalScript: ${output.user = 'paywall-' + Date.now()}
+- runFlow: subflows/launch-clean.yaml
+- runFlow:
+    file: subflows/sign-in.yaml
+    env:
+      USER: ${output.user}
+- runFlow:
+    file: subflows/add-plant.yaml
+    env:
+      PLANT: Plant One
+- runFlow:
+    file: subflows/add-plant.yaml
+    env:
+      PLANT: Plant Two
+- runFlow:
+    file: subflows/add-plant.yaml
+    env:
+      PLANT: Plant Three
+- tapOn:
+    id: add-plant
+- assertVisible: The free plan includes 3 plants.
+- extendedWaitUntil:
+    visible:
+      id: buy-monthly
+    timeout: 30000
+- takeScreenshot: e2e/screenshots/3-paywall
+- tapOn:
+    id: buy-monthly
+# Test Store may show its own confirmation sheet depending on the SDK version.
+- tapOn:
+    text: Purchase
+    optional: true
+- extendedWaitUntil:
+    visible: Welcome to Premium 🌿
+    timeout: 30000
+- tapOn: OK
+- tapOn:
+    id: add-plant
+- assertVisible:
+    id: plant-name-input
+- takeScreenshot: e2e/screenshots/3-premium-fourth-plant
