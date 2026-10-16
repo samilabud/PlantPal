@@ -18,6 +18,6 @@ appId: com.samilabud.plantpal.dev
     timeout: 30000
 - scrollUntilVisible:
     element:
-      id: guide-done
-- tapOn:
-    id: guide-done
+      text: Start using PlantPal
+    visibilityPercentage: 50
+- tapOn: Start using PlantPal
