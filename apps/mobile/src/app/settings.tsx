@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
-import * as Updates from 'expo-updates';
 import { useState } from 'react';
 import { Alert, Linking, StyleSheet, View } from 'react-native';
 
@@ -9,11 +8,10 @@ import { deleteAccount, signOut, useAuthStore } from '@/auth';
 import { PlanCard } from '@/components/plan-card';
 import { RemindersCard } from '@/components/reminders-card';
 import { env } from '@/config/env';
+import { PRIVACY_URL, SUPPORT_URL } from '@/config/site';
 import { requestSync, useSyncStore } from '@/sync/sync-manager';
+import { describeUpdate } from '@/updates/describe-update';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
-
-/** Public pages, the same for every build (the store listings link to them too). */
-const SITE = 'https://plantpal-api.vercel.app';
 
 export default function SettingsScreen() {
   const colors = useColors();
@@ -124,13 +122,13 @@ export default function SettingsScreen() {
           label="Privacy policy"
           variant="secondary"
           accessibilityHint="Opens in your browser"
-          onPress={() => Linking.openURL(`${SITE}/privacy`)}
+          onPress={() => Linking.openURL(PRIVACY_URL)}
         />
         <Button
           label="Help"
           variant="secondary"
           accessibilityHint="Opens in your browser"
-          onPress={() => Linking.openURL(`${SITE}/support`)}
+          onPress={() => Linking.openURL(SUPPORT_URL)}
         />
       </View>
 
@@ -163,13 +161,3 @@ const styles = StyleSheet.create({
   card: { padding: spacing.md, borderRadius: radius.md, gap: spacing.xs },
   links: { gap: spacing.sm },
 });
-
-/** Which JavaScript is running: the build's own bundle or an EAS Update (and on which channel). */
-function describeUpdate() {
-  if (__DEV__) return 'Updates: off in development (code comes from Metro)';
-  const channel = Updates.channel ?? 'no channel';
-  if (Updates.isEmbeddedLaunch) return `Channel ${channel} · built-in bundle`;
-  const id = Updates.updateId?.slice(0, 8) ?? '?';
-  const when = Updates.createdAt ? ` · ${Updates.createdAt.toLocaleDateString()}` : '';
-  return `Channel ${channel} · update ${id}${when}`;
-}

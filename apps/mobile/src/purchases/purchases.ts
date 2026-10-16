@@ -5,6 +5,7 @@ import Purchases, {
   type CustomerInfo,
   type PurchasesPackage,
 } from 'react-native-purchases';
+import { Platform } from 'react-native';
 import { create } from 'zustand';
 
 import { syncSubscription } from '@/api';
@@ -16,13 +17,19 @@ import { env } from '@/config/env';
  * - Development builds: the Test Store key, which allows real purchase flows with no App Store
  *   or Google Play setup. RevenueCat deliberately crashes release builds that use it, so it's
  *   only ever read when __DEV__ is true.
- * - Preview/production builds (M7): the per-store keys, purchases run in the stores' sandbox.
+ * - Preview/production builds: the per-store keys (appl_… / goog_…). Purchases in TestFlight
+ *   and Play internal testing run in the stores' sandbox.
  */
 function apiKey(): string | null {
   if (__DEV__ && process.env.EXPO_PUBLIC_REVENUECAT_TEST_KEY)
     return process.env.EXPO_PUBLIC_REVENUECAT_TEST_KEY;
   if (env.appVariant === 'development') return null;
-  return null; // store keys are added with the store setup in M7
+  // Static references so Expo inlines them at build time (set per environment on EAS).
+  const key =
+    Platform.OS === 'ios'
+      ? process.env.EXPO_PUBLIC_REVENUECAT_APPLE_KEY
+      : process.env.EXPO_PUBLIC_REVENUECAT_GOOGLE_KEY;
+  return key || null; // null: the paywall says purchases aren't set up in this build
 }
 
 export const isPurchasesAvailable = () => apiKey() !== null;

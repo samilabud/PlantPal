@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
@@ -23,10 +23,18 @@ const VARIANTS: Record<Variant, { name: string; id: string; scheme: string }> = 
 
 const current = VARIANTS[variant];
 
-/** Firebase config for FCM (Android push). Public identifiers only; used once the file exists. */
-const googleServicesFile = existsSync('./google-services.json')
-  ? './google-services.json'
-  : undefined;
+/**
+ * Firebase config for FCM (Android push). Public identifiers only. Used only for the app ids it
+ * lists: Google's Gradle plugin fails a build whose package isn't in the file. A variant that
+ * isn't registered in Firebase yet still builds; it just can't receive remote push.
+ */
+const GOOGLE_SERVICES = './google-services.json';
+const firebasePackages: string[] = existsSync(GOOGLE_SERVICES)
+  ? JSON.parse(readFileSync(GOOGLE_SERVICES, 'utf8')).client.map(
+      (c: { client_info: { android_client_info: { package_name: string } } }) =>
+        c.client_info.android_client_info.package_name,
+    )
+  : [];
 
 /** "com.googleusercontent.apps.<id>": the reversed iOS client id from Google Cloud. Not secret. */
 const googleIosUrlScheme = process.env.GOOGLE_IOS_URL_SCHEME;
@@ -44,10 +52,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: current.id,
     supportsTablet: false,
     usesAppleSignIn: true,
+    // Only standard HTTPS: exempt from export documentation (sets ITSAppUsesNonExemptEncryption).
+    config: { usesNonExemptEncryption: false },
   },
   android: {
     package: current.id,
-    googleServicesFile,
+    googleServicesFile: firebasePackages.includes(current.id) ? GOOGLE_SERVICES : undefined,
     adaptiveIcon: {
       backgroundColor: '#EAF6E6', // matches the icon background (docs/brand/plantpal-logo.png)
       foregroundImage: './assets/images/android-icon-foreground.png',

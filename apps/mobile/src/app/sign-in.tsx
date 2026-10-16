@@ -1,6 +1,6 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useEffect, useState } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { Linking, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -11,7 +11,9 @@ import {
   signInWithApple,
   signInWithGoogle,
 } from '@/auth';
+import { PRIVACY_URL } from '@/config/site';
 import { Button, Logo, spacing, Text, useColors } from '@/ui';
+import { describeUpdate } from '@/updates/describe-update';
 
 type Provider = 'apple' | 'google' | 'dev';
 
@@ -105,10 +107,22 @@ export default function SignInScreen() {
         )}
       </View>
 
-      <Text muted variant="caption" style={styles.legal}>
-        By signing in you agree to the privacy policy. You can delete your account at any time in
-        Settings.
-      </Text>
+      <View style={styles.footer}>
+        <Text muted variant="caption" style={styles.center}>
+          By signing in you agree to the{' '}
+          <Text
+            variant="caption"
+            accessibilityRole="link"
+            style={{ color: colors.primary, textDecorationLine: 'underline' }}
+            onPress={() => Linking.openURL(PRIVACY_URL)}>
+            privacy policy
+          </Text>
+          . You can delete your account at any time in Settings.
+        </Text>
+        <Text muted variant="caption" style={styles.center} testID="app-version">
+          {describeUpdate()}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -119,5 +133,6 @@ const styles = StyleSheet.create({
   actions: { gap: spacing.md },
   appleButton: { height: 48, width: '100%' },
   devInput: { borderWidth: 1, borderRadius: 8, padding: spacing.sm, minHeight: 44, fontSize: 16 },
-  legal: { textAlign: 'center' },
+  footer: { gap: spacing.xs },
+  center: { textAlign: 'center' },
 });
