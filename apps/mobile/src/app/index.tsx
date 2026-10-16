@@ -97,6 +97,12 @@ export default function PlantsScreen() {
               <Text muted>
                 Add your first plant and PlantPal will remind you when it needs water.
               </Text>
+              <Button
+                testID="empty-open-guide"
+                label="See what PlantPal can do"
+                variant="secondary"
+                onPress={() => router.push('/guide')}
+              />
             </View>
           }
         />

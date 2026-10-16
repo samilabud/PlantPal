@@ -30,10 +30,12 @@ const mockedLive = jest.mocked(useLiveQuery);
 const daysAgo = (d: number) => new Date(Date.now() - d * 86_400_000).toISOString();
 
 describe('PlantsScreen', () => {
-  it('shows an empty state', async () => {
+  it('shows an empty state with a way to learn what the app does', async () => {
     mockedLive.mockReturnValue({ data: [], loading: false, error: null });
     await render(<PlantsScreen />);
     expect(screen.getByText('No plants yet')).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'See what PlantPal can do' }));
+    expect(jest.requireMock('expo-router').router.push).toHaveBeenCalledWith('/guide');
   });
 
   it('lists plants with their watering status and waters one', async () => {
