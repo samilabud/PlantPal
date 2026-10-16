@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import * as Updates from 'expo-updates';
 import { useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, View } from 'react-native';
 
 import { getHealth } from '@/api';
 import { deleteAccount, signOut, useAuthStore } from '@/auth';
@@ -11,6 +11,9 @@ import { RemindersCard } from '@/components/reminders-card';
 import { env } from '@/config/env';
 import { requestSync, useSyncStore } from '@/sync/sync-manager';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
+
+/** Public pages, the same for every build (the store listings link to them too). */
+const SITE = 'https://plantpal-api.vercel.app';
 
 export default function SettingsScreen() {
   const colors = useColors();
@@ -116,6 +119,21 @@ export default function SettingsScreen() {
         </Text>
       </View>
 
+      <View style={styles.links}>
+        <Button
+          label="Privacy policy"
+          variant="secondary"
+          accessibilityHint="Opens in your browser"
+          onPress={() => Linking.openURL(`${SITE}/privacy`)}
+        />
+        <Button
+          label="Help"
+          variant="secondary"
+          accessibilityHint="Opens in your browser"
+          onPress={() => Linking.openURL(`${SITE}/support`)}
+        />
+      </View>
+
       <Button
         testID="sign-out"
         label="Sign out"
@@ -143,6 +161,7 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   card: { padding: spacing.md, borderRadius: radius.md, gap: spacing.xs },
+  links: { gap: spacing.sm },
 });
 
 /** Which JavaScript is running: the build's own bundle or an EAS Update (and on which channel). */

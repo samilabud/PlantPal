@@ -1,5 +1,5 @@
 import { DeleteAccountRequest, type DeleteAccountResponse } from '@plantpal/shared';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 import { revokeAppleGrant } from '@/auth/apple-revoke';
 import { authConfig } from '@/auth/config';
@@ -8,7 +8,7 @@ import { getMe } from '@/auth/session';
 import { billingConfig } from '@/billing/config';
 import { deleteCustomer } from '@/billing/revenuecat';
 import { db } from '@/db';
-import { users, webhookEvents } from '@/db/schema';
+import { devices, pushTickets, users, webhookEvents } from '@/db/schema';
 import { json, parseBody, withErrors } from '@/lib/http';
 import { deleteUserPhotos } from '@/storage/photos';
 
@@ -42,6 +42,12 @@ export const DELETE = withErrors(async (request) => {
 
   await deleteUserPhotos(userId);
   await db().delete(webhookEvents).where(eq(webhookEvents.appUserId, userId));
+  // Pending push receipts hold the token without a user id; drop them with the devices.
+  const tokens = db()
+    .select({ token: devices.expoPushToken })
+    .from(devices)
+    .where(eq(devices.userId, userId));
+  await db().delete(pushTickets).where(inArray(pushTickets.expoPushToken, tokens));
   await db().delete(users).where(eq(users.id, userId));
 
   // Best effort, after our own data is gone: a RevenueCat outage must never block someone
