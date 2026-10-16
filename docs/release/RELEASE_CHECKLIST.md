@@ -7,16 +7,16 @@ Status as of 2026-10-16. ✅ done and verified · 🟡 done in code, waiting on 
 ## 1. Security before any build leaves this machine
 | | Step | Owner |
 |---|---|---|
-| ⬜ | **Rotate the FCM service-account key** `cc8cb68d13…` (it was pasted in a chat). Google Cloud > IAM > Service accounts > plantpal-bd84c > Keys: create a new key, upload it with `npx eas-cli@latest credentials` (Android > Push notifications > FCM V1), then delete the old key | you |
+| ⚠️ | FCM service-account key `cc8cb68d13…` was pasted in a chat. **Owner's decision (2026-10-16): keep it** for this portfolio app. Accepted risk: anyone with it could send push notifications to PlantPal users. Rotate before real users (Google Cloud > IAM > Service accounts > Keys, then `npx eas-cli@latest credentials`) | you |
 | ⬜ | Restrict the Firebase Android API key to the app ids and SHA-1s (Google Cloud > Credentials) | you |
 | ⬜ | Swap `REVENUECAT_SECRET_KEY` on Vercel (Production and Preview) from the public `test_` key to a secret `sk_` key. Account deletion and the webhook re-check need it | you |
-| ⬜ | Set `CONTACT_EMAIL` on Vercel (Production). Until then the pages point to GitHub issues, which store review may not accept as a contact | you |
+| ✅ | `CONTACT_EMAIL` set on Vercel (Production); the pages show it after the next deploy | you |
 | ✅ | No secrets in the repo: gitleaks scans the full history on every push | me |
 
 ## 2. Accounts and console setup
 | | Step | Owner |
 |---|---|---|
-| ⬜ | Firebase: add Android apps `com.samilabud.plantpal` and `com.samilabud.plantpal.preview`, download the new `google-services.json` (it lists all three). Until then preview/store builds work but get no remote push (local reminders still work) | you |
+| ✅ | Firebase: preview and production Android apps registered; `google-services.json` now lists all three (verified: project plantpal-bd84c, dev entry unchanged) | you |
 | ⬜ | Apple Developer: App IDs for `com.samilabud.plantpal(.preview)` with Sign in with Apple; add them to `APPLE_CLIENT_IDS` on Vercel; create the Sign in with Apple key (.p8) for token revocation on account deletion | you |
 | ⬜ | Google Cloud: OAuth clients (Web, Android with the EAS signing SHA-1, iOS); set `EXPO_PUBLIC_GOOGLE_*` on EAS and the web client id on Vercel. Without it, Android store builds have no way to sign in | you |
 | ⬜ | App Store Connect: create the app record (bundle id `com.samilabud.plantpal`), the subscription group (monthly, yearly) and the lifetime non-consumable; In-App Purchase key for RevenueCat | you |
