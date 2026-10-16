@@ -11,8 +11,9 @@ name: Sign in and out
       USER: ${output.user}
 - assertVisible: No plants yet
 - takeScreenshot: e2e/screenshots/1-signed-in
-- tapOn:
-    id: open-settings
+# Deep link instead of tapping the header: in development builds the dev client's floating
+# tools button sits on top of the header's Settings link (it doesn't exist in release builds).
+- openLink: plantpal-dev://settings
 - assertVisible: ${output.user + '@dev.plantpal.test'}
 - scrollUntilVisible:
     element:

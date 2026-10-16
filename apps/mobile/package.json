@@ -60,7 +60,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "doctor": "expo-doctor",
-    "test:ci": "mkdir -p reports && jest --ci --coverage --coverageReporters=json-summary --coverageReporters=text-summary --json --outputFile=reports/jest.json"
+    "test:ci": "mkdir -p reports && jest --ci --coverage --coverageReporters=json-summary --coverageReporters=text-summary --json --outputFile=reports/jest.json",
+    "e2e": "maestro test e2e/ --format junit --output reports/maestro-junit.xml"
   },
   "private": true,
   "jest": {

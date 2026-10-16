@@ -1,16 +1,41 @@
 # Fresh start: wipe app data (signed out, empty local DB), then open the development build
-# pointed at Metro. 10.0.2.2 is the Android emulator's address for the host Mac.
+# straight into the JS bundle served by Metro. 10.0.2.2 is the Android emulator's address
+# for the host Mac (for a physical phone, use the Mac's LAN IP instead).
+# Opening the link directly (instead of launchApp + link) avoids racing the dev launcher.
 appId: com.samilabud.plantpal.dev
 ---
-- launchApp:
-    clearState: true
-    stopApp: true
-- openLink: exp+plantpal://expo-development-client/?url=${METRO_URL || "http%3A%2F%2F10.0.2.2%3A8081"}
-# The dev client shows a one-time "developer menu" intro after a fresh install.
-- tapOn:
-    text: Continue
-    optional: true
-- extendedWaitUntil:
-    visible:
-      id: dev-sign-in
-    timeout: 90000
+- stopApp
+- clearState
+- openLink: exp+plantpal://expo-development-client/?url=http%3A%2F%2F10.0.2.2%3A8081
+# Development-build screens can appear in any order and at any time while the bundle loads:
+# the dev client's one-time intro, its full developer menu, or Android's "isn't responding"
+# dialog (debug builds block the main thread while loading). Until our sign-in screen shows,
+# clear whatever is in the way. Each pass waits a little for the screen to change.
+- repeat:
+    while:
+      notVisible:
+        id: dev-sign-in
+    times: 30
+    commands:
+      - runFlow:
+          when:
+            visible: .*isn't responding.*
+          commands:
+            - tapOn: Wait
+      - runFlow:
+          when:
+            visible: Continue
+          commands:
+            - tapOn: Continue
+      - runFlow:
+          when:
+            visible: Toggle performance monitor
+          commands:
+            - pressKey: back
+      - extendedWaitUntil:
+          visible:
+            id: dev-sign-in
+          timeout: 4000
+          optional: true
+- assertVisible:
+    id: dev-sign-in

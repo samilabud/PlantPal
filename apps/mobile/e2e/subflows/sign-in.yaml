@@ -1,13 +1,17 @@
 # Signs in as ${USER} with the dev-only test sign-in, and closes the first-run guide.
 appId: com.samilabud.plantpal.dev
 ---
+# The field starts empty (placeholder "dev"), so no erasing is needed.
 - tapOn:
     id: dev-user-name
-- eraseText: 40
 - inputText: ${USER}
-- hideKeyboard
+# Android Back closes the keyboard (and nothing else while it is open).
+- pressKey: back
+# Signing in shows a spinner first: don't let Maestro re-tap a button that has already
+# done its job (it would then fail because the button is gone).
 - tapOn:
     id: dev-sign-in
+    retryTapIfNoChange: false
 # First sign-in on this install: the "How PlantPal works" guide opens once.
 - extendedWaitUntil:
     visible: Here is everything you can do with PlantPal.

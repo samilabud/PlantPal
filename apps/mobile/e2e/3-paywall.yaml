@@ -31,12 +31,14 @@ name: Free limit, paywall, purchase
 - takeScreenshot: e2e/screenshots/3-paywall
 - tapOn:
     id: buy-monthly
-# Test Store may show its own confirmation sheet depending on the SDK version.
-- tapOn:
-    text: Purchase
-    optional: true
+# RevenueCat's Test Store asks which outcome to simulate.
 - extendedWaitUntil:
-    visible: Welcome to Premium 🌿
+    visible: Test Store Purchase
+    timeout: 30000
+- takeScreenshot: e2e/screenshots/3-test-store-dialog
+- tapOn: TEST VALID PURCHASE
+- extendedWaitUntil:
+    visible: Welcome to Premium.*
     timeout: 30000
 - tapOn: OK
 - tapOn:

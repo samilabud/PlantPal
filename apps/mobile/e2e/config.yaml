@@ -1,0 +1,3 @@
+# Maestro workspace: run only the top-level flows (subflows/ are building blocks).
+flows:
+  - "*.yaml"

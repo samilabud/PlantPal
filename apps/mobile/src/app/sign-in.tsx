@@ -21,7 +21,7 @@ export default function SignInScreen() {
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Dev builds only: lets E2E tests (and you) sign in as separate test users.
-  const [devName, setDevName] = useState('dev');
+  const [devName, setDevName] = useState(''); // empty = the default "dev" user
 
   useEffect(() => {
     isAppleSignInAvailable().then(setAppleAvailable);
@@ -81,6 +81,8 @@ export default function SignInScreen() {
                   .slice(0, 32),
               )
             }
+            placeholder="dev"
+            placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
             autoCorrect={false}
             style={[styles.devInput, { borderColor: colors.border, color: colors.text }]}
