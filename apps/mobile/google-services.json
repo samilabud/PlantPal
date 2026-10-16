@@ -7,9 +7,47 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:235830529103:android:8b329b6d1f9f15145eee3a",
+        "android_client_info": {
+          "package_name": "com.samilabud.plantpal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPAKpW-an6tNym0YA6Fz8aEzdIoeadnvQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:235830529103:android:62de97fac92037135eee3a",
         "android_client_info": {
           "package_name": "com.samilabud.plantpal.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPAKpW-an6tNym0YA6Fz8aEzdIoeadnvQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235830529103:android:58a7aba5ac84438d5eee3a",
+        "android_client_info": {
+          "package_name": "com.samilabud.plantpal.preview"
         }
       },
       "oauth_client": [],
