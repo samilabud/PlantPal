@@ -64,11 +64,15 @@ describe.skipIf(!hasDb)('RevenueCat webhook (integration)', () => {
 
   it('OUT OF ORDER: an old EXPIRATION arriving after a renewal cannot downgrade the user', async () => {
     // RevenueCat says: active for 30 more days (the renewal already happened).
-    fetchSpy.mockResolvedValue(subscriber(inDays(30)));
-    await webhook(signedWebhook({ type: 'RENEWAL', app_user_id: user.id }));
-    await webhook(
+    // A fresh Response per call: a Response body can only be read once.
+    fetchSpy.mockImplementation(async () => subscriber(inDays(30)));
+    const renewal = await webhook(signedWebhook({ type: 'RENEWAL', app_user_id: user.id }));
+    const lateExpiration = await webhook(
       signedWebhook({ type: 'EXPIRATION', app_user_id: user.id, entitlement_ids: ['premium'] }),
     );
+    // Both must be fully processed, or this test would pass for the wrong reason.
+    expect([renewal.status, lateExpiration.status]).toEqual([200, 200]);
+    expect(fetchSpy).toHaveBeenCalledTimes(2);
     expect((await planOf(user.id)).plan).toBe('premium'); // the event's type didn't matter, the state did
   });
 
