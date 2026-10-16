@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
+import * as Updates from 'expo-updates';
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
@@ -110,6 +111,9 @@ export default function SettingsScreen() {
               ? 'API unreachable'
               : 'Checking…'}
         </Text>
+        <Text muted variant="caption" selectable testID="update-info">
+          {describeUpdate()}
+        </Text>
       </View>
 
       <Button
@@ -140,3 +144,13 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   card: { padding: spacing.md, borderRadius: radius.md, gap: spacing.xs },
 });
+
+/** Which JavaScript is running: the build's own bundle or an EAS Update (and on which channel). */
+function describeUpdate() {
+  if (__DEV__) return 'Updates: off in development (code comes from Metro)';
+  const channel = Updates.channel ?? 'no channel';
+  if (Updates.isEmbeddedLaunch) return `Channel ${channel} · built-in bundle`;
+  const id = Updates.updateId?.slice(0, 8) ?? '?';
+  const when = Updates.createdAt ? ` · ${Updates.createdAt.toLocaleDateString()}` : '';
+  return `Channel ${channel} · update ${id}${when}`;
+}

@@ -21,7 +21,7 @@
     "preview": {
       "extends": "base",
       "distribution": "internal",
-      "channel": "preview",
+      "channel": "staging",
       "environment": "preview",
       "env": { "APP_VARIANT": "preview" }
     },

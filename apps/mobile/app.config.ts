@@ -96,6 +96,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     reactCompiler: true,
   },
   owner: 'samilabud',
+  // EAS Update. The fingerprint policy hashes the native project, so an update can only reach
+  // builds whose native code matches it (a JS update can never call a missing native module).
+  // Each build profile sets its channel in eas.json (preview -> staging, production -> production).
+  runtimeVersion: { policy: 'fingerprint' },
+  updates: {
+    url: 'https://u.expo.dev/795e7f59-ea67-44c6-bd7a-d0ab622042d2',
+    // Check on every launch without delaying startup: a new update downloads in the background
+    // and runs on the next launch.
+    checkAutomatically: 'ON_LOAD',
+    fallbackToCacheTimeout: 0,
+  },
   extra: {
     appVariant: variant,
     // The EAS project (expo.dev/@samilabud/plantpal). Push tokens are issued per project.
