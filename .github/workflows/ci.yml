@@ -50,4 +50,20 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm test
+      - name: Tests with coverage (JUnit + JSON reports)
+        run: pnpm test:ci
+      - name: Test report in the job summary
+        if: always()
+        run: node scripts/test-summary.mjs >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload test reports and coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            packages/shared/reports/
+            apps/api/reports/
+            apps/api/coverage/coverage-summary.json
+            apps/mobile/reports/
+            apps/mobile/coverage/coverage-summary.json
+          if-no-files-found: warn

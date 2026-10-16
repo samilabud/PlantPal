@@ -59,7 +59,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "doctor": "expo-doctor"
+    "doctor": "expo-doctor",
+    "test:ci": "mkdir -p reports && jest --ci --coverage --coverageReporters=json-summary --coverageReporters=text-summary --json --outputFile=reports/jest.json"
   },
   "private": true,
   "jest": {
@@ -74,6 +75,10 @@
     "setupFiles": [
       "./node_modules/@react-native-google-signin/google-signin/jest/build/jest/setup.js"
     ],
-    "testTimeout": 15000
+    "testTimeout": 15000,
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/app/_layout.tsx"
+    ]
   }
 }

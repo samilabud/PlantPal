@@ -40,3 +40,5 @@ apps/mobile/android/
 .DS_Store
 *.log
 .idea/
+reports/
+junit.xml
