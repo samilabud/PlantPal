@@ -1,6 +1,13 @@
-import { Link, router, Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { LimitNotice } from '@/components/limit-notice';
 import { PlantPhoto } from '@/components/plant-photo';
@@ -46,9 +53,15 @@ export default function PlantsScreen() {
           title: 'My plants', // still used as the back-button label on child screens
           headerTitle: () => <Logo variant="horizontal" height={30} />,
           headerRight: () => (
-            <Link href="/settings" accessibilityLabel="Open settings" testID="open-settings">
+            <Pressable
+              onPress={() => router.push('/settings')}
+              accessibilityRole="button"
+              accessibilityLabel="Open settings"
+              testID="open-settings"
+              hitSlop={12}
+              style={{ padding: spacing.xs }}>
               <Text style={{ color: colors.primary }}>Settings</Text>
-            </Link>
+            </Pressable>
           ),
         }}
       />
@@ -60,7 +73,9 @@ export default function PlantsScreen() {
         <Text accessibilityRole="alert" style={[styles.center, { color: colors.danger }]}>
           Could not read your plants: {error.message}
         </Text>
-      ) : loading ? null : (
+      ) : loading ? (
+        <ActivityIndicator style={styles.center} accessibilityLabel="Loading your plants" />
+      ) : (
         <FlatList
           testID="plant-list"
           data={plants}

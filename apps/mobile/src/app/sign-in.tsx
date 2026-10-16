@@ -1,6 +1,6 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -20,6 +20,8 @@ export default function SignInScreen() {
   const [appleAvailable, setAppleAvailable] = useState(false);
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Dev builds only: lets E2E tests (and you) sign in as separate test users.
+  const [devName, setDevName] = useState('dev');
 
   useEffect(() => {
     isAppleSignInAvailable().then(setAppleAvailable);
@@ -67,13 +69,31 @@ export default function SignInScreen() {
           />
         )}
         {isDevSignInEnabled && (
+          <TextInput
+            testID="dev-user-name"
+            accessibilityLabel="Test user name"
+            value={devName}
+            onChangeText={(t) =>
+              setDevName(
+                t
+                  .toLowerCase()
+                  .replace(/[^a-z0-9-]/g, '')
+                  .slice(0, 32),
+              )
+            }
+            autoCapitalize="none"
+            autoCorrect={false}
+            style={[styles.devInput, { borderColor: colors.border, color: colors.text }]}
+          />
+        )}
+        {isDevSignInEnabled && (
           <Button
             testID="dev-sign-in"
             label="Dev sign-in (test only)"
             variant="secondary"
             loading={busy === 'dev'}
             disabled={busy !== null}
-            onPress={() => run('dev', () => signInDev('dev'))}
+            onPress={() => run('dev', () => signInDev(devName || 'dev'))}
           />
         )}
         {error && (
@@ -96,5 +116,6 @@ const styles = StyleSheet.create({
   header: { marginTop: spacing.xl, gap: spacing.md, alignItems: 'center' },
   actions: { gap: spacing.md },
   appleButton: { height: 48, width: '100%' },
+  devInput: { borderWidth: 1, borderRadius: 8, padding: spacing.sm, minHeight: 44, fontSize: 16 },
   legal: { textAlign: 'center' },
 });

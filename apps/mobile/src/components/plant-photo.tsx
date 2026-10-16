@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { getPhotoViewUrl } from '@/api';
@@ -16,6 +17,7 @@ type Props = { photoId: string | null; localUri?: string | null; size: number; l
 export function PlantPhoto({ photoId, localUri, size, label }: Props) {
   const colors = useColors();
   const hasLocal = localFileExists(localUri ?? null);
+  const [failed, setFailed] = useState(false);
   const remote = useQuery({
     queryKey: ['photo-url', photoId],
     queryFn: () => getPhotoViewUrl(photoId!),
@@ -31,7 +33,8 @@ export function PlantPhoto({ photoId, localUri, size, label }: Props) {
     backgroundColor: colors.surface,
   };
 
-  if (!photoId || !uri) {
+  // No photo, URL not ready, or the image failed to load (offline, expired URL): placeholder.
+  if (!photoId || !uri || failed) {
     return (
       <View style={[styles.placeholder, box]} accessibilityLabel={label} accessible>
         <Image
@@ -50,6 +53,7 @@ export function PlantPhoto({ photoId, localUri, size, label }: Props) {
       contentFit="cover"
       transition={150}
       accessibilityLabel={label}
+      onError={() => setFailed(true)}
     />
   );
 }
