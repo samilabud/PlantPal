@@ -68,7 +68,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-router',
-    'expo-dev-client',
+    // The dev-tools link (exp+plantpal://) only belongs in the development build; without this
+    // option preview and store builds also registered it and showed up in "Open with" dialogs.
+    ['expo-dev-client', { addGeneratedScheme: variant === 'development' }],
     'expo-apple-authentication',
     'expo-secure-store',
     'expo-sqlite',
