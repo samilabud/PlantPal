@@ -74,8 +74,8 @@ Short points I can say out loud about PlantPal, each backed by code in this repo
 14. **A fix found in M7:** the dev-tools link (`exp+plantpal://`) had leaked into store builds through the dev-client plugin. It's now limited to the development build, verified in the store bundle's manifest.
 15. **Proven:**
     - local reminders and deep links on the emulator
-    - a real remote push
-    - "Server push: registered" on the store build installed from Google Play
+    - a real remote push to the dev build
+    - token registration on the store build (delivery to it needed the FCM key on the production app id, which was missing at first)
     - iOS push not yet proven
 
 ## 4. Subscriptions and release engineering

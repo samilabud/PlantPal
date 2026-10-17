@@ -60,7 +60,7 @@ Rolled out to the internal testing track and installed from Google Play on the o
 | Diagnostics | `https://plantpal-api.vercel.app · production`, "API ok · database ok", `v0.1.0 · production · built-in bundle` |
 | Google sign-in | signed in with Google, account shows the Gmail and "Signed in with: google" |
 | Sync and photo upload | plant with photo, "Synced", 0 pending |
-| Remote push | "Server push: registered" (FCM in the store build) |
+| Remote push | **Only registration proven.** The phone got an Expo push token and registered it ("Server push: registered"), but Expo had no FCM V1 key for `com.samilabud.plantpal` (it was uploaded for the `.dev` app only), so a remote push to the store app couldn't be delivered. Found on 2026-10-17 in the EAS credentials page; delivery to the store build is **not yet proven**. |
 | Purchase (license tester) | Play receipt "Test card, always approves", monthly test plan renews every 5 min; app shows "Welcome to Premium"; server profile "Plan: premium" (server re-checked RevenueCat with the `sk_` key) |
 | Renewals | 6 renewals (Google's documented test schedule), all in RevenueCat's customer history |
 | Webhook to our server | every event in RevenueCat's webhook log shows **Sent** |
