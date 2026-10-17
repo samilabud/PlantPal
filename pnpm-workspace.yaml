@@ -9,3 +9,18 @@ ignoredBuiltDependencies:
 # Packages allowed to run install scripts (pnpm blocks them by default).
 onlyBuiltDependencies:
   - better-sqlite3
+
+# One React for the whole workspace. Expo SDK 57 pins react 19.2.3; with a second version in the
+# repo (Next.js had pulled 19.3), packages that find React by hoisting got whichever copy won the
+# install order, and a fresh install (like EAS's) failed with "Invalid hook call".
+overrides:
+  react: 19.2.3
+  react-dom: 19.2.3
+
+# posthog-react-native doesn't declare React as a peer; declaring it makes pnpm link the app's
+# own react and react-native instead of relying on hoisting.
+packageExtensions:
+  posthog-react-native:
+    peerDependencies:
+      react: '*'
+      react-native: '*'

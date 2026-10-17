@@ -25,7 +25,9 @@ const flag = useFeatureFlag as jest.Mock;
 let capture: jest.SpyInstance;
 
 function renderPaywall() {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: Infinity } },
+  });
   return render(
     <QueryClientProvider client={client}>
       <PaywallScreen />
