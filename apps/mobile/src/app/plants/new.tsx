@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 
+import { track } from '@/analytics/analytics';
 import { PlantForm } from '@/components/plant-form';
 import { mutate } from '@/data/mutations';
 import { addPhoto, createPlant } from '@/data/plants';
@@ -17,6 +18,7 @@ export default function NewPlantScreen() {
             const id = await createPlant(db, { name, wateringIntervalDays });
             if (photo) await addPhoto(db, id, photo.photoId, photo.uri);
           });
+          track('plant_added', { with_photo: Boolean(photo) });
           router.back();
           softAskForReminders(name);
         }}

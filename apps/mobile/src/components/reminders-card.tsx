@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, AppState, StyleSheet, View } from 'react-native';
 
+import { track } from '@/analytics/analytics';
 import { sendTestPush } from '@/api';
 import { isDevSignInEnabled } from '@/auth';
 import { getDb } from '@/db/database';
@@ -40,6 +41,7 @@ export function RemindersCard() {
     const state = await requestPermission();
     setPermission(state);
     if (state === 'granted') {
+      track('reminders_enabled', {});
       await syncLocalReminders(await getDb());
       await registerForPush();
     }

@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Linking, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Switch, View } from 'react-native';
 
+import { useAnalyticsConsent } from '@/analytics/analytics';
 import { getHealth } from '@/api';
 import { deleteAccount, signOut, useAuthStore } from '@/auth';
 import { PlanCard } from '@/components/plan-card';
@@ -20,6 +21,7 @@ export default function SettingsScreen() {
   const [error, setError] = useState<string | null>(null);
   const sync = useSyncStore();
   const health = useQuery({ queryKey: ['health'], queryFn: getHealth });
+  const analytics = useAnalyticsConsent();
 
   async function doSignOut() {
     setBusy('signOut');
@@ -101,6 +103,27 @@ export default function SettingsScreen() {
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <Text variant="heading">Usage analytics</Text>
+        {analytics.available ? (
+          <View style={styles.row}>
+            <Text style={styles.rowText}>Share anonymous usage events</Text>
+            <Switch
+              testID="analytics-switch"
+              accessibilityLabel="Share anonymous usage events"
+              value={analytics.enabled}
+              onValueChange={analytics.set}
+            />
+          </View>
+        ) : (
+          <Text testID="analytics-off">Off in this build</Text>
+        )}
+        <Text muted variant="caption">
+          Counts such as &quot;a plant was added&quot; help improve PlantPal. Never plant names,
+          photos or your email. No ads, no tracking across apps.
+        </Text>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <Text variant="heading">Diagnostics</Text>
         <Text muted variant="caption" selectable>
           {env.apiUrl} · {env.appVariant}
@@ -160,4 +183,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   card: { padding: spacing.md, borderRadius: radius.md, gap: spacing.xs },
   links: { gap: spacing.sm },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  rowText: { flex: 1 },
 });

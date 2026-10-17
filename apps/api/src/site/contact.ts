@@ -7,4 +7,4 @@ export const contact = {
   issues: 'https://github.com/samilabud/PlantPal/issues',
 };
 
-export const POLICY_DATE = 'October 16, 2026';
+export const POLICY_DATE = 'October 17, 2026';

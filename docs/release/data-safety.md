@@ -6,7 +6,8 @@ stores (`apps/api/src/db/schema.ts`) and from the SDKs in the app. The public po
 together.
 
 **SDKs that send data off the phone:** our own API, Expo push token registration, RevenueCat
-(purchases), Apple / Google sign-in. No analytics, crash-reporting or ad SDKs.
+(purchases), Apple / Google sign-in, PostHog (optional usage analytics: a fixed event list, no
+autocapture, no session replay, opt-out in Settings). No crash-reporting or ad SDKs.
 
 ## Google Play: Data safety
 
@@ -15,7 +16,7 @@ together.
 | Does the app collect or share any of the required user data types? | Yes |
 | Is all user data encrypted in transit? | Yes (HTTPS only: Vercel, Expo, RevenueCat, Google) |
 | Can users request that their data be deleted? | Yes: in the app (Settings > Delete account) and on the web (`/delete-account`) |
-| Is any data shared with third parties? | No. Vercel, Neon, Expo and RevenueCat act as service providers on our behalf, which Google says is not "sharing" |
+| Is any data shared with third parties? | No. Vercel, Neon, Expo, RevenueCat and PostHog act as service providers on our behalf, which Google says is not "sharing" |
 
 | Data type | Collected | Optional? | Purpose | Notes |
 |---|---|---|---|---|
@@ -25,8 +26,9 @@ together.
 | App activity > Other user-generated content | Yes | Required | App functionality | Plant names, watering intervals, watering times |
 | Financial info > Purchase history | Yes | Optional (only if they buy) | App functionality | Plan and expiry; RevenueCat checks the store |
 | Device or other IDs | Yes | Optional (only with reminders on) | App functionality | Expo push token |
+| App activity > App interactions | Yes | Optional (opt-out in Settings) | Analytics | Fixed PostHog events (plant added/watered, photo added, reminders on, paywall viewed, purchase completed), linked to the random account id |
 
-Not collected: location, name, contacts, messages, health, files, calendar, web history, crash logs, diagnostics, advertising ID.
+Not collected: location, name, contacts, messages, health, files, calendar, web history, crash logs, diagnostics, advertising ID. (PostHog adds the app version and phone model to events; that is part of the App interactions entry, not diagnostics.)
 
 ## App Store: App Privacy
 
@@ -40,8 +42,9 @@ Not collected: location, name, contacts, messages, health, files, calendar, web 
 | Identifiers > User ID | Yes | No | App Functionality |
 | Identifiers > Device ID | Yes | No | App Functionality (push token) |
 | Purchases > Purchase History | Yes | No | App Functionality, Analytics (RevenueCat's own guidance says to select both) |
+| Usage Data > Product Interaction | Yes | No | Analytics (PostHog events; optional, opt-out in Settings) |
 
-Not collected: Diagnostics (RevenueCat states it doesn't collect them; we ship no crash reporter), Location, Health, Financial Info, Contacts, Browsing/Search History, Usage Data, Sensitive Info.
+Not collected: Diagnostics (RevenueCat states it doesn't collect them; we ship no crash reporter), Location, Health, Financial Info, Contacts, Browsing/Search History, Sensitive Info.
 
 **Push token classification:** neither store's page names push tokens. They are declared as a device-level identifier (the closest definition on both pages) to err on the side of disclosure.
 

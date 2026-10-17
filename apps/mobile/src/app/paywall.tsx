@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import type { PurchasesPackage } from 'react-native-purchases';
 
+import { track, usePaywallVariant, type PaywallVariant } from '@/analytics/analytics';
 import { buy, getPackages, isPurchasesAvailable, restore } from '@/purchases/purchases';
 import { FREE_PLANT_LIMIT } from '@plantpal/shared';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
@@ -11,6 +12,22 @@ import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 const REASON: Record<string, string> = {
   plants: `The free plan includes ${FREE_PLANT_LIMIT} plants.`,
   photos: 'The free plan includes one photo per plant.',
+};
+
+/** The `paywall-variant` flag (PostHog A/B test): same plans and prices, different framing. */
+const COPY: Record<PaywallVariant, { title: string; benefits: string[] }> = {
+  control: {
+    title: 'PlantPal Premium',
+    benefits: ['Unlimited plants', 'Photo history for every plant', 'Supports an independent app'],
+  },
+  'plants-first': {
+    title: 'Room for every plant',
+    benefits: [
+      'Add as many plants as you own',
+      'Keep a photo diary of each one',
+      'Supports an independent app',
+    ],
+  },
 };
 
 const PERIOD: Record<string, string> = {
@@ -23,6 +40,13 @@ export default function PaywallScreen() {
   const colors = useColors();
   const { reason } = useLocalSearchParams<{ reason?: string }>();
   const [busy, setBusy] = useState<string | null>(null);
+  const { variant, ready } = usePaywallVariant();
+  const copy = COPY[variant];
+
+  // Recorded once the flag is known, so the event carries the copy the user actually saw.
+  useEffect(() => {
+    if (ready) track('paywall_viewed', { reason: reason ?? 'direct', variant });
+  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps -- once per visit
   const packages = useQuery({
     queryKey: ['packages'],
     queryFn: getPackages,
@@ -33,6 +57,7 @@ export default function PaywallScreen() {
     setBusy(pkg.identifier);
     try {
       if (await buy(pkg)) {
+        track('purchase_completed', { package_type: pkg.packageType, variant });
         router.back();
         Alert.alert('Welcome to Premium 🌿', 'Unlimited plants and photo history are unlocked.');
       }
@@ -59,14 +84,14 @@ export default function PaywallScreen() {
   return (
     <Screen>
       <Text variant="title" accessibilityRole="header">
-        PlantPal Premium
+        {copy.title}
       </Text>
       {reason && REASON[reason] && <Text muted>{REASON[reason]}</Text>}
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text>✓ Unlimited plants</Text>
-        <Text>✓ Photo history for every plant</Text>
-        <Text>✓ Supports an independent app</Text>
+        {copy.benefits.map((b) => (
+          <Text key={b}>✓ {b}</Text>
+        ))}
       </View>
 
       {!isPurchasesAvailable() ? (

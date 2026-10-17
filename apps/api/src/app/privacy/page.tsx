@@ -16,8 +16,8 @@ export default function PrivacyPage() {
       <p>
         PlantPal is a small plant-watering app built as a portfolio project. It collects only what
         it needs to keep your plants in sync between your devices and to remind you to water them.
-        There are no ads, no analytics and no tracking, and your data is never sold or shared for
-        marketing.
+        There are no ads and no tracking across apps, and your data is never sold or shared for
+        marketing. Anonymous usage counts can be switched off in Settings.
       </p>
 
       <h2>What PlantPal stores</h2>
@@ -46,6 +46,13 @@ export default function PrivacyPage() {
         <li>
           <strong>Sign-in sessions:</strong> secure session tokens, stored only in hashed form.
         </li>
+        <li>
+          <strong>Usage analytics (optional):</strong> a short, fixed list of events such as &quot;a
+          plant was added&quot;, &quot;the paywall was shown&quot; or &quot;a purchase
+          completed&quot;, with your random account id, the app version and the phone model. Never
+          plant names, photos or your email; no screen recording and no tap tracking. Switch it off
+          any time in Settings &gt; Usage analytics.
+        </li>
       </ul>
       <p>
         Your plants are also stored on your phone so the app works offline. Signing out removes that
@@ -58,6 +65,7 @@ export default function PrivacyPage() {
         <li>Apple and Google, for sign-in, purchases and delivering push notifications.</li>
         <li>Expo, which forwards reminders to Apple&apos;s and Google&apos;s push services.</li>
         <li>RevenueCat, which checks your subscription status with Apple or Google.</li>
+        <li>PostHog, which stores the optional usage analytics and runs the paywall A/B test.</li>
       </ul>
       <p>
         These services act on PlantPal&apos;s behalf and keep basic technical logs (such as IP

@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import { track } from '@/analytics/analytics';
 import { LimitNotice } from '@/components/limit-notice';
 import { PlantPhoto } from '@/components/plant-photo';
 import { SyncBadge } from '@/components/sync-badge';
@@ -145,7 +146,10 @@ function PlantRow({ plant }: { plant: PlantListItem }) {
         label="Water"
         accessibilityLabel={`Mark ${plant.name} as watered`}
         variant={urgent ? 'primary' : 'secondary'}
-        onPress={() => mutate((db) => waterPlant(db, plant.id))}
+        onPress={() => {
+          track('plant_watered', { from: 'list' });
+          return mutate((db) => waterPlant(db, plant.id));
+        }}
       />
     </View>
   );

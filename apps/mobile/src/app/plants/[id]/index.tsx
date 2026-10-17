@@ -14,6 +14,7 @@ import {
   waterPlant,
 } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
+import { track } from '@/analytics/analytics';
 import { capturePhoto } from '@/photos/capture';
 import { canAddPhoto, usePremium } from '@/purchases/limits';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
@@ -49,7 +50,9 @@ export default function PlantDetailScreen() {
     }
     try {
       const captured = await capturePhoto(source);
-      if (captured) await mutate((db) => addPhoto(db, id, captured.photoId, captured.uri));
+      if (!captured) return;
+      await mutate((db) => addPhoto(db, id, captured.photoId, captured.uri));
+      track('photo_added', { source });
     } catch (e) {
       Alert.alert('Photo', e instanceof Error ? e.message : 'Could not add the photo');
     }
@@ -95,7 +98,10 @@ export default function PlantDetailScreen() {
       <Button
         testID="water-now"
         label="Water now"
-        onPress={() => mutate((db) => waterPlant(db, id))}
+        onPress={() => {
+          track('plant_watered', { from: 'detail' });
+          return mutate((db) => waterPlant(db, id));
+        }}
       />
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>

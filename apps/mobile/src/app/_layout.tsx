@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { identifyUser } from '@/analytics/analytics';
 import { restoreSession, useAuthStore } from '@/auth';
 import '@/notifications/notifications'; // sets the foreground notification handler
 import { useNotificationNavigation, useReminderScheduler } from '@/notifications/use-notifications';
@@ -25,7 +26,9 @@ export default function RootLayout() {
 
   const userId = useAuthStore((s) => s.user?.id);
   useEffect(() => {
-    if (status === 'signedIn' && userId) startPurchases(userId).catch(() => undefined);
+    if (status !== 'signedIn' || !userId) return;
+    startPurchases(userId).catch(() => undefined);
+    identifyUser(userId);
   }, [status, userId]);
 
   useNotificationNavigation(status === 'signedIn');
