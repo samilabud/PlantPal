@@ -75,7 +75,7 @@ Short points I can say out loud about PlantPal, each backed by code in this repo
 15. **Proven:**
     - local reminders and deep links on the emulator
     - a real remote push to the dev build
-    - token registration on the store build (delivery to it needed the FCM key on the production app id, which was missing at first)
+    - a remote push received by the store build from Google Play (it first needed the FCM key on the production app id, which had been set for the dev app only)
     - iOS push not yet proven
 
 ## 4. Subscriptions and release engineering

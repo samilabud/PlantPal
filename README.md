@@ -82,7 +82,7 @@ Each claim links to the evidence that proves it. ✅ proven · 🟡 partly prove
 | **Account deletion** in the app and on the web (data, photos, RevenueCat customer) | [M2](docs/evidence/m2-auth.md), [M7](docs/evidence/m7-release.md#privacy-support-and-deletion-pages-live) | ✅ |
 | **Offline-first**: SQLite source of truth, outbox, sync endpoint, last-write-wins with clock clamp, tombstones | [M3](docs/evidence/m3-offline-sync.md) | ✅ |
 | Camera / photo library, compression, private upload with signed URLs | [M3](docs/evidence/m3-offline-sync.md) | ✅ |
-| **Push**: permission flow, local reminders, remote push (Expo → FCM), deep link from a notification | [M4](docs/evidence/m4-notifications.md) | ✅ on the Android dev build · 🟡 store build: token registration only · ❌ iOS device |
+| **Push**: permission flow, local reminders, remote push (Expo → FCM), deep link from a notification | [M4](docs/evidence/m4-notifications.md) | ✅ Android (dev build and the Play build) · ❌ iOS device |
 | **Subscriptions** with RevenueCat: paywall, entitlement on device and server, signed idempotent webhook, replay test, restore | [M5](docs/evidence/m5-subscriptions.md) | ✅ |
 | Real Google Play sandbox purchase → renewals → expiry, all reaching the server | [M7](docs/evidence/m7-release.md#google-play-internal-testing-real-phone-production-server) | ✅ |
 | Development build and config plugins (not Expo Go) | [M1](docs/evidence/m1-foundation.md) | ✅ |
