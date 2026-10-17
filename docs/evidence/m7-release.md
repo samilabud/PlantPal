@@ -33,6 +33,20 @@ The preview build shows no sign-in button yet. That's expected: Google sign-in n
 
 This is the safety the fingerprint policy buys: a mismatched update is ignored rather than loaded into a binary it wasn't built for.
 
+## Google sign-in (Android)
+**Google Cloud project `plantpal-bd84c`:**
+- consent screen: External, Testing, with test users
+- one Web client: its id is the token audience the server checks
+- four Android clients:
+  - dev (debug key)
+  - preview (EAS key)
+  - Play signing (Google's app-signing key)
+  - upload (EAS production key, cross-checked: Play's upload certificate SHA-1 equals the one read from the `.aab`)
+
+**Where the Web client id lives:** Vercel `GOOGLE_CLIENT_IDS` (Production and Preview, production redeployed), EAS `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (all environments), local env files. It was checked against Google before use: Google recognizes it, and a fake id gets a different answer.
+
+**Result:** in the dev build, against the local API, "Sign in with Google" → Google account → server verified the ID token → Settings shows the Gmail and "Signed in with: google". Not yet proven: a Play-installed build against production (that needs the internal testing rollout, step 4).
+
 ## Privacy, support and deletion pages (live)
 | Page | URL | Check |
 |---|---|---|

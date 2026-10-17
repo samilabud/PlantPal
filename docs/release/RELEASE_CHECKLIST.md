@@ -18,7 +18,7 @@ Status as of 2026-10-16. ✅ done and verified · 🟡 done in code, waiting on 
 |---|---|---|
 | ✅ | Firebase: preview and production Android apps registered; `google-services.json` now lists all three (verified: project plantpal-bd84c, dev entry unchanged) | you |
 | ⬜ | Apple Developer: App IDs for `com.samilabud.plantpal(.preview)` with Sign in with Apple; add them to `APPLE_CLIENT_IDS` on Vercel; create the Sign in with Apple key (.p8) for token revocation on account deletion | you |
-| ⬜ | Google Cloud: OAuth clients (Web, Android with the EAS signing SHA-1, iOS); set `EXPO_PUBLIC_GOOGLE_*` on EAS and the web client id on Vercel. Without it, Android store builds have no way to sign in | you |
+| ✅ | Google sign-in: Web client and 4 Android clients (dev, preview, Play signing, upload); ids set on Vercel and EAS; sign-in verified on the dev build. Consent screen still in Testing (publish before a public release) | you + me |
 | ⬜ | App Store Connect: create the app record (bundle id `com.samilabud.plantpal`), the subscription group (monthly, yearly) and the lifetime non-consumable; In-App Purchase key for RevenueCat | you |
 | ⬜ | Play Console: create the app, the subscriptions and the lifetime product; service account JSON for RevenueCat | you |
 | ⬜ | RevenueCat: add the App Store and Play apps, attach the store products to the `premium` entitlement and the `default` offering; put the `appl_…` / `goog_…` SDK keys on EAS as `EXPO_PUBLIC_REVENUECAT_APPLE_KEY` / `_GOOGLE_KEY` | you |
