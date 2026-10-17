@@ -45,7 +45,28 @@ This is the safety the fingerprint policy buys: a mismatched update is ignored r
 
 **Where the Web client id lives:** Vercel `GOOGLE_CLIENT_IDS` (Production and Preview, production redeployed), EAS `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (all environments), local env files. It was checked against Google before use: Google recognizes it, and a fake id gets a different answer.
 
-**Result:** in the dev build, against the local API, "Sign in with Google" → Google account → server verified the ID token → Settings shows the Gmail and "Signed in with: google". Not yet proven: a Play-installed build against production (that needs the internal testing rollout, step 4).
+**Result:** in the dev build, against the local API, "Sign in with Google" → Google account → server verified the ID token → Settings shows the Gmail and "Signed in with: google". Also proven later on a Play-installed build against production (see the next section).
+
+## Google Play internal testing: real phone, production server
+**Build:** `388e7da5…`, versionCode 3, store profile. Checked before upload:
+- upload certificate SHA-1 equals Play's
+- `exp+plantpal` absent from the manifest
+- RevenueCat Play key, Google web client id and production API URL present in the JS bundle
+
+Rolled out to the internal testing track and installed from Google Play on the owner's Android phone.
+
+| Check (store build, production API) | Result |
+|---|---|
+| Diagnostics | `https://plantpal-api.vercel.app · production`, "API ok · database ok", `v0.1.0 · production · built-in bundle` |
+| Google sign-in | signed in with Google, account shows the Gmail and "Signed in with: google" |
+| Sync and photo upload | plant with photo, "Synced", 0 pending |
+| Remote push | "Server push: registered" (FCM in the store build) |
+| Purchase (license tester) | Play receipt "Test card, always approves", monthly test plan renews every 5 min; app shows "Welcome to Premium"; server profile "Plan: premium" (server re-checked RevenueCat with the `sk_` key) |
+| Renewals | 6 renewals (Google's documented test schedule), all in RevenueCat's customer history |
+| Webhook to our server | every event in RevenueCat's webhook log shows **Sent** |
+| Expiry | RevenueCat entitlement expired at 14:52:58 UTC; Google's "subscription has been canceled" email; the phone switched back to **Plan: free** on its own (the M6 expiry fix, now proven with a real store subscription) |
+
+The server-side check used the secret key to read the subscriber (read-only); the app user id is our internal UUID. RevenueCat holds no email.
 
 ## Privacy, support and deletion pages (live)
 | Page | URL | Check |
@@ -77,7 +98,7 @@ Integration-tested, including a "RevenueCat down" case.
 - The version, channel and update id are shown on sign-in and in Settings (unit-tested).
 
 ## Not done (needs accounts or decisions; see the checklist)
-- iOS build, TestFlight and Play internal testing
+- iOS build and TestFlight (waiting for Apple)
 - real Apple and Google sign-in
 - store products in RevenueCat
 - App Store screenshots
