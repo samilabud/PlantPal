@@ -20,8 +20,8 @@ Status as of 2026-10-16. ✅ done and verified · 🟡 done in code, waiting on 
 | ⬜ | Apple Developer: App IDs for `com.samilabud.plantpal(.preview)` with Sign in with Apple; add them to `APPLE_CLIENT_IDS` on Vercel; create the Sign in with Apple key (.p8) for token revocation on account deletion | you |
 | ✅ | Google sign-in: Web client and 4 Android clients (dev, preview, Play signing, upload); ids set on Vercel and EAS; sign-in verified on the dev build. Consent screen still in Testing (publish before a public release) | you + me |
 | ⬜ | App Store Connect: create the app record (bundle id `com.samilabud.plantpal`), the subscription group (monthly, yearly) and the lifetime non-consumable; In-App Purchase key for RevenueCat | you |
-| ⬜ | Play Console: create the app, the subscriptions and the lifetime product; service account JSON for RevenueCat | you |
-| ⬜ | RevenueCat: add the App Store and Play apps, attach the store products to the `premium` entitlement and the `default` offering; put the `appl_…` / `goog_…` SDK keys on EAS as `EXPO_PUBLIC_REVENUECAT_APPLE_KEY` / `_GOOGLE_KEY` | you |
+| ✅ | Play Console: app `com.samilabud.plantpal` created; subscriptions `plantpal_premium_monthly` (base plan `monthly`, $9.99) and `plantpal_premium_yearly` (`yearly`, $79.99), one-time `plantpal_premium_lifetime` (`buy`, $99.99), all active; license tester added; service account `revenuecat@plantpal-bd84c` invited | you |
+| 🟡 | RevenueCat: Play app added with service credentials (catalog checks ✅; "subscription purchases" check waits for the first rolled-out release, step 4). `goog_` key verified and set on EAS production as `EXPO_PUBLIC_REVENUECAT_GOOGLE_KEY`. App Store side waits for Apple | you + me |
 | ⬜ | Play Console: answer Data safety, content rating, target audience, ads from `docs/release/data-safety.md` | you |
 | ⬜ | App Store Connect: App Privacy answers, age rating, privacy URL, support URL from `docs/release/` | you |
 
@@ -34,7 +34,7 @@ Status as of 2026-10-16. ✅ done and verified · 🟡 done in code, waiting on 
 | ✅ | `eas build --profile preview --platform android`: build `dd82c614…`, APK on the staging channel | me |
 | ✅ | `eas update --channel staging --environment preview`: update `01a14699…` reached the APK (version line changed; `docs/evidence/m7-release.md`). `APP_VARIANT` is an EAS environment variable, so updates and builds share the config | me |
 | ⬜ | iOS build: a simulator build needs no Apple credentials; a TestFlight build needs `eas credentials` with your Apple login (interactive) | you + me |
-| ⬜ | Production builds: `eas build --profile production --platform all` | me, after your OK |
+| 🟡 | Android production build `714e1e07…` (versionCode 2) uploaded to internal testing as a **draft**; Play upload certificate matches. **Rebuild before rollout**: the draft predates the RevenueCat key and the dev-client link fix (a JS update can't reach it, because the native fingerprint changed). iOS waits for Apple | me, after your OK |
 | ⬜ | Google Play internal testing: create the app in Play Console and a service account key (uploaded to EAS); then `eas submit --platform android` creates the first internal-testing release. The app stays a draft until the listing and policy forms are complete (docs.expo.dev/submit/android) | you + me |
 | ⬜ | TestFlight internal testing: `eas submit --platform ios` uploads; internal testers need no review | you + me |
 | ⬜ | Store review submission: **only after you say "submit"** | you |
