@@ -65,6 +65,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
+    // Libraries merge these into the manifest, but PlantPal never uses them: the photo picker
+    // needs no storage permission, SecureStore is used without biometrics, and the overlay and
+    // dump permissions belong to developer tooling. Fewer permissions = an honest store listing.
+    blockedPermissions: [
+      'android.permission.SYSTEM_ALERT_WINDOW',
+      'android.permission.DUMP',
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+      'android.permission.USE_BIOMETRIC',
+      'android.permission.USE_FINGERPRINT',
+    ],
   },
   plugins: [
     'expo-router',
