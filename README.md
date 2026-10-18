@@ -88,13 +88,13 @@ Each claim links to the evidence that proves it. ✅ proven · 🟡 partly prove
 | Development build and config plugins (not Expo Go) | [M1](docs/evidence/m1-foundation.md) | ✅ |
 | **EAS Build**, versions, channels, environment variables | [M7](docs/evidence/m7-release.md) | ✅ Android |
 | **EAS Update** (OTA) on a staging channel, received by an installed build | [M7](docs/evidence/m7-release.md#eas-update-on-the-staging-channel) | ✅ |
-| **EAS Submit** to Google Play | [M8](docs/evidence/m8-portfolio.md) | ⏳ in progress |
+| **EAS Submit** to Google Play | [M8](docs/evidence/m8-portfolio.md#eas-submit-gap-7) | ✅ |
 | **CI**: secret scan, lint, typecheck, tests with coverage report; manual EAS build workflow | [M6](docs/evidence/m6-quality.md#ci) | ✅ |
-| Unit, component and integration tests (Jest, React Native Testing Library, Vitest with real Postgres) | [M6](docs/evidence/m6-quality.md) | ✅ 185 tests |
+| Unit, component and integration tests (Jest, React Native Testing Library, Vitest with real Postgres) | [M6](docs/evidence/m6-quality.md), [M8](docs/evidence/m8-portfolio.md#fresh-clone-definition-of-done) | ✅ 185 tests, also from a fresh clone |
 | **Maestro** end-to-end flows: sign in, add offline then sync, paywall | [M6](docs/evidence/m6-quality.md#end-to-end-maestro-android-emulator-api-33-development-build) | 🟡 each passes alone; back-to-back runs flaky on the dev build |
 | Accessibility labels, roles, large text | [M6](docs/evidence/m6-quality.md#accessibility) | ✅ |
 | Performance check of the list | [M6](docs/evidence/m6-quality.md#performance-check-the-plant-list) | 🟡 query measured (1.4 ms / 1,000 plants); scroll smoothness not measured on a device |
-| **Analytics and a feature flag** with PostHog (privacy-first, opt-out) | [M8](docs/evidence/m8-portfolio.md) | ⏳ in progress |
+| **Analytics and a feature flag** with PostHog (privacy-first, opt-out) | [M8](docs/evidence/m8-portfolio.md#analytics-and-feature-flag-posthog-gap-9) | ✅ events from the Play build; A/B data not yet meaningful (one tester) |
 | Privacy policy, support and data-deletion pages; store privacy answers | [M7](docs/evidence/m7-release.md#privacy-support-and-deletion-pages-live), [data safety](docs/release/data-safety.md) | ✅ |
 
 ## Run it locally
