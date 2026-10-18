@@ -10,7 +10,7 @@ Every claim matches a feature with evidence in `docs/evidence/`.
 | Short description (Google Play) | 80 | Never forget to water a plant again. Works offline and syncs across your phones. (80) |
 | Keywords (App Store) | 100 | plant,water,watering,reminder,houseplant,garden,care,schedule,succulent,offline,tracker,indoor,green (100) |
 | Category | | App Store: Lifestyle. Google Play: House & Home |
-| Price | | Free, with an optional Premium subscription |
+| Price | | Free, with optional Premium: USD 0.50 / month, USD 5 / year, USD 10 lifetime (Play converts other currencies) |
 | Contains ads | | No |
 
 ## Full description (both stores, under 4,000)
@@ -43,7 +43,7 @@ Payment is charged to your Apple ID or Google account at confirmation of purchas
 | Account deletion (Google Play) | https://plantpal-api.vercel.app/delete-account | after the M7 push |
 
 ## Review notes (App Store and Google Play)
-Store builds only offer Sign in with Apple and Sign in with Google, so reviewers sign in with their own Apple ID or Google account, which is normal for apps with only social sign-in. No demo account is needed. To test Premium, reviewers use the stores' sandbox purchases (no real charge).
+Google requires credentials, and reviewers may not use personal accounts for purchases. So a dedicated review Google account (no personal data, 2-step verification off) is entered in Play Console > **Sign in details**, never in this repo. It is a **license tester** (free test purchases) and was a test user on the Google consent screen while it was in Testing.
 
 ## Screenshots
 Alt text (≤ 140 characters): "Plant list showing which plants need water today", "Guide listing everything PlantPal can do", "Monstera detail with its watering history".

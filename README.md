@@ -7,7 +7,8 @@ notifications, in-app subscriptions, release engineering, testing and analytics.
 > **Built with AI assistance.** This project was built with Claude Code as a pair programmer.
 > I (Samil Abud) reviewed every change and can explain every file
 > ([interview notes](docs/INTERVIEW_NOTES.md)).
-> Subscriptions run in **sandbox / test mode only**. There are no production users and no revenue.
+> Premium is a real Google Play in-app purchase (USD 0.50 / month, 5 / year, 10 lifetime), priced
+> low on purpose. Every purchase so far was a **test purchase**: no revenue is claimed.
 
 **Status:** Android is in **Google Play internal testing**. iOS is built but **not yet on TestFlight**
 (Apple developer account pending). See the [final report](docs/FINAL_REPORT.md) for what is and
@@ -16,7 +17,7 @@ isn't proven.
 ## What it does
 Sign in with Google (Apple on iOS), add plants with a photo and a watering interval, and tap
 **Water**. The list shows what's due; reminders arrive the morning a plant needs water; everything
-works offline and syncs across devices. Premium (sandbox) unlocks unlimited plants and photo
+works offline and syncs across devices. Premium unlocks unlimited plants and photo
 history. Account deletion lives in Settings.
 
 ## Architecture
