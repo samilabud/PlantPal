@@ -99,6 +99,13 @@ Each claim links to the evidence that proves it. ✅ proven · 🟡 partly prove
 | **Analytics and a feature flag** with PostHog (privacy-first, opt-out) | [M8](docs/evidence/m8-portfolio.md#analytics-and-feature-flag-posthog-gap-9) | ✅ events from the Play build; A/B data not yet meaningful (one tester) |
 | Privacy policy, support and data-deletion pages; store privacy answers | [M7](docs/evidence/m7-release.md#privacy-support-and-deletion-pages-live), [data safety](docs/release/data-safety.md) | ✅ |
 
+## Roadmap
+| Next | What | Plan |
+|---|---|---|
+| **M9** | **Identify with AI:** take a photo and Claude suggests the plant's name and watering interval (pre-filled, the user confirms). Server-side Claude API calls, daily limits, an evaluation set, privacy and Play AI-policy updates. | [docs/prompts/M9_AI_AND_SPANISH.md](docs/prompts/M9_AI_AND_SPANISH.md) |
+| **M9** | **Spanish:** the whole app, notifications, web pages and store listing in English and Spanish; follows the phone's language, with a switch in Settings and on the sign-in screen. | same |
+| Later | iOS release (TestFlight, App Store) once the Apple developer account is approved | [release checklist](docs/release/RELEASE_CHECKLIST.md) |
+
 ## Run it locally
 
 Requirements: Node ≥ 22.13, pnpm 10, Docker, and Android Studio (emulator) or Xcode ≥ 26.4.
