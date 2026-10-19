@@ -10,8 +10,9 @@ notifications, in-app subscriptions, release engineering, testing and analytics.
 > Premium is a real Google Play in-app purchase (USD 0.50 / month, 5 / year, 10 lifetime), priced
 > low on purpose. Every purchase so far was a **test purchase**: no revenue is claimed.
 
-**Status:** Android is in **Google Play internal testing**. iOS is built but **not yet on TestFlight**
-(Apple developer account pending). See the [final report](docs/FINAL_REPORT.md) for what is and
+**Status:** **Live on Google Play** since 2026-10-19:
+[play.google.com/store/apps/details?id=com.samilabud.plantpal](https://play.google.com/store/apps/details?id=com.samilabud.plantpal).
+iOS is **not yet on TestFlight** (Apple developer account pending). See the [final report](docs/FINAL_REPORT.md) for what is and
 isn't proven.
 
 ## What it does
@@ -75,7 +76,7 @@ Each claim links to the evidence that proves it. ✅ proven · 🟡 partly prove
 
 | Claim | Evidence | Status |
 |---|---|---|
-| Android app distributed through **Google Play** (internal testing), installed on a real phone | [M7](docs/evidence/m7-release.md#google-play-internal-testing-real-phone-production-server) | ✅ |
+| Android app **published on Google Play** (production, passed Google's review), first tested through internal testing on a real phone | [M7](docs/evidence/m7-release.md#google-play-internal-testing-real-phone-production-server), [store page](https://play.google.com/store/apps/details?id=com.samilabud.plantpal) | ✅ |
 | iOS app on **TestFlight / App Store** | [checklist](docs/release/RELEASE_CHECKLIST.md) | ❌ Apple account pending |
 | **Sign in with Google**, verified on the server, against production | [M2](docs/evidence/m2-auth.md), [M7](docs/evidence/m7-release.md#google-sign-in-android) | ✅ |
 | **Sign in with Apple** (nonce, token verification, grant revocation on deletion) | [M2](docs/evidence/m2-auth.md) | 🟡 implemented and tested on the server; not run on an iPhone |
@@ -91,7 +92,7 @@ Each claim links to the evidence that proves it. ✅ proven · 🟡 partly prove
 | **EAS Update** (OTA) on a staging channel, received by an installed build | [M7](docs/evidence/m7-release.md#eas-update-on-the-staging-channel) | ✅ |
 | **EAS Submit** to Google Play | [M8](docs/evidence/m8-portfolio.md#eas-submit-gap-7) | ✅ |
 | **CI**: secret scan, lint, typecheck, tests with coverage report; manual EAS build workflow | [M6](docs/evidence/m6-quality.md#ci) | ✅ |
-| Unit, component and integration tests (Jest, React Native Testing Library, Vitest with real Postgres) | [M6](docs/evidence/m6-quality.md), [M8](docs/evidence/m8-portfolio.md#fresh-clone-definition-of-done) | ✅ 185 tests, also from a fresh clone |
+| Unit, component and integration tests (Jest, React Native Testing Library, Vitest with real Postgres) | [M6](docs/evidence/m6-quality.md), [M8](docs/evidence/m8-portfolio.md#fresh-clone-definition-of-done) | ✅ 190 tests, also from a fresh clone |
 | **Maestro** end-to-end flows: sign in, add offline then sync, paywall | [M6](docs/evidence/m6-quality.md#end-to-end-maestro-android-emulator-api-33-development-build) | 🟡 each passes alone; back-to-back runs flaky on the dev build |
 | Accessibility labels, roles, large text | [M6](docs/evidence/m6-quality.md#accessibility) | ✅ |
 | Performance check of the list | [M6](docs/evidence/m6-quality.md#performance-check-the-plant-list) | 🟡 query measured (1.4 ms / 1,000 plants); scroll smoothness not measured on a device |
