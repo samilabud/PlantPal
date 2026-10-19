@@ -1,6 +1,7 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
+import { toUserMessage } from '@/errors/user-message';
 import { PlantPhoto } from '@/components/plant-photo';
 import { useLiveQuery } from '@/data/live';
 import { mutate } from '@/data/mutations';
@@ -54,7 +55,7 @@ export default function PlantDetailScreen() {
       await mutate((db) => addPhoto(db, id, captured.photoId, captured.uri));
       track('photo_added', { source });
     } catch (e) {
-      Alert.alert('Photo', e instanceof Error ? e.message : 'Could not add the photo');
+      Alert.alert('Photo', toUserMessage(e, 'photo'));
     }
   }
 

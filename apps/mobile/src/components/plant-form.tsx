@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, TextInput, View } from 'react-native';
 
+import { toUserMessage } from '@/errors/user-message';
 import { capturePhoto, type CapturedPhoto } from '@/photos/capture';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
@@ -45,7 +46,7 @@ export function PlantForm({ initial, allowPhoto = false, submitLabel, onSubmit }
       const captured = await capturePhoto(source);
       if (captured) setPhoto(captured);
     } catch (e) {
-      Alert.alert('Photo', e instanceof Error ? e.message : 'Could not get the photo');
+      Alert.alert('Photo', toUserMessage(e, 'photo'));
     }
   }
 

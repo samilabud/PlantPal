@@ -105,6 +105,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           ],
         ]
       : []),
+    // R8 for release builds: smaller, faster app (Play flags apps under 25% "DEX optimization").
+    // Development builds are debug builds, so they're unaffected.
+    [
+      'expo-build-properties',
+      {
+        android: { enableMinifyInReleaseBuilds: true, enableShrinkResourcesInReleaseBuilds: true },
+      },
+    ],
     [
       'expo-splash-screen',
       {

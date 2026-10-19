@@ -24,11 +24,17 @@ describe('SignInScreen', () => {
     expect(mockedSignInDev).toHaveBeenCalledWith('dev');
   });
 
-  it('shows the error when sign-in fails', async () => {
-    mockedSignInDev.mockRejectedValue(new Error('Server unreachable'));
+  it('shows a plain-language error, never the raw library message', async () => {
+    mockedSignInDev.mockRejectedValue(
+      Object.assign(new Error('DEVELOPER_ERROR: Follow troubleshooting instructions at …'), {
+        code: '10',
+      }),
+    );
     await render(<SignInScreen />);
     await fireEvent.press(screen.getByTestId('dev-sign-in'));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Server unreachable');
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent(/Google sign-in isn't working in this version/);
+    expect(alert).not.toHaveTextContent(/DEVELOPER_ERROR/);
   });
 
   it('hides Google when it is not configured', async () => {

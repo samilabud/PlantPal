@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import type { PurchasesPackage } from 'react-native-purchases';
 
+import { toUserMessage } from '@/errors/user-message';
 import { track, usePaywallVariant, type PaywallVariant } from '@/analytics/analytics';
 import { buy, getPackages, isPurchasesAvailable, restore } from '@/purchases/purchases';
 import { FREE_PLANT_LIMIT } from '@plantpal/shared';
@@ -62,7 +63,7 @@ export default function PaywallScreen() {
         Alert.alert('Welcome to Premium 🌿', 'Unlimited plants and photo history are unlocked.');
       }
     } catch (e) {
-      Alert.alert('Purchase failed', e instanceof Error ? e.message : 'Please try again.');
+      Alert.alert('Purchase failed', toUserMessage(e, 'purchase'));
     } finally {
       setBusy(null);
     }
@@ -75,7 +76,7 @@ export default function PaywallScreen() {
       Alert.alert('Restore', premium ? 'Premium restored.' : 'No active subscription found.');
       if (premium) router.back();
     } catch (e) {
-      Alert.alert('Restore failed', e instanceof Error ? e.message : 'Please try again.');
+      Alert.alert('Restore failed', toUserMessage(e, 'restore'));
     } finally {
       setBusy(null);
     }

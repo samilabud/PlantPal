@@ -11,6 +11,7 @@ import {
   signInWithApple,
   signInWithGoogle,
 } from '@/auth';
+import { toUserMessage } from '@/errors/user-message';
 import { PRIVACY_URL } from '@/config/site';
 import { Button, Logo, spacing, Text, useColors } from '@/ui';
 import { describeUpdate } from '@/updates/describe-update';
@@ -35,7 +36,7 @@ export default function SignInScreen() {
     try {
       await action(); // On success the auth store flips and the router leaves this screen.
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Sign-in failed');
+      setError(toUserMessage(e, 'signIn'));
     } finally {
       setBusy(null);
     }

@@ -2,6 +2,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { AppState } from 'react-native';
 import { create } from 'zustand';
 
+import { toUserMessage } from '@/errors/user-message';
 import { ApiError, getMe, getPhotoUploadUrl, postSync, putPhotoFile } from '@/api';
 import { useAuthStore } from '@/auth/auth-store';
 import { notifyDataChanged } from '@/data/live';
@@ -92,7 +93,7 @@ async function run() {
       error instanceof ApiError && (error.kind === 'network' || error.kind === 'timeout');
     set({
       status: offline ? 'offline' : 'error',
-      error: offline ? null : error instanceof Error ? error.message : 'Sync failed',
+      error: offline ? null : toUserMessage(error, 'sync'),
     });
   } finally {
     set({ pending: await pendingCount(db) });

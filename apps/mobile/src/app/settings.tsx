@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Linking, StyleSheet, Switch, View } from 'react-native';
 
+import { toUserMessage } from '@/errors/user-message';
 import { useAnalyticsConsent } from '@/analytics/analytics';
 import { getHealth } from '@/api';
 import { deleteAccount, signOut, useAuthStore } from '@/auth';
@@ -56,7 +57,7 @@ export default function SettingsScreen() {
             try {
               await deleteAccount();
             } catch (e) {
-              setError(e instanceof Error ? e.message : 'Could not delete the account');
+              setError(toUserMessage(e, 'deleteAccount'));
             } finally {
               setBusy(null);
             }
