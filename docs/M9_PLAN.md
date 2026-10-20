@@ -1,6 +1,11 @@
 # PlantPal: M9.0 plan (AI identification and Spanish)
 
-Status: **waiting for "go"**. No code written.
+Status: **decisions made 2026-10-19, waiting for "go"**. No code written.
+
+Decisions: new PlantPal key (Default workspace for now; set on Vercel Production as a Secret and in
+`apps/api/.env.local`, verified with a free token-count call); evaluation budget up to $2; Premium
+30/day **and** 100/month (Free 3/day); `AI_DAILY_LIMIT=1.00` USD; server-side fallback on.
+Photos: start with openly licensed images, owner's photos added later.
 Date: 2026-10-19. Brief: [`prompts/M9_AI_AND_SPANISH.md`](prompts/M9_AI_AND_SPANISH.md).
 
 Docs used (read today):
