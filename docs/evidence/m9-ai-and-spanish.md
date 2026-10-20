@@ -293,3 +293,26 @@ gendered, Reportar vs Denunciar).
 - A Spanish server push received on a phone (unit- and integration-tested only).
 - The Spanish web pages on Vercel (built and served locally; go live with the push).
 - Review by a native speaker.
+
+## M9.4: Release (2026-10-20)
+
+| Step | Result |
+|---|---|
+| Push to `main` (`d8c6df0`) | CI ✅; Vercel production deployment Ready; build log `[migrate] migrations applied` (0004 AI tables, 0005 device language) |
+| Production checks | `/api/health` ok (database ok); `/privacy`, `/es/privacy`, `/support`, `/es/support`, `/delete-account`, `/es/delete-account` all 200 with the right `<html lang>`; both privacy policies show the Anthropic section, dated October 20, 2026; `/api/plants/identify` and `/report` answer 401 without sign-in |
+| Build 7 | EAS build `be10cf0b` (version code 7, runtime `3b6bf88f…`), auto-submitted to the internal track as a draft (submission `29ea01d1`). A second submission to the production track was refused by Play ("This version code was already uploaded"), which confirms the internal upload; the release was then created from the library in Play Console |
+| Play Console (owner) | Data safety: App interactions now "App functionality, Analytics", optional, not shared. English listing: new full description and 4 screenshots. Spanish (Latin America) listing added: name "PlantPal: Riega tus plantas", descriptions, 4 screenshots. Production release 7 (0.1.0), full rollout, with English and Spanish release notes |
+| Sent for review | All four changes together, 2026-10-20, managed publishing off (the release goes live once approved) |
+
+Store screenshots: [`docs/release/screenshots/`](../release/screenshots/) (English) and
+[`docs/release/screenshots/es/`](../release/screenshots/es/), made from seeded demo accounts with
+Android's demo status bar (`docs/release/screenshots/README.md`).
+
+### Not proven yet
+- **Build 7 was not tested on a phone before it was sent for review** (the owner chose to send it
+  for review right away). Identify with AI against production, Spanish on a release build (plural
+  rules, dates), Android's per-app language setting and a Spanish push are verified only on the
+  emulator, the local API, or in tests.
+- Google's review result.
+- A real identification against the production API (production has no test sign-in; the first
+  one will come from the app).

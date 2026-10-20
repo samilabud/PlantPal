@@ -62,11 +62,11 @@ Status as of 2026-10-20.
 |---|---|---|
 | ✅ | `ANTHROPIC_API_KEY` on Vercel Production (Secret); `AI_DAILY_LIMIT` unset = $1/day default | you |
 | ⬜ | Recommended before real users: a separate "PlantPal" Anthropic workspace with a monthly spend limit, and a key that doesn't expire Nov 18, 2026 (or a rotation date) | you |
-| ⬜ | **"push"**: deploys the API (identify and report routes, Spanish pages, updated privacy policy) and runs migrations 0004 (AI tables) and 0005 (device language) on Neon. Safe for the live app: v6 never calls the new routes; existing devices default to English | you say, me |
-| ⬜ | Check production after the push: `/api/health`, `/privacy` and `/es/privacy` show the AI section, one identification from curl with a test account | me |
-| ⬜ | **Build 7** (`eas build --profile production --platform android`; native changes: per-app language, iOS locales). Auto-submits to the internal track as a **draft** | you OK, me |
+| ✅ | **"push"** (2026-10-20, `d8c6df0`): deploys the API (identify and report routes, Spanish pages, updated privacy policy) and runs migrations 0004 (AI tables) and 0005 (device language) on Neon. Safe for the live app: v6 never calls the new routes; existing devices default to English | you say, me |
+| ✅ | Check production after the push (2026-10-20, all OK; a real identification waits for the app): `/api/health`, `/privacy` and `/es/privacy` show the AI section, one identification from curl with a test account | me |
+| ✅ | **Build 7** (EAS `be10cf0b`, version code 7) (`eas build --profile production --platform android`; native changes: per-app language, iOS locales). Auto-submits to the internal track as a **draft** | you OK, me |
 | ⬜ | Play Console: roll out the internal-testing draft to testers | you |
 | ⬜ | Internal testing on your phone, both languages: identify a plant, report a suggestion, switch language in Settings and on sign-in, Android per-app language setting, a Spanish reminder | you + me |
-| ⬜ | Play Console: Data safety change (App interactions + App functionality), see `data-safety.md` "M9 changes" | you |
-| ⬜ | Play Console: Spanish (es-419) listing translation from `store-listing.es.md`; updated English text from `store-listing.md`; new screenshots from `screenshots/` | you |
-| ⬜ | Production review submission: **only after you say "submit"** | you |
+| ✅ | Play Console: Data safety change (App interactions + App functionality), see `data-safety.md` "M9 changes" | you |
+| ✅ | Play Console: Spanish (es-419) listing translation from `store-listing.es.md`; updated English text from `store-listing.md`; new screenshots from `screenshots/` | you |
+| 🟡 | Production review submission: **"submit" given 2026-10-20**; release 7 + listings + Data safety sent for review together | you |
