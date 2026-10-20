@@ -20,13 +20,19 @@ const REASON: Record<string, string> = {
 const COPY: Record<PaywallVariant, { title: string; benefits: string[] }> = {
   control: {
     title: 'PlantPal Premium',
-    benefits: ['Unlimited plants', 'Photo history for every plant', 'Supports an independent app'],
+    benefits: [
+      'Unlimited plants',
+      'Photo history for every plant',
+      `${IDENTIFY_LIMITS.premium.perDay} AI plant identifications a day`,
+      'Supports an independent app',
+    ],
   },
   'plants-first': {
     title: 'Room for every plant',
     benefits: [
       'Add as many plants as you own',
       'Keep a photo diary of each one',
+      `Identify up to ${IDENTIFY_LIMITS.premium.perDay} plants a day with AI`,
       'Supports an independent app',
     ],
   },
@@ -61,7 +67,10 @@ export default function PaywallScreen() {
       if (await buy(pkg)) {
         track('purchase_completed', { package_type: pkg.packageType, variant });
         router.back();
-        Alert.alert('Welcome to Premium 🌿', 'Unlimited plants and photo history are unlocked.');
+        Alert.alert(
+          'Welcome to Premium 🌿',
+          'Unlimited plants, photo history and more AI identifications are unlocked.',
+        );
       }
     } catch (e) {
       Alert.alert('Purchase failed', toUserMessage(e, 'purchase'));
