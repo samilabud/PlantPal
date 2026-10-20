@@ -7,4 +7,5 @@ export const contact = {
   issues: 'https://github.com/samilabud/PlantPal/issues',
 };
 
-export const POLICY_DATE = 'October 17, 2026';
+/** Date of the current privacy policy, as shown on each language's page. */
+export const POLICY_DATE = { en: 'October 20, 2026', es: '20 de octubre de 2026' };
