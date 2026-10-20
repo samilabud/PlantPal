@@ -131,3 +131,71 @@ What that means for the limits (decision for the owner):
 - Accuracy on real users' photos; 25 photos is a small, clean set, and only 14 kinds of plant.
 - The Spanish quality was checked by me, not a native speaker.
 - Server-side fallback has never fired, so its billing path is tested only with a fake response.
+
+## M9.2: App (2026-10-20)
+
+### What was built
+| Piece | Where |
+|---|---|
+| "Identify with AI" component: button, cancellable busy state, AI-labeled suggestion, "not sure", errors, offline, Report | `apps/mobile/src/components/ai-identify.tsx` |
+| The request lifecycle (cancel on new photo or leaving the screen; a late answer is ignored) | `apps/mobile/src/ai/use-identify.ts` |
+| Resize to 1024 px + base64 (Expo SDK 57 `ImageManipulator`), first-use notice | `apps/mobile/src/ai/identify.ts` |
+| Plant form: pre-fill + "suggested by AI" label; detail screen: "Use these details" opens Edit pre-filled | `plant-form.tsx`, `plants/[id]/index.tsx`, `plants/[id]/edit.tsx` |
+| Messages for every identify error code (`toUserMessage(…, 'identify')`) | `apps/mobile/src/errors/user-message.ts` |
+| API client: caller cancellation (`ApiError` kind `cancelled`) and the server's error details | `apps/mobile/src/api/client.ts` |
+| Paywall line for the AI limit (`reason=ai`) | `apps/mobile/src/app/paywall.tsx` |
+
+Docs used: Expo SDK 57 [ImageManipulator](https://docs.expo.dev/versions/v57.0.0/sdk/imagemanipulator/)
+(`resize({ width, height: null })`, `saveAsync({ base64: true })`).
+
+UX rules from the brief, and how they're met:
+- **Pre-fill, never save:** the suggestion fills name and interval; saving still needs "Save plant".
+  On the detail screen, "Use these details" opens the edit form pre-filled; nothing changes until Save.
+- **Label:** "Suggested by AI. Please check it." on the card, and a note above the form fields.
+- **Low confidence / not a plant:** nothing pre-filled; "I'm not sure what this is. Try a closer
+  photo of the leaves."
+- **Errors never block adding a plant:** every message ends with what still works.
+- **Offline:** the button is disabled with an explanation; the rest of the form works.
+- **First-use notice:** one sentence ("PlantPal sends this photo to Anthropic's AI service to
+  identify the plant. We don't keep the photo.") with Privacy policy / Cancel / Continue. Only
+  Continue counts as seen. Stored per account, like the first-run guide.
+- **Report this suggestion:** Wrong plant / Offensive, sent without leaving the app.
+- **Busy:** "Identifying…" with Cancel; the app gives up after 20 s (the server after 15 s).
+
+### Tests
+`__tests__/ai-identify-test.tsx` (11), `__tests__/ai-notice-test.ts` (4), plus new cases in
+`user-message-test.ts` and `api-client-test.ts`: suggestion labeled and handed over; low
+confidence and not-a-plant pre-fill nothing; offline disabled with explanation; notice declined
+means no call; cancel ignores a late answer; free daily limit offers Premium; unavailable allows
+a retry; report sends the right body; the form pre-fills, the user edits, and Save sends the
+edited values. Notice: Continue marks seen, Cancel asks again, privacy link opens, not shown twice.
+
+Whole repo: lint ✅, typecheck ✅, tests ✅ shared 2 · API 108 · mobile 123 = **233**.
+
+### On the emulator (Maestro, development build, local API, real Claude)
+`apps/mobile/e2e/4-add-plant-with-ai.yaml` passed: gallery photo → crop → Identify with AI →
+notice → suggestion → pre-filled form → saved.
+
+| One-time notice | Suggestion, form pre-filled | Saved |
+|---|---|---|
+| ![notice](img/m9-ai-notice.png) | ![suggestion](img/m9-ai-suggestion.png) | ![saved](img/m9-saved.png) |
+
+The identification took 2.8 s and cost $0.006. The plant then synced with its photo (checked in the
+local database) after refreshing the local Blob credentials: "Sync failed" in the last screenshot
+was the 12-hour local credential having expired, not this feature.
+
+Notes from the run:
+- The first two attempts failed before reaching the app's screens: Android's "isn't responding"
+  dialog and a Maestro device-server timeout, with the Mac at a load average of 26. The same
+  host-load flakiness as M6/M7; the third run passed once the load dropped.
+- One local API call timed out at 15 s with no response (the first call after the dev server
+  picked up the new route); the next calls took 2.5 s. Not reproduced since; to watch in
+  production logs (`status: "timeout"`).
+
+### Not proven yet
+- On a physical phone and a store build (comes with build 7 in M9.4).
+- The detail screen's "Use these details" path on the emulator (covered by code review and the
+  form test only).
+- "Report this suggestion" from the emulator (unit-tested in the app, integration-tested on the
+  server).
+- The offline state on a device (unit-tested).

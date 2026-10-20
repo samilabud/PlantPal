@@ -1,0 +1,53 @@
+# Flow 4: add a plant with "Identify with AI": pick a photo, accept the one-time notice, get a
+# suggestion labeled as the AI's, check the form was pre-filled, save. It calls the real Claude
+# API through the local API (ANTHROPIC_API_KEY in apps/api/.env.local): about $0.006 per run.
+appId: com.samilabud.plantpal.dev
+name: Add a plant with AI
+---
+- evalScript: ${output.user = 'ai-' + Date.now()}
+- addMedia:
+    - media/monstera.jpg
+- runFlow: subflows/launch-clean.yaml
+- runFlow:
+    file: subflows/sign-in.yaml
+    env:
+      USER: ${output.user}
+- tapOn:
+    id: add-plant
+- tapOn: Choose photo
+# Android's photo picker: the newest photo (the one just added) is first. Then the square crop.
+- extendedWaitUntil:
+    visible: Recent
+    timeout: 20000
+- tapOn:
+    point: 15%,34%
+- tapOn: CROP
+- tapOn:
+    id: ai-identify-button
+# The one-time notice says where the photo goes, with a privacy link.
+- extendedWaitUntil:
+    visible: .*sends this photo to Anthropic.*
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/4-ai-notice
+- tapOn: (?i)continue
+- extendedWaitUntil:
+    visible:
+      id: ai-suggestion
+    timeout: 45000
+- assertVisible: Suggested by AI. Please check it.
+- assertVisible:
+    id: ai-prefilled
+- takeScreenshot: e2e/screenshots/4-ai-suggestion
+- scrollUntilVisible:
+    element:
+      id: plant-submit
+- tapOn:
+    id: plant-submit
+- tapOn:
+    text: Not now
+    optional: true
+# The AI's name was saved (it may be "Monstera" or a longer common name that contains it).
+- extendedWaitUntil:
+    visible: .*Monstera.*
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/4-saved
