@@ -1,4 +1,4 @@
-import { t } from '@/i18n';
+import { t as defaultT, type T } from '@/i18n';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -31,7 +31,8 @@ export function wateringStatus(
   return { state: 'ok', dueAt, days: Math.ceil((dueAt.getTime() - now.getTime()) / DAY_MS) };
 }
 
-export function describeStatus(status: WateringStatus): string {
+/** In components pass `t` from useT, so the text follows a language change. */
+export function describeStatus(status: WateringStatus, t: T = defaultT): string {
   switch (status.state) {
     case 'never':
       return t('status.never');

@@ -1,10 +1,11 @@
 import Constants from 'expo-constants';
 import * as Updates from 'expo-updates';
 
-import { formatDate, t } from '@/i18n';
+import { formatDate, t as defaultT, type T } from '@/i18n';
 
 /** "v0.1.0 · staging · update 1a2b3c4d": which app and which JavaScript is running. */
-export function describeUpdate(): string {
+/** In components pass `t` from useT, so the text follows a language change. */
+export function describeUpdate(t: T = defaultT): string {
   const version = `v${Constants.expoConfig?.version ?? '?'}`;
   if (__DEV__) return `${version} · ${t('update.development')}`;
   const channel = Updates.channel ?? t('update.noChannel');

@@ -6,7 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { markSeen } from '@/data/first-run';
 import { getDb } from '@/db/database';
 
-import { t, useT } from '@/i18n';
+import { useT, type T } from '@/i18n';
 import { usePremium } from '@/purchases/limits';
 import { Button, Logo, radius, Screen, spacing, Text, useColors } from '@/ui';
 
@@ -29,7 +29,7 @@ export const FEATURES: { icon: string; key: FeatureKey }[] = [
   { icon: '🔒', key: 'control' },
 ];
 
-export const featureText = (key: FeatureKey) => ({
+export const featureText = (key: FeatureKey, t: T) => ({
   title: t(`guide.features.${key}.title`),
   body: t(`guide.features.${key}.body`, {
     plants: FREE_PLANT_LIMIT,
@@ -40,7 +40,7 @@ export const featureText = (key: FeatureKey) => ({
 
 export default function GuideScreen() {
   const colors = useColors();
-  useT(); // re-render when the language changes
+  const t = useT();
   const premium = usePremium();
 
   // Marked as seen only once it is really on screen.
@@ -58,7 +58,7 @@ export default function GuideScreen() {
       </View>
 
       {FEATURES.map((f) => {
-        const { title, body } = featureText(f.key);
+        const { title, body } = featureText(f.key, t);
         return (
           <View
             key={f.key}

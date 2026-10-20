@@ -8,11 +8,11 @@ import { toUserMessage } from '@/errors/user-message';
 import { track, usePaywallVariant, type PaywallVariant } from '@/analytics/analytics';
 import { buy, getPackages, isPurchasesAvailable, restore } from '@/purchases/purchases';
 import { FREE_PLANT_LIMIT, IDENTIFY_LIMITS } from '@plantpal/shared';
-import { t, useT } from '@/i18n';
+import { useT, type T } from '@/i18n';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 
 const REASONS = ['plants', 'photos', 'ai'] as const;
-const reasonText = (reason: string | undefined) =>
+const reasonText = (reason: string | undefined, t: T) =>
   REASONS.find((r) => r === reason) &&
   t(`paywall.reasons.${reason as (typeof REASONS)[number]}`, {
     limit: FREE_PLANT_LIMIT,
@@ -25,7 +25,7 @@ const COPY_KEY: Record<PaywallVariant, 'control' | 'plantsFirst'> = {
   control: 'control',
   'plants-first': 'plantsFirst',
 };
-const copyFor = (variant: PaywallVariant) => {
+const copyFor = (variant: PaywallVariant, t: T) => {
   const k = COPY_KEY[variant];
   return {
     title: t(`paywall.${k}.title`),
@@ -41,19 +41,19 @@ const copyFor = (variant: PaywallVariant) => {
 const CHECK = '✓ ';
 
 const PERIODS = ['MONTHLY', 'ANNUAL', 'LIFETIME'] as const;
-const periodText = (packageType: string) =>
+const periodText = (packageType: string, t: T) =>
   PERIODS.find((p) => p === packageType)
     ? t(`paywall.period.${packageType as (typeof PERIODS)[number]}`)
     : '';
 
 export default function PaywallScreen() {
   const colors = useColors();
-  useT(); // re-render when the language changes
+  const t = useT();
   const { reason } = useLocalSearchParams<{ reason?: string }>();
   const [busy, setBusy] = useState<string | null>(null);
   const { variant, ready } = usePaywallVariant();
-  const copy = copyFor(variant);
-  const reasonLine = reasonText(reason);
+  const copy = copyFor(variant, t);
+  const reasonLine = reasonText(reason, t);
 
   // Recorded once the flag is known, so the event carries the copy the user actually saw.
   useEffect(() => {
@@ -123,10 +123,10 @@ export default function PaywallScreen() {
           <Button
             key={pkg.identifier}
             testID={`buy-${pkg.packageType.toLowerCase()}`}
-            label={`${pkg.product.priceString} ${periodText(pkg.packageType)}`.trim()}
+            label={`${pkg.product.priceString} ${periodText(pkg.packageType, t)}`.trim()}
             accessibilityLabel={t('paywall.subscribeLabel', {
               price: pkg.product.priceString,
-              period: periodText(pkg.packageType),
+              period: periodText(pkg.packageType, t),
             })}
             loading={busy === pkg.identifier}
             disabled={busy !== null}

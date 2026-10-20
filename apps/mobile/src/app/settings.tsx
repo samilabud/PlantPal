@@ -12,7 +12,7 @@ import { PlanCard } from '@/components/plan-card';
 import { RemindersCard } from '@/components/reminders-card';
 import { env } from '@/config/env';
 import { privacyUrl, supportUrl } from '@/config/site';
-import { formatDateTime, useT } from '@/i18n';
+import { formatDateTime, useLanguage, useT } from '@/i18n';
 import { requestSync, useSyncStore } from '@/sync/sync-manager';
 import { describeUpdate } from '@/updates/describe-update';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
@@ -20,6 +20,7 @@ import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 export default function SettingsScreen() {
   const colors = useColors();
   const t = useT();
+  const language = useLanguage();
   const user = useAuthStore((s) => s.user);
   const [busy, setBusy] = useState<'signOut' | 'delete' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +99,9 @@ export default function SettingsScreen() {
         </Text>
         <Text muted>
           {t('settings.lastSynced', {
-            when: sync.lastSyncedAt ? formatDateTime(sync.lastSyncedAt) : t('settings.never'),
+            when: sync.lastSyncedAt
+              ? formatDateTime(sync.lastSyncedAt, language)
+              : t('settings.never'),
           })}
         </Text>
         {sync.error && <Text style={{ color: colors.danger }}>{sync.error}</Text>}
@@ -142,7 +145,7 @@ export default function SettingsScreen() {
               : t('settings.checking')}
         </Text>
         <Text muted variant="caption" selectable testID="update-info">
-          {describeUpdate()}
+          {describeUpdate(t)}
         </Text>
       </View>
 

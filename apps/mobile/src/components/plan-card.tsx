@@ -7,12 +7,13 @@ import { useLiveQuery } from '@/data/live';
 import { listPlants } from '@/data/plants';
 import { usePremium } from '@/purchases/limits';
 import { usePremiumStore } from '@/purchases/purchases';
-import { formatDate, useT } from '@/i18n';
+import { formatDate, useLanguage, useT } from '@/i18n';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 export function PlanCard() {
   const colors = useColors();
   const t = useT();
+  const language = useLanguage();
   const premium = usePremium();
   const expiresAt = useAuthStore((s) => s.user?.planExpiresAt);
   const managementUrl = usePremiumStore((s) => s.managementUrl);
@@ -23,7 +24,9 @@ export function PlanCard() {
       <Text variant="heading">{t('plan.title')}</Text>
       {premium ? (
         <Text testID="plan-status">
-          {expiresAt ? t('plan.premiumUntil', { date: formatDate(expiresAt) }) : t('plan.premium')}
+          {expiresAt
+            ? t('plan.premiumUntil', { date: formatDate(expiresAt, language) })
+            : t('plan.premium')}
         </Text>
       ) : (
         <Text testID="plan-status">

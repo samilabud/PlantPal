@@ -1,0 +1,43 @@
+# Flow 5: switching language takes effect at once, on screens that already show data, without a
+# restart; and the choice survives restarting the app.
+appId: com.samilabud.plantpal.dev
+name: Switch language
+---
+- evalScript: ${output.user = 'lang-' + Date.now()}
+- runFlow: subflows/launch-clean.yaml
+- runFlow:
+    file: subflows/sign-in.yaml
+    env:
+      USER: ${output.user}
+- runFlow:
+    file: subflows/add-plant.yaml
+    env:
+      PLANT: Basil
+- assertVisible: Not watered yet
+# Development builds draw a floating tools button over the right end of the header, right on the
+# "Settings" link: tap the link's left side (store builds have no such button).
+- tapOn:
+    id: open-settings
+    point: 15%,50%
+- tapOn:
+    id: settings-language-es
+- assertVisible: Idioma
+- pressKey: back
+# The list that was already on screen now speaks Spanish.
+- assertVisible: Aún sin regar
+- assertVisible: Mis plantas (1)
+- assertVisible: Agregar planta
+- takeScreenshot: e2e/screenshots/5-list-es
+# Restart: the choice is remembered on the device.
+- stopApp
+- openLink: exp+plantpal://expo-development-client/?url=http%3A%2F%2F10.0.2.2%3A8081
+- extendedWaitUntil:
+    visible: Aún sin regar
+    timeout: 60000
+# Back to English for the other flows.
+- tapOn:
+    id: open-settings
+    point: 15%,50%
+- tapOn:
+    id: settings-language-system
+- assertVisible: Language

@@ -1,0 +1,24 @@
+appId: com.samilabud.plantpal.dev
+---
+- runFlow: ../subflows/launch-clean.yaml
+- extendedWaitUntil:
+    visible: Toggle performance monitor
+    timeout: 8000
+    optional: true
+- runFlow:
+    when:
+      visible: Toggle performance monitor
+    commands:
+      - pressKey: back
+- tapOn:
+    id: language-es
+- extendedWaitUntil:
+    visible: Nunca más olvides regar una planta.
+    timeout: 10000
+- takeScreenshot: toggle-es
+- tapOn:
+    id: language-en
+- extendedWaitUntil:
+    visible: Never forget to water a plant again.
+    timeout: 10000
+- takeScreenshot: toggle-en

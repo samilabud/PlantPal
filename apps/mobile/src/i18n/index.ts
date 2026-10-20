@@ -36,19 +36,30 @@ function readPreference(): LanguagePreference {
 
 const resolve = (p: LanguagePreference): AppLanguage => (p === 'system' ? systemLanguage() : p);
 
-const usePreferenceStore = create<{ preference: LanguagePreference }>(() => ({
-  preference: readPreference(),
-}));
+const initialPreference = readPreference();
+
+/**
+ * The language as React state. With the React Compiler on, a component that reads the language
+ * through a plain function (i18n.language) can be memoized and keep showing the old one; reading
+ * it from this store (or passing `t` from useT) makes the language a real dependency.
+ */
+const usePreferenceStore = create<{ preference: LanguagePreference; language: AppLanguage }>(
+  () => ({ preference: initialPreference, language: resolve(initialPreference) }),
+);
 
 i18n.use(initReactI18next).init({
   resources: { en: { translation: en }, es: { translation: es } },
-  lng: resolve(usePreferenceStore.getState().preference),
+  lng: resolve(initialPreference),
   fallbackLng: 'en',
   // Synchronous: the resources are bundled, so the first frame is already translated.
   initAsync: false,
   interpolation: { escapeValue: false }, // React escapes already
   returnNull: false,
 });
+
+i18n.on('languageChanged', (lng) =>
+  usePreferenceStore.setState({ language: lng === 'es' ? 'es' : 'en' }),
+);
 
 /** Switches immediately (every `useT` screen re-renders) and remembers the choice. */
 export function setLanguagePreference(preference: LanguagePreference) {
@@ -62,12 +73,15 @@ export function setLanguagePreference(preference: LanguagePreference) {
 }
 
 export const useLanguagePreference = () => usePreferenceStore((s) => s.preference);
+/** The language the app is showing, as state: use this (not currentLanguage) during render. */
+export const useLanguage = () => usePreferenceStore((s) => s.language);
 
 /** The language the app is showing right now. */
 export const currentLanguage = (): AppLanguage => (i18n.language === 'es' ? 'es' : 'en');
 
 /** For Intl dates and numbers: neutral Latin American Spanish. */
-export const currentLocale = () => (currentLanguage() === 'es' ? 'es-419' : 'en-US');
+const localeOf = (language: AppLanguage) => (language === 'es' ? 'es-419' : 'en-US');
+export const currentLocale = () => localeOf(currentLanguage());
 
 /** Calls `listener` whenever the app's language changes (push registration, local reminders). */
 export function onLanguageChange(listener: (language: AppLanguage) => void) {
@@ -83,10 +97,15 @@ AppState.addEventListener('change', (state) => {
   if (language !== i18n.language) i18n.changeLanguage(language);
 });
 
-export const formatDateTime = (iso: string) =>
-  new Date(iso).toLocaleString(currentLocale(), { dateStyle: 'medium', timeStyle: 'short' });
-export const formatDate = (value: string | number | Date) =>
-  new Date(value).toLocaleDateString(currentLocale(), { dateStyle: 'medium' });
+/** In components, pass `useLanguage()` so the compiler re-runs these when the language changes. */
+export const formatDateTime = (iso: string, language: AppLanguage = currentLanguage()) =>
+  new Date(iso).toLocaleString(localeOf(language), { dateStyle: 'medium', timeStyle: 'short' });
+export const formatDate = (
+  value: string | number | Date,
+  language: AppLanguage = currentLanguage(),
+) => new Date(value).toLocaleDateString(localeOf(language), { dateStyle: 'medium' });
+
+export type T = typeof i18n.t;
 
 /** For code outside components (alerts, notifications, error messages). */
 export const t = i18n.t.bind(i18n);

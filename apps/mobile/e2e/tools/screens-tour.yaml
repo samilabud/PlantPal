@@ -1,0 +1,132 @@
+# Screenshot tour: every screen in one language. Not part of the E2E suite (it lives outside the
+# top-level folder). Run once per language:
+#   maestro test -e LANG=en e2e/tools/screens-tour.yaml
+#   maestro test -e LANG=es e2e/tools/screens-tour.yaml
+# Uses "Identify with AI" once: one real Claude call through the local API (~$0.006).
+appId: com.samilabud.plantpal.dev
+name: Screens tour
+---
+- evalScript: ${output.user = 'tour-' + LANG + '-' + Date.now()}
+- addMedia:
+    - ../media/monstera.jpg
+- runFlow: ../subflows/launch-clean.yaml
+# The dev build's menu slides up a moment after launch (first run after clearing data); wait for
+# it and close it so it doesn't cover the screen.
+- extendedWaitUntil:
+    visible: Toggle performance monitor
+    timeout: 8000
+    optional: true
+- runFlow:
+    when:
+      visible: Toggle performance monitor
+    commands:
+      - pressKey: back
+# The language switch on the sign-in screen, before signing in.
+- tapOn:
+    id: language-${LANG}
+- takeScreenshot: e2e/screenshots/tour-${LANG}-01-sign-in
+- tapOn:
+    id: dev-user-name
+- inputText: ${output.user}
+- pressKey: back
+- tapOn:
+    id: dev-sign-in
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: (Here is everything|Esto es todo).*
+    timeout: 30000
+- takeScreenshot: e2e/screenshots/tour-${LANG}-02-guide
+- scrollUntilVisible:
+    element:
+      id: guide-done
+- tapOn:
+    id: guide-done
+- extendedWaitUntil:
+    visible:
+      id: add-plant
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/tour-${LANG}-03-empty
+# A plant with a photo and an AI suggestion.
+- tapOn:
+    id: add-plant
+- tapOn: (Choose photo|Elegir foto)
+- extendedWaitUntil:
+    visible: Recent
+    timeout: 20000
+- tapOn:
+    point: 15%,34%
+- tapOn: CROP
+- tapOn:
+    id: ai-identify-button
+- extendedWaitUntil:
+    visible: .*(Anthropic).*
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/tour-${LANG}-04-ai-notice
+- tapOn: (?i)(continue|continuar)
+- extendedWaitUntil:
+    visible:
+      id: ai-suggestion
+    timeout: 45000
+- takeScreenshot: e2e/screenshots/tour-${LANG}-05-ai-suggestion
+- scrollUntilVisible:
+    element:
+      id: plant-submit
+- tapOn:
+    id: plant-submit
+- tapOn:
+    text: (Not now|Ahora no)
+    optional: true
+# Two more plants, one of them watered, so the list shows different states.
+- tapOn:
+    id: add-plant
+- tapOn:
+    id: plant-name-input
+- inputText: Pothos
+- tapOn:
+    id: plant-interval-input
+- eraseText: 3
+- inputText: '5'
+- hideKeyboard
+- tapOn:
+    id: plant-submit
+- tapOn:
+    id: add-plant
+- tapOn:
+    id: plant-name-input
+- inputText: Ficus
+- hideKeyboard
+- tapOn:
+    id: plant-submit
+- tapOn: (Water|Regar)
+- takeScreenshot: e2e/screenshots/tour-${LANG}-06-list
+- tapOn: Ficus
+- extendedWaitUntil:
+    visible:
+      id: water-now
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/tour-${LANG}-07-detail
+- scrollUntilVisible:
+    element:
+      text: (Edit plant|Editar planta)
+- tapOn: (Edit plant|Editar planta)
+- takeScreenshot: e2e/screenshots/tour-${LANG}-08-edit
+- pressKey: back
+- pressKey: back
+- tapOn:
+    id: open-settings
+    point: 15%,50% # dev builds draw a tools button over the link's right end
+- takeScreenshot: e2e/screenshots/tour-${LANG}-09-settings
+- scrollUntilVisible:
+    element:
+      id: delete-account
+- takeScreenshot: e2e/screenshots/tour-${LANG}-10-settings-bottom
+- scrollUntilVisible:
+    element:
+      id: upgrade
+    direction: UP
+- tapOn:
+    id: upgrade
+- extendedWaitUntil:
+    visible: (PlantPal Premium|Room for every plant|Espacio para todas tus plantas)
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/tour-${LANG}-11-paywall

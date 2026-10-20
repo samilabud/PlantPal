@@ -90,6 +90,22 @@
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/app/_layout.tsx"
-    ]
+    ],
+    "transform": {
+      "\\.[jt]sx?$": [
+        "babel-jest",
+        {
+          "presets": [
+            "babel-preset-expo"
+          ],
+          "caller": {
+            "name": "metro",
+            "bundler": "metro",
+            "platform": "android",
+            "supportsReactCompiler": true
+          }
+        }
+      ]
+    }
   }
 }

@@ -127,7 +127,7 @@ export default function SignInScreen() {
           {t('signIn.agreeAfter')}
         </Text>
         <Text muted variant="caption" style={styles.center} testID="app-version">
-          {describeUpdate()}
+          {describeUpdate(t)}
         </Text>
       </View>
     </SafeAreaView>

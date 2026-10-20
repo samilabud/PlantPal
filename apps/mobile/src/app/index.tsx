@@ -120,7 +120,7 @@ function PlantRow({ plant }: { plant: PlantListItem }) {
   const colors = useColors();
   const t = useT();
   const status = wateringStatus(plant.lastWateredAt, plant.wateringIntervalDays);
-  const statusText = describeStatus(status);
+  const statusText = describeStatus(status, t);
   const urgent = status.state === 'overdue' || status.state === 'today' || status.state === 'never';
 
   return (

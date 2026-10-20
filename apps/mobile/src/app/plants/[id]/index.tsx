@@ -19,12 +19,13 @@ import { describeStatus, wateringStatus } from '@/data/watering';
 import { track } from '@/analytics/analytics';
 import { capturePhoto, localFileExists } from '@/photos/capture';
 import { canAddPhoto, usePremium } from '@/purchases/limits';
-import { formatDateTime, useT } from '@/i18n';
+import { formatDateTime, useLanguage, useT } from '@/i18n';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 export default function PlantDetailScreen() {
   const colors = useColors();
   const t = useT();
+  const language = useLanguage();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: plant, loading } = useLiveQuery((db) => getPlant(db, id), [id]);
   const { data: waterings } = useLiveQuery((db) => listWaterings(db, id), [id]);
@@ -41,6 +42,7 @@ export default function PlantDetailScreen() {
   }
   const statusText = describeStatus(
     wateringStatus(plant.lastWateredAt, plant.wateringIntervalDays),
+    t,
   );
   const cover = photos?.find((p) => p.id === plant.coverPhotoId);
   // The AI needs the file itself; a photo only synced from another phone isn't on this one.
@@ -124,10 +126,12 @@ export default function PlantDetailScreen() {
         {waterings?.length ? (
           waterings.map((w) => (
             <View key={w.id} style={styles.historyRow}>
-              <Text style={styles.flex}>{formatDateTime(w.wateredAt)}</Text>
+              <Text style={styles.flex}>{formatDateTime(w.wateredAt, language)}</Text>
               <Button
                 label={t('detail.undo')}
-                accessibilityLabel={t('detail.undoLabel', { date: formatDateTime(w.wateredAt) })}
+                accessibilityLabel={t('detail.undoLabel', {
+                  date: formatDateTime(w.wateredAt, language),
+                })}
                 variant="secondary"
                 onPress={() => mutate((db) => deleteWatering(db, w.id))}
               />
@@ -147,7 +151,7 @@ export default function PlantDetailScreen() {
                 photoId={p.id}
                 localUri={p.localUri}
                 size={96}
-                label={t('detail.photoFrom', { date: formatDateTime(p.takenAt) })}
+                label={t('detail.photoFrom', { date: formatDateTime(p.takenAt, language) })}
               />
               {p.uploadState === 'pending' && (
                 <Text variant="caption" muted>

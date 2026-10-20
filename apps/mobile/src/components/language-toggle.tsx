@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { currentLanguage, setLanguagePreference, useT } from '@/i18n';
+import { setLanguagePreference, useLanguage, useT } from '@/i18n';
 import { Text, useColors } from '@/ui';
 
 const LANGUAGES = ['en', 'es'] as const;
@@ -12,7 +12,7 @@ const LANGUAGES = ['en', 'es'] as const;
 export function LanguageToggle() {
   const colors = useColors();
   const t = useT();
-  const active = currentLanguage();
+  const active = useLanguage();
   return (
     <View style={styles.toggle} testID="language-toggle">
       {LANGUAGES.map((language, i) => (
@@ -45,6 +45,7 @@ export function LanguageToggle() {
 }
 
 const styles = StyleSheet.create({
-  toggle: { flexDirection: 'row', justifyContent: 'flex-end' },
+  // Centered: the top-right corner is where development builds draw their tools button.
+  toggle: { flexDirection: 'row', justifyContent: 'center' },
   toggleItem: { flexDirection: 'row', alignItems: 'center' },
 });
