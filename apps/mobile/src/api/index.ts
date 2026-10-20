@@ -6,6 +6,7 @@ import {
   PushSendResult,
   SignedUrlResponse,
   SyncResponse,
+  type AppLanguage,
   type IdentifyReportRequest,
   type IdentifyRequest,
   type SyncRequest,
@@ -54,10 +55,14 @@ export async function putPhotoFile(url: string, uri: string) {
   if (!response.ok) throw new Error(`Photo upload failed (${response.status})`);
 }
 
-export const registerDevice = (expoPushToken: string, platform: 'ios' | 'android') =>
+export const registerDevice = (
+  expoPushToken: string,
+  platform: 'ios' | 'android',
+  language: AppLanguage,
+) =>
   api.request('/api/devices', {
     method: 'POST',
-    body: { expoPushToken, platform },
+    body: { expoPushToken, platform, language },
     schema: OkResponse,
   });
 

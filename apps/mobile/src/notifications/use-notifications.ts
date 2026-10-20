@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 
 import { useDataVersion } from '@/data/live';
 import { getDb } from '@/db/database';
+import { onLanguageChange } from '@/i18n';
 
 import { syncLocalReminders, urlFromNotification } from './notifications';
 import { registerForPush } from './push-registration';
@@ -41,7 +42,13 @@ export function useReminderScheduler(enabled: boolean) {
   const version = useDataVersion((s) => s.version);
 
   useEffect(() => {
-    if (enabled) registerForPush();
+    if (!enabled) return;
+    registerForPush();
+    // New language: server pushes and local reminders are rewritten in it.
+    return onLanguageChange(async () => {
+      registerForPush();
+      syncLocalReminders(await getDb()).catch(() => undefined);
+    });
   }, [enabled]);
 
   useEffect(() => {

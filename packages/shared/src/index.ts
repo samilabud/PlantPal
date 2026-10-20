@@ -4,4 +4,5 @@ export * from './health';
 export * from './identify';
 export * from './plans';
 export * from './push';
+export * from './push-texts';
 export * from './sync';

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { AppLanguage } from './identify';
+
 /** Expo push tokens look like ExponentPushToken[xxxx] (older) or ExpoPushToken[xxxx]. */
 export const ExpoPushToken = z
   .string()
@@ -8,6 +10,8 @@ export const ExpoPushToken = z
 export const RegisterDeviceRequest = z.object({
   expoPushToken: ExpoPushToken,
   platform: z.enum(['ios', 'android']),
+  /** The app's language, for server-sent reminders. Optional: app versions before M9 don't send it. */
+  language: AppLanguage.optional(),
 });
 export type RegisterDeviceRequest = z.infer<typeof RegisterDeviceRequest>;
 

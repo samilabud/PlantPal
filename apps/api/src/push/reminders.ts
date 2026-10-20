@@ -1,3 +1,4 @@
+import { OVERDUE_PUSH, type AppLanguage } from '@plantpal/shared';
 import { eq, inArray, sql } from 'drizzle-orm';
 
 import type { Db } from '@/db';
@@ -29,14 +30,18 @@ export async function findOverduePlants(db: Db, now = new Date()) {
   return [...rows];
 }
 
-export function digestFor(plants: { id: string; name: string }[]): Omit<PushMessage, 'to'> {
+export function digestFor(
+  plants: { id: string; name: string }[],
+  language: AppLanguage = 'en',
+): Omit<PushMessage, 'to'> {
+  const text = OVERDUE_PUSH[language];
   const base = { sound: 'default' as const, channelId: 'reminders' as const };
   if (plants.length === 1) {
     const [plant] = plants;
     return {
       ...base,
-      title: `🪴 ${plant!.name} needs water`,
-      body: "It's past its watering day. Tap to open it.",
+      title: text.oneTitle(plant!.name),
+      body: text.oneBody,
       data: { url: `/plants/${plant!.id}` },
     };
   }
@@ -44,10 +49,10 @@ export function digestFor(plants: { id: string; name: string }[]): Omit<PushMess
     .slice(0, 3)
     .map((p) => p.name)
     .join(', ');
-  const more = plants.length > 3 ? ` and ${plants.length - 3} more` : '';
+  const more = plants.length > 3 ? text.andMore(plants.length - 3) : '';
   return {
     ...base,
-    title: `🪴 ${plants.length} plants need water`,
+    title: text.manyTitle(plants.length),
     body: `${names}${more}`,
     data: { url: '/' },
   };
@@ -63,11 +68,14 @@ export async function buildReminderMessages(db: Db, now = new Date()): Promise<P
   if (!byUser.size) return [];
 
   const userDevices = await db
-    .select({ userId: devices.userId, token: devices.expoPushToken })
+    .select({ userId: devices.userId, token: devices.expoPushToken, language: devices.language })
     .from(devices)
     .where(inArray(devices.userId, [...byUser.keys()]));
 
-  return userDevices.map((d) => ({ to: d.token, ...digestFor(byUser.get(d.userId)!) }));
+  return userDevices.map((d) => ({
+    to: d.token,
+    ...digestFor(byUser.get(d.userId)!, d.language),
+  }));
 }
 
 export async function devicesOf(db: Db, userId: string) {

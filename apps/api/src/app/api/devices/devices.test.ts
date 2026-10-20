@@ -40,6 +40,17 @@ describe.skipIf(!hasDb)('device and push routes (integration)', () => {
     expect(await testDb().db.select().from(devices)).toHaveLength(0);
   });
 
+  it('stores the language, and an older app (no language) keeps the stored one', async () => {
+    const u = await createUser();
+    const body = { expoPushToken: t, platform: 'android' };
+    await register(req('POST', { ...body, language: 'es' }, u.auth));
+    expect((await testDb().db.select().from(devices))[0]!.language).toBe('es');
+    await register(req('POST', body, u.auth)); // app version from before M9
+    expect((await testDb().db.select().from(devices))[0]!.language).toBe('es');
+    await register(req('POST', { ...body, language: 'en' }, u.auth));
+    expect((await testDb().db.select().from(devices))[0]!.language).toBe('en');
+  });
+
   it('rejects something that is not an Expo push token', async () => {
     const u = await createUser();
     const res = await register(req('POST', { expoPushToken: 'hello', platform: 'ios' }, u.auth));

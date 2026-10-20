@@ -139,6 +139,7 @@ export const plantPhotos = pgTable(
 );
 
 export const platformEnum = pgEnum('device_platform', ['ios', 'android']);
+export const languageEnum = pgEnum('app_language', ['en', 'es']);
 
 /** One row per installed app that can receive push. A token belongs to one user at a time. */
 export const devices = pgTable(
@@ -150,6 +151,8 @@ export const devices = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     expoPushToken: text('expo_push_token').notNull().unique(),
     platform: platformEnum('platform').notNull(),
+    /** Language of the server's pushes to this phone (a user's phones can differ). */
+    language: languageEnum('language').notNull().default('en'),
     lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
     ...timestamps,
   },

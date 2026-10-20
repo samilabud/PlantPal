@@ -18,10 +18,21 @@ export const POST = withErrors(async (request) => {
   const body = await parseBody(request, RegisterDeviceRequest);
   await db()
     .insert(devices)
-    .values({ userId, expoPushToken: body.expoPushToken, platform: body.platform })
+    .values({
+      userId,
+      expoPushToken: body.expoPushToken,
+      platform: body.platform,
+      language: body.language ?? 'en',
+    })
     .onConflictDoUpdate({
       target: devices.expoPushToken,
-      set: { userId, platform: body.platform, lastSeenAt: sql`now()` },
+      set: {
+        userId,
+        platform: body.platform,
+        // An older app that doesn't send a language keeps whatever was stored.
+        ...(body.language && { language: body.language }),
+        lastSeenAt: sql`now()`,
+      },
     });
   return json(ok);
 });

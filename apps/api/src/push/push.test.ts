@@ -22,8 +22,10 @@ const message = (to: string): PushMessage => ({
 });
 const reply = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
 
-async function addDevice(userId: string, t: string) {
-  await testDb().db.insert(devices).values({ userId, expoPushToken: t, platform: 'android' });
+async function addDevice(userId: string, t: string, language: 'en' | 'es' = 'en') {
+  await testDb()
+    .db.insert(devices)
+    .values({ userId, expoPushToken: t, platform: 'android', language });
 }
 
 describe('digestFor', () => {
@@ -40,6 +42,17 @@ describe('digestFor', () => {
       body: 'A, B, C and 2 more',
       data: { url: '/' },
     });
+  });
+  it('speaks Spanish to a phone set to Spanish', () => {
+    expect(digestFor([{ id: 'p1', name: 'Helecho' }], 'es')).toMatchObject({
+      title: '🪴 Helecho necesita agua',
+      body: 'Ya pasó su día de riego. Toca para abrirla.',
+    });
+    const d = digestFor(
+      ['A', 'B', 'C', 'D', 'E'].map((n) => ({ id: n, name: n })),
+      'es',
+    );
+    expect(d).toMatchObject({ title: '🪴 5 plantas necesitan agua', body: 'A, B, C y 2 más' });
   });
 });
 
@@ -151,7 +164,17 @@ describe.skipIf(!hasDb)('push (integration)', () => {
     expect(overdue.map((p) => p.name)).toEqual(['Thirsty']);
 
     await addDevice(user.id, token('phone'));
+    await addDevice(user.id, token('tablet'), 'es'); // one user, two languages
     const messages = await buildReminderMessages(testDb().db, now);
-    expect(messages).toMatchObject([{ to: token('phone'), data: { url: `/plants/${thirsty}` } }]);
+    expect(messages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          to: token('phone'),
+          title: '🪴 Thirsty needs water',
+          data: { url: `/plants/${thirsty}` },
+        }),
+        expect.objectContaining({ to: token('tablet'), title: '🪴 Thirsty necesita agua' }),
+      ]),
+    );
   });
 });
