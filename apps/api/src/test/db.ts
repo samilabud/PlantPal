@@ -8,7 +8,11 @@ export function testDb() {
   return conn;
 }
 
-/** Wipes every table between tests. `users` cascades to the rest. */
+/**
+ * Wipes every table between tests. `users` cascades to user data; push tickets and webhook
+ * events aren't linked to a user, so they're listed too (a leftover ticket made the cron test
+ * call Expo for receipts, depending on which test file ran before it).
+ */
 export async function resetDb() {
-  await testDb().sql`truncate table users cascade`;
+  await testDb().sql`truncate table users, push_tickets, webhook_events cascade`;
 }
