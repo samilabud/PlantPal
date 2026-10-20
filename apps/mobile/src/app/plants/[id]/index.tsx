@@ -19,13 +19,12 @@ import { describeStatus, wateringStatus } from '@/data/watering';
 import { track } from '@/analytics/analytics';
 import { capturePhoto, localFileExists } from '@/photos/capture';
 import { canAddPhoto, usePremium } from '@/purchases/limits';
+import { formatDateTime, useT } from '@/i18n';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
-
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 export default function PlantDetailScreen() {
   const colors = useColors();
+  const t = useT();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: plant, loading } = useLiveQuery((db) => getPlant(db, id), [id]);
   const { data: waterings } = useLiveQuery((db) => listWaterings(db, id), [id]);
@@ -36,7 +35,7 @@ export default function PlantDetailScreen() {
   if (!plant) {
     return (
       <View style={styles.missing}>
-        <Text>This plant was deleted.</Text>
+        <Text>{t('detail.deleted')}</Text>
       </View>
     );
   }
@@ -58,26 +57,22 @@ export default function PlantDetailScreen() {
       await mutate((db) => addPhoto(db, id, captured.photoId, captured.uri));
       track('photo_added', { source });
     } catch (e) {
-      Alert.alert('Photo', toUserMessage(e, 'photo'));
+      Alert.alert(t('form.photoTitle'), toUserMessage(e, 'photo'));
     }
   }
 
   function confirmDelete() {
-    Alert.alert(
-      'Delete plant?',
-      `${plant!.name} and its history will be removed on all your devices.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            await mutate((db) => deletePlant(db, id));
-            router.back();
-          },
+    Alert.alert(t('detail.deleteTitle'), t('detail.deleteBody', { name: plant!.name }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          await mutate((db) => deletePlant(db, id));
+          router.back();
         },
-      ],
-    );
+      },
+    ]);
   }
 
   return (
@@ -88,21 +83,20 @@ export default function PlantDetailScreen() {
           photoId={plant.coverPhotoId}
           localUri={cover?.localUri}
           size={160}
-          label={`Photo of ${plant.name}`}
+          label={t('common.photoOf', { name: plant.name })}
         />
         <Text variant="title" accessibilityRole="header">
           {plant.name}
         </Text>
         <Text muted>
-          Every {plant.wateringIntervalDays} {plant.wateringIntervalDays === 1 ? 'day' : 'days'} ·{' '}
-          {statusText}
+          {t('detail.every', { count: plant.wateringIntervalDays })} · {statusText}
         </Text>
       </View>
 
       <AiIdentify
         photoUri={aiPhoto}
         action={{
-          label: 'Use these details',
+          label: t('detail.useAi'),
           // Opens the edit form pre-filled; the user still decides and taps Save.
           onPress: (s) =>
             router.push({
@@ -118,7 +112,7 @@ export default function PlantDetailScreen() {
 
       <Button
         testID="water-now"
-        label="Water now"
+        label={t('detail.waterNow')}
         onPress={() => {
           track('plant_watered', { from: 'detail' });
           return mutate((db) => waterPlant(db, id));
@@ -126,26 +120,26 @@ export default function PlantDetailScreen() {
       />
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text variant="heading">Watering history</Text>
+        <Text variant="heading">{t('detail.history')}</Text>
         {waterings?.length ? (
           waterings.map((w) => (
             <View key={w.id} style={styles.historyRow}>
-              <Text style={styles.flex}>{formatDate(w.wateredAt)}</Text>
+              <Text style={styles.flex}>{formatDateTime(w.wateredAt)}</Text>
               <Button
-                label="Undo"
-                accessibilityLabel={`Remove watering on ${formatDate(w.wateredAt)}`}
+                label={t('detail.undo')}
+                accessibilityLabel={t('detail.undoLabel', { date: formatDateTime(w.wateredAt) })}
                 variant="secondary"
                 onPress={() => mutate((db) => deleteWatering(db, w.id))}
               />
             </View>
           ))
         ) : (
-          <Text muted>Not watered yet.</Text>
+          <Text muted>{t('detail.notWatered')}</Text>
         )}
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text variant="heading">Photos</Text>
+        <Text variant="heading">{t('detail.photos')}</Text>
         <View style={styles.photoGrid}>
           {photos?.map((p) => (
             <View key={p.id}>
@@ -153,11 +147,11 @@ export default function PlantDetailScreen() {
                 photoId={p.id}
                 localUri={p.localUri}
                 size={96}
-                label={`Photo from ${formatDate(p.takenAt)}`}
+                label={t('detail.photoFrom', { date: formatDateTime(p.takenAt) })}
               />
               {p.uploadState === 'pending' && (
                 <Text variant="caption" muted>
-                  Waiting to upload
+                  {t('detail.waitingUpload')}
                 </Text>
               )}
             </View>
@@ -165,13 +159,13 @@ export default function PlantDetailScreen() {
         </View>
         <View style={styles.photoButtons}>
           <Button
-            label="Take photo"
+            label={t('form.takePhoto')}
             variant="secondary"
             style={styles.flex}
             onPress={() => addPhotoFrom('camera')}
           />
           <Button
-            label="Choose photo"
+            label={t('form.choosePhoto')}
             variant="secondary"
             style={styles.flex}
             onPress={() => addPhotoFrom('library')}
@@ -180,11 +174,16 @@ export default function PlantDetailScreen() {
       </View>
 
       <Button
-        label="Edit plant"
+        label={t('detail.edit')}
         variant="secondary"
         onPress={() => router.push({ pathname: '/plants/[id]/edit', params: { id } })}
       />
-      <Button testID="delete-plant" label="Delete plant" variant="danger" onPress={confirmDelete} />
+      <Button
+        testID="delete-plant"
+        label={t('detail.delete')}
+        variant="danger"
+        onPress={confirmDelete}
+      />
     </ScrollView>
   );
 }

@@ -1,20 +1,13 @@
 import { statusCodes } from '@react-native-google-signin/google-signin';
 
 import { ApiError } from '@/api/client';
+import { t } from '@/i18n';
 
 export type ErrorContext =
   'signIn' | 'sync' | 'purchase' | 'restore' | 'photo' | 'deleteAccount' | 'identify' | 'report';
 
-const FALLBACK: Record<ErrorContext, string> = {
-  signIn: "Couldn't sign you in. Please try again.",
-  sync: "Couldn't sync. Your changes are safe on this phone and will sync later.",
-  purchase: "The purchase didn't go through. You weren't charged. Please try again.",
-  restore: "Couldn't restore purchases. Please try again.",
-  photo: "Couldn't add the photo. Please try again.",
-  deleteAccount: "Couldn't delete your account. Nothing was deleted. Please try again.",
-  identify: "Couldn't identify the plant right now. You can still add it yourself.",
-  report: "Couldn't send the report. Please try again.",
-};
+/** Read at call time, so the message is in the language the app shows right now. */
+const fallback = (context: ErrorContext) => t(`errors.fallback.${context}`);
 
 /**
  * "Identify with AI" answers with its own codes. The feature is optional, so every message ends
@@ -25,20 +18,17 @@ function identifyMessage(error: ApiError): string | null {
     case 'identify_limit': {
       const monthly = error.details?.period === 'month';
       const free = error.details?.plan === 'free';
-      if (monthly)
-        return "You've used this month's AI identifications. You can still add plants yourself.";
-      return free
-        ? "You've used today's free AI identifications. Premium gives you more, or try again tomorrow."
-        : "You've used today's AI identifications. Try again tomorrow.";
+      if (monthly) return t('errors.identifyMonthly');
+      return free ? t('errors.identifyDailyFree') : t('errors.identifyDaily');
     }
     case 'ai_resting':
-      return 'AI identification is resting for today. Try again tomorrow, or add the plant yourself.';
+      return t('errors.aiResting');
     case 'ai_timeout':
-      return 'The AI took too long to answer. Please try again.';
+      return t('errors.aiTimeout');
     case 'ai_not_configured':
     case 'ai_unavailable':
     case 'ai_invalid_output':
-      return withRef(FALLBACK.identify, error.code);
+      return withRef(fallback('identify'), error.code);
     default:
       return null;
   }
@@ -74,42 +64,30 @@ export function toUserMessage(error: unknown, context: ErrorContext): string {
   if (error instanceof ApiError) {
     const special = context === 'identify' ? identifyMessage(error) : null;
     if (special) return special;
-    if (error.kind === 'network')
-      return 'No internet connection. Check your connection and try again.';
-    if (error.kind === 'timeout')
-      return 'PlantPal is taking too long to respond. Please try again.';
-    if (error.status === 401) return 'Your session expired. Please sign in again.';
-    if (error.status === 429) return 'Too many attempts. Please wait a minute and try again.';
-    if (error.status && error.status >= 500)
-      return `PlantPal's server had a problem. Please try again in a moment. (ref: server-${error.status})`;
-    return withRef(FALLBACK[context], error.code ?? `http-${error.status ?? '?'}`);
+    if (error.kind === 'network') return t('errors.network');
+    if (error.kind === 'timeout') return t('errors.timeout');
+    if (error.status === 401) return t('errors.session');
+    if (error.status === 429) return t('errors.rateLimited');
+    if (error.status && error.status >= 500) return t('errors.server', { status: error.status });
+    return withRef(fallback(context), error.code ?? `http-${error.status ?? '?'}`);
   }
 
   const code = codeOf(error);
   if (code && context === 'signIn') {
-    if (code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE)
-      return 'Google Play services is missing or out of date on this phone. Update it from the Play Store and try again.';
-    if (code === GOOGLE_DEVELOPER_ERROR)
-      return withRef(
-        "Google sign-in isn't working in this version of PlantPal. Please update the app, or try again later.",
-        'google-10',
-      );
-    return withRef(FALLBACK[context], `google-${code}`);
+    if (code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) return t('errors.playServices');
+    if (code === GOOGLE_DEVELOPER_ERROR) return withRef(t('errors.googleDeveloper'), 'google-10');
+    return withRef(fallback(context), `google-${code}`);
   }
   if (code && (context === 'purchase' || context === 'restore')) {
-    if (code === RC.NETWORK) return 'No internet connection. Check your connection and try again.';
-    if (code === RC.PURCHASE_NOT_ALLOWED)
-      return 'Purchases are not allowed on this device or account.';
-    if (code === RC.PAYMENT_PENDING)
-      return 'Your payment is pending. Premium unlocks as soon as Google Play confirms it.';
-    if (code === RC.ALREADY_PURCHASED)
-      return 'You already own this. Tap "Restore purchases" to unlock it on this phone.';
-    if (code === RC.STORE_PROBLEM)
-      return "Google Play had a problem. You weren't charged. Please try again later.";
-    return withRef(FALLBACK[context], `store-${code}`);
+    if (code === RC.NETWORK) return t('errors.network');
+    if (code === RC.PURCHASE_NOT_ALLOWED) return t('errors.purchaseNotAllowed');
+    if (code === RC.PAYMENT_PENDING) return t('errors.paymentPending');
+    if (code === RC.ALREADY_PURCHASED) return t('errors.alreadyPurchased');
+    if (code === RC.STORE_PROBLEM) return t('errors.storeProblem');
+    return withRef(fallback(context), `store-${code}`);
   }
 
-  return FALLBACK[context];
+  return fallback(context);
 }
 
 const withRef = (message: string, ref: string) => `${message} (ref: ${ref})`;

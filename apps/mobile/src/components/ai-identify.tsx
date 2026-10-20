@@ -7,6 +7,7 @@ import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { reportSuggestion } from '@/api';
 import { useIdentify } from '@/ai/use-identify';
 import { toUserMessage } from '@/errors/user-message';
+import { t, useT } from '@/i18n';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 type Props = {
@@ -27,6 +28,7 @@ const noop = () => {};
  */
 export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
   const colors = useColors();
+  const t = useT();
   const { isConnected } = useNetInfo();
   const offline = isConnected === false; // null = not known yet: let the request decide
   const { state, identify, cancel } = useIdentify(onSuggestion);
@@ -43,7 +45,7 @@ export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
       {state.kind !== 'busy' && state.kind !== 'suggested' && (
         <Button
           testID="ai-identify-button"
-          label={state.kind === 'idle' ? 'Identify with AI' : 'Try again with AI'}
+          label={state.kind === 'idle' ? t('ai.button') : t('ai.retry')}
           variant="secondary"
           disabled={offline}
           onPress={() => identify(photoUri)}
@@ -51,21 +53,26 @@ export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
       )}
       {offline && state.kind !== 'busy' && (
         <Text variant="caption" muted>
-          Identify with AI needs an internet connection. You can still add the plant yourself.
+          {t('ai.offline')}
         </Text>
       )}
 
       {state.kind === 'busy' && (
         <View style={styles.row}>
-          <Button label="Identifying…" loading style={styles.flex} />
-          <Button testID="ai-cancel" label="Cancel" variant="secondary" onPress={cancel} />
+          <Button label={t('ai.busy')} loading style={styles.flex} />
+          <Button
+            testID="ai-cancel"
+            label={t('common.cancel')}
+            variant="secondary"
+            onPress={cancel}
+          />
         </View>
       )}
 
       {state.kind === 'suggested' && (
         <View testID="ai-suggestion" accessibilityLiveRegion="polite" style={box}>
           <Text variant="caption" style={{ color: colors.primary }}>
-            Suggested by AI. Please check it.
+            {t('ai.label')}
           </Text>
           <Text variant="heading">{state.suggestion.commonName}</Text>
           {state.suggestion.scientificName && (
@@ -74,10 +81,7 @@ export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
             </Text>
           )}
           {state.suggestion.wateringIntervalDays !== null && (
-            <Text>
-              Water about every {state.suggestion.wateringIntervalDays}{' '}
-              {state.suggestion.wateringIntervalDays === 1 ? 'day' : 'days'}
-            </Text>
+            <Text>{t('ai.waterEvery', { count: state.suggestion.wateringIntervalDays })}</Text>
           )}
           {state.suggestion.careTip && <Text muted>{state.suggestion.careTip}</Text>}
           {action && (
@@ -93,7 +97,7 @@ export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
             onPress={() => askToReport(state.id, state.suggestion)}
             hitSlop={8}>
             <Text variant="caption" muted style={styles.link}>
-              Report this suggestion
+              {t('ai.report')}
             </Text>
           </Pressable>
         </View>
@@ -101,7 +105,7 @@ export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
 
       {state.kind === 'unsure' && (
         <View testID="ai-unsure" accessibilityRole="alert" style={box}>
-          <Text>{"I'm not sure what this is. Try a closer photo of the leaves."}</Text>
+          <Text>{t('ai.unsure')}</Text>
         </View>
       )}
 
@@ -110,7 +114,7 @@ export function AiIdentify({ photoUri, onSuggestion = noop, action }: Props) {
           <Text>{state.message}</Text>
           {state.offerUpgrade && (
             <Button
-              label="See Premium"
+              label={t('common.seePremium')}
               variant="secondary"
               onPress={() => router.push({ pathname: '/paywall', params: { reason: 'ai' } })}
             />
@@ -126,15 +130,15 @@ function askToReport(identificationId: string, suggestion: IdentifyResult) {
   const send = async (reason: IdentifyReportReason) => {
     try {
       await reportSuggestion({ identificationId, reason, suggestion });
-      Alert.alert('Thanks', "Thanks for telling us. We'll review this suggestion.");
+      Alert.alert(t('ai.reportThanksTitle'), t('ai.reportThanks'));
     } catch (error) {
-      Alert.alert('Report', toUserMessage(error, 'report'));
+      Alert.alert(t('ai.reportTitle'), toUserMessage(error, 'report'));
     }
   };
-  Alert.alert('Report this suggestion', "What's wrong with it?", [
-    { text: 'Wrong plant', onPress: () => send('wrong') },
-    { text: 'Offensive', onPress: () => send('offensive') },
-    { text: 'Cancel', style: 'cancel' },
+  Alert.alert(t('ai.report'), t('ai.reportQuestion'), [
+    { text: t('ai.reportWrong'), onPress: () => send('wrong') },
+    { text: t('ai.reportOffensive'), onPress: () => send('offensive') },
+    { text: t('common.cancel'), style: 'cancel' },
   ]);
 }
 

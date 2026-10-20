@@ -2,7 +2,7 @@ import { FREE_PLANT_LIMIT } from '@plantpal/shared';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
-import GuideScreen, { FEATURES } from '@/app/guide';
+import GuideScreen, { FEATURES, featureText } from '@/app/guide';
 import { hasSeen, markSeen } from '@/data/first-run';
 import { migrate } from '@/db/migrations';
 import { usePremium } from '@/purchases/limits';
@@ -20,7 +20,8 @@ describe('GuideScreen', () => {
   it('lists every feature, each readable by screen readers as one item', async () => {
     await render(<GuideScreen />);
     for (const f of FEATURES) {
-      expect(screen.getByLabelText(`${f.title}. ${f.body}`)).toBeOnTheScreen();
+      const { title, body } = featureText(f.key);
+      expect(screen.getByLabelText(`${title}. ${body}`)).toBeOnTheScreen();
     }
   });
 

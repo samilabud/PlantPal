@@ -1,0 +1,322 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "dismiss": "Dismiss",
+    "notNow": "Not now",
+    "seePremium": "See Premium",
+    "upgrade": "Upgrade",
+    "opensInBrowser": "Opens in your browser",
+    "photoOf": "Photo of {{name}}"
+  },
+  "nav": {
+    "myPlants": "My plants",
+    "newPlant": "New plant",
+    "plant": "Plant",
+    "editPlant": "Edit plant",
+    "settings": "Settings",
+    "premium": "Premium",
+    "guide": "How PlantPal works"
+  },
+  "language": {
+    "title": "Language",
+    "system": "System default",
+    "systemWith": "System default ({{language}})",
+    "en": "English",
+    "es": "Español",
+    "toggleLabel": "Language: {{language}}. Tap to switch."
+  },
+  "signIn": {
+    "tagline": "Never forget to water a plant again.",
+    "google": "Sign in with Google",
+    "devUserName": "Test user name",
+    "devSignIn": "Dev sign-in (test only)",
+    "agreeBefore": "By signing in you agree to the ",
+    "privacyPolicy": "privacy policy",
+    "agreeAfter": ". You can delete your account at any time in Settings."
+  },
+  "plants": {
+    "openSettings": "Open settings",
+    "readError": "Could not read your plants: {{message}}",
+    "loading": "Loading your plants",
+    "count_one": "My plants ({{count}})",
+    "count_other": "My plants ({{count}})",
+    "emptyTitle": "No plants yet",
+    "emptyBody": "Add your first plant and PlantPal will remind you when it needs water.",
+    "emptyGuide": "See what PlantPal can do",
+    "add": "Add plant",
+    "water": "Water",
+    "rowLabel": "{{name}}. {{status}}. Open details.",
+    "waterLabel": "Mark {{name}} as watered"
+  },
+  "status": {
+    "never": "Not watered yet",
+    "today": "Water today",
+    "overdue_one": "Overdue by {{count}} day",
+    "overdue_other": "Overdue by {{count}} days",
+    "tomorrow": "Water tomorrow",
+    "inDays_one": "Water in {{count}} day",
+    "inDays_other": "Water in {{count}} days"
+  },
+  "form": {
+    "takePhoto": "Take photo",
+    "choosePhoto": "Choose photo",
+    "photoPreview": "Plant photo preview",
+    "photoTitle": "Photo",
+    "name": "Name",
+    "nameLabel": "Plant name",
+    "namePlaceholder": "e.g. Monstera",
+    "interval": "Water every (days)",
+    "intervalLabel": "Water every how many days",
+    "save": "Save plant",
+    "saveChanges": "Save changes",
+    "aiPrefilled": "Name and watering were suggested by AI. Please check them.",
+    "errors": {
+      "nameRequired": "Give your plant a name",
+      "nameTooLong": "Name is too long (80 characters max)",
+      "interval": "Water every 1 to 365 days"
+    }
+  },
+  "detail": {
+    "deleted": "This plant was deleted.",
+    "notFound": "Plant not found",
+    "every_one": "Every {{count}} day",
+    "every_other": "Every {{count}} days",
+    "waterNow": "Water now",
+    "history": "Watering history",
+    "notWatered": "Not watered yet.",
+    "undo": "Undo",
+    "undoLabel": "Remove watering on {{date}}",
+    "photos": "Photos",
+    "photoFrom": "Photo from {{date}}",
+    "waitingUpload": "Waiting to upload",
+    "edit": "Edit plant",
+    "delete": "Delete plant",
+    "deleteTitle": "Delete plant?",
+    "deleteBody": "{{name}} and its history will be removed on all your devices.",
+    "useAi": "Use these details"
+  },
+  "ai": {
+    "button": "Identify with AI",
+    "retry": "Try again with AI",
+    "busy": "Identifying…",
+    "offline": "Identify with AI needs an internet connection. You can still add the plant yourself.",
+    "label": "Suggested by AI. Please check it.",
+    "waterEvery_one": "Water about every {{count}} day",
+    "waterEvery_other": "Water about every {{count}} days",
+    "unsure": "I'm not sure what this is. Try a closer photo of the leaves.",
+    "report": "Report this suggestion",
+    "reportQuestion": "What's wrong with it?",
+    "reportWrong": "Wrong plant",
+    "reportOffensive": "Offensive",
+    "reportThanksTitle": "Thanks",
+    "reportThanks": "Thanks for telling us. We'll review this suggestion.",
+    "reportTitle": "Report",
+    "noticeTitle": "Identify with AI",
+    "noticeBody": "PlantPal sends this photo to Anthropic's AI service to identify the plant. We don't keep the photo.",
+    "noticePrivacy": "Privacy policy",
+    "noticeContinue": "Continue"
+  },
+  "guide": {
+    "intro": "Here is everything you can do with PlantPal.",
+    "start": "Start using PlantPal",
+    "features": {
+      "add": {
+        "title": "Add your plants",
+        "body": "Give each plant a name, say how often it needs water, and add a photo from your camera or gallery."
+      },
+      "ai": {
+        "title": "Identify with AI",
+        "body": "Not sure what plant it is? Take a photo and tap \"Identify with AI\" for a suggested name and watering interval. Always check it before saving."
+      },
+      "water": {
+        "title": "Water with one tap",
+        "body": "Tap \"Water\" when you water a plant. The list shows when each one needs water next, and you can undo a tap from its history."
+      },
+      "reminders": {
+        "title": "Get reminders",
+        "body": "Turn on reminders in Settings and PlantPal tells you the morning a plant is due, plus a daily nudge if one is overdue. Tap a reminder to open that plant."
+      },
+      "offline": {
+        "title": "Works without internet",
+        "body": "Everything works offline. Your changes are saved on the phone and sync on their own when you are back online; the badge at the top shows the status."
+      },
+      "devices": {
+        "title": "Same plants on every device",
+        "body": "Sign in on another phone and your plants, waterings and photos are there. Changes on one phone appear on the others."
+      },
+      "photos": {
+        "title": "Photo history",
+        "body": "See how a plant grows with a photo timeline. Free accounts keep one photo per plant."
+      },
+      "premium": {
+        "title": "Premium",
+        "body": "The free plan includes {{plants}} plants and {{aiFree}} AI identifications a day. Premium unlocks unlimited plants, photo history and {{aiPremium}} AI identifications a day. Already subscribed on another phone? Use \"Restore purchases\"."
+      },
+      "control": {
+        "title": "You stay in control",
+        "body": "Sign out at any time, or delete your account and all its data from Settings. Signing out also clears your plants from this phone."
+      }
+    }
+  },
+  "settings": {
+    "account": "Account",
+    "noEmail": "No email shared",
+    "signedInWith": "Signed in with: {{providers}}",
+    "plan": "Plan: {{plan}}",
+    "planFree": "Free",
+    "planPremium": "Premium",
+    "sync": "Sync",
+    "syncStatus": "Status: {{status}} · {{pending}} pending",
+    "syncStates": {
+      "idle": "up to date",
+      "syncing": "syncing",
+      "offline": "offline",
+      "error": "failed"
+    },
+    "lastSynced": "Last synced: {{when}}",
+    "never": "never",
+    "syncNow": "Sync now",
+    "analytics": "Usage analytics",
+    "analyticsSwitch": "Share anonymous usage events",
+    "analyticsOff": "Off in this build",
+    "analyticsNote": "Counts such as \"a plant was added\" help improve PlantPal. Never plant names, photos or your email. No ads, no tracking across apps.",
+    "diagnostics": "Diagnostics",
+    "health": "API {{status}} · database {{db}} · v{{version}}",
+    "unreachable": "API unreachable",
+    "checking": "Checking…",
+    "privacy": "Privacy policy",
+    "help": "Help",
+    "signOut": "Sign out",
+    "deleteAccount": "Delete account",
+    "unsyncedTitle": "Unsynced changes",
+    "unsyncedBody_one": "{{count}} change hasn't reached the server yet. If you sign out now it will be lost.",
+    "unsyncedBody_other": "{{count}} changes haven't reached the server yet. If you sign out now they will be lost.",
+    "signOutAnyway": "Sign out anyway",
+    "deleteTitle": "Delete account?",
+    "deleteBody": "This permanently deletes your account and all your plants on every device. It cannot be undone."
+  },
+  "plan": {
+    "title": "Plan",
+    "premium": "Premium",
+    "premiumUntil": "Premium · renews or ends {{date}}",
+    "free": "Free · {{count}} of {{limit}} plants",
+    "manage": "Manage subscription",
+    "upgrade": "Upgrade to Premium"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "status": "Watering reminders: {{state}}",
+    "on": "On",
+    "off": "Off",
+    "blocked": "Blocked in system settings",
+    "about": "A reminder on the morning a plant needs water, plus a daily nudge if one is overdue. No marketing, ever.",
+    "push": "Server push: {{status}}",
+    "turnOn": "Turn on reminders",
+    "openSettings": "Open system settings",
+    "test": "Test reminder",
+    "testPush": "Test push",
+    "testBody": "Lock the phone or leave the app: it arrives in about 10 seconds.",
+    "testPushResult": "Sent to {{devices}} device(s): {{accepted}} accepted, {{failed}} failed.",
+    "testPushFailed": "Failed",
+    "softAskTitle": "Get watering reminders?",
+    "softAskBody": "PlantPal can remind you the morning {{name}} needs water.",
+    "remindMe": "Remind me",
+    "channel": "Watering reminders"
+  },
+  "sync": {
+    "syncing": "Syncing…",
+    "offline": "Offline",
+    "offlinePending": "Offline · {{count}} to sync",
+    "failed": "Sync failed · retry",
+    "pending": "{{count}} to sync",
+    "synced": "Synced",
+    "label": "Sync status: {{status}}. Tap to sync now."
+  },
+  "limit": {
+    "title": "Premium is no longer active",
+    "items_one": "1 new item",
+    "items_other": "{{count}} new items",
+    "body": "{{items}} couldn't be saved: the free plan includes {{limit}} plants and one photo per plant. Upgrade to keep adding, or restore a subscription you already have."
+  },
+  "paywall": {
+    "reasons": {
+      "plants": "The free plan includes {{limit}} plants.",
+      "photos": "The free plan includes one photo per plant.",
+      "ai": "The free plan includes {{free}} AI identifications a day; Premium includes {{premium}}."
+    },
+    "control": {
+      "title": "PlantPal Premium",
+      "b1": "Unlimited plants",
+      "b2": "Photo history for every plant",
+      "b3": "{{count}} AI plant identifications a day",
+      "b4": "Supports an independent app"
+    },
+    "plantsFirst": {
+      "title": "Room for every plant",
+      "b1": "Add as many plants as you own",
+      "b2": "Keep a photo diary of each one",
+      "b3": "Identify up to {{count}} plants a day with AI",
+      "b4": "Supports an independent app"
+    },
+    "period": {
+      "MONTHLY": "per month",
+      "ANNUAL": "per year",
+      "LIFETIME": "once"
+    },
+    "subscribeLabel": "Subscribe for {{price}} {{period}}",
+    "welcomeTitle": "Welcome to Premium 🌿",
+    "welcomeBody": "Unlimited plants, photo history and more AI identifications are unlocked.",
+    "purchaseFailed": "Purchase failed",
+    "restoreTitle": "Restore",
+    "restored": "Premium restored.",
+    "nothingToRestore": "No active subscription found.",
+    "restoreFailed": "Restore failed",
+    "notSetUp": "Purchases aren't set up in this build yet.",
+    "loading": "Loading plans",
+    "loadFailed": "Plans couldn't be loaded. Check your connection.",
+    "restore": "Restore purchases",
+    "testOnly": "Test purchases only: no real money is charged. ",
+    "renewal": "Subscriptions renew automatically until cancelled in your store account settings."
+  },
+  "notifications": {
+    "dueTitle": "🪴 Time to water {{name}}",
+    "dueBody": "{{name}} is due today. Tap to mark it as watered.",
+    "testTitle": "🪴 Test reminder",
+    "testBody": "Tap to open your plant."
+  },
+  "update": {
+    "development": "development (code from Metro)",
+    "noChannel": "no channel",
+    "builtIn": "built-in bundle",
+    "update": "update {{id}}"
+  },
+  "errors": {
+    "fallback": {
+      "signIn": "Couldn't sign you in. Please try again.",
+      "sync": "Couldn't sync. Your changes are safe on this phone and will sync later.",
+      "purchase": "The purchase didn't go through. You weren't charged. Please try again.",
+      "restore": "Couldn't restore purchases. Please try again.",
+      "photo": "Couldn't add the photo. Please try again.",
+      "deleteAccount": "Couldn't delete your account. Nothing was deleted. Please try again.",
+      "identify": "Couldn't identify the plant right now. You can still add it yourself.",
+      "report": "Couldn't send the report. Please try again."
+    },
+    "network": "No internet connection. Check your connection and try again.",
+    "timeout": "PlantPal is taking too long to respond. Please try again.",
+    "session": "Your session expired. Please sign in again.",
+    "rateLimited": "Too many attempts. Please wait a minute and try again.",
+    "server": "PlantPal's server had a problem. Please try again in a moment. (ref: server-{{status}})",
+    "playServices": "Google Play services is missing or out of date on this phone. Update it from the Play Store and try again.",
+    "googleDeveloper": "Google sign-in isn't working in this version of PlantPal. Please update the app, or try again later.",
+    "purchaseNotAllowed": "Purchases are not allowed on this device or account.",
+    "paymentPending": "Your payment is pending. Premium unlocks as soon as Google Play confirms it.",
+    "alreadyPurchased": "You already own this. Tap \"Restore purchases\" to unlock it on this phone.",
+    "storeProblem": "Google Play had a problem. You weren't charged. Please try again later.",
+    "identifyMonthly": "You've used this month's AI identifications. You can still add plants yourself.",
+    "identifyDailyFree": "You've used today's free AI identifications. Premium gives you more, or try again tomorrow.",
+    "identifyDaily": "You've used today's AI identifications. Try again tomorrow.",
+    "aiResting": "AI identification is resting for today. Try again tomorrow, or add the plant yourself.",
+    "aiTimeout": "The AI took too long to answer. Please try again."
+  }
+}

@@ -1,0 +1,322 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "dismiss": "Cerrar",
+    "notNow": "Ahora no",
+    "seePremium": "Ver Premium",
+    "upgrade": "Mejorar",
+    "opensInBrowser": "Se abre en tu navegador",
+    "photoOf": "Foto de {{name}}"
+  },
+  "nav": {
+    "myPlants": "Mis plantas",
+    "newPlant": "Nueva planta",
+    "plant": "Planta",
+    "editPlant": "Editar planta",
+    "settings": "Configuración",
+    "premium": "Premium",
+    "guide": "Cómo funciona PlantPal"
+  },
+  "language": {
+    "title": "Idioma",
+    "system": "Predeterminado del sistema",
+    "systemWith": "Predeterminado del sistema ({{language}})",
+    "en": "English",
+    "es": "Español",
+    "toggleLabel": "Idioma: {{language}}. Toca para cambiar."
+  },
+  "signIn": {
+    "tagline": "Nunca más olvides regar una planta.",
+    "google": "Iniciar sesión con Google",
+    "devUserName": "Nombre del usuario de prueba",
+    "devSignIn": "Inicio de sesión de desarrollo (solo pruebas)",
+    "agreeBefore": "Al iniciar sesión aceptas la ",
+    "privacyPolicy": "política de privacidad",
+    "agreeAfter": ". Puedes eliminar tu cuenta cuando quieras en Configuración."
+  },
+  "plants": {
+    "openSettings": "Abrir configuración",
+    "readError": "No se pudieron leer tus plantas: {{message}}",
+    "loading": "Cargando tus plantas",
+    "count_one": "Mis plantas ({{count}})",
+    "count_other": "Mis plantas ({{count}})",
+    "emptyTitle": "Todavía no tienes plantas",
+    "emptyBody": "Agrega tu primera planta y PlantPal te avisará cuando necesite agua.",
+    "emptyGuide": "Mira lo que puede hacer PlantPal",
+    "add": "Agregar planta",
+    "water": "Regar",
+    "rowLabel": "{{name}}. {{status}}. Abrir detalles.",
+    "waterLabel": "Marcar {{name}} como regada"
+  },
+  "status": {
+    "never": "Aún sin regar",
+    "today": "Riégala hoy",
+    "overdue_one": "Atrasada {{count}} día",
+    "overdue_other": "Atrasada {{count}} días",
+    "tomorrow": "Riégala mañana",
+    "inDays_one": "Riégala en {{count}} día",
+    "inDays_other": "Riégala en {{count}} días"
+  },
+  "form": {
+    "takePhoto": "Tomar foto",
+    "choosePhoto": "Elegir foto",
+    "photoPreview": "Vista previa de la foto de la planta",
+    "photoTitle": "Foto",
+    "name": "Nombre",
+    "nameLabel": "Nombre de la planta",
+    "namePlaceholder": "p. ej. Monstera",
+    "interval": "Regar cada (días)",
+    "intervalLabel": "Cada cuántos días regar",
+    "save": "Guardar planta",
+    "saveChanges": "Guardar cambios",
+    "aiPrefilled": "La IA sugirió el nombre y el riego. Revísalos, por favor.",
+    "errors": {
+      "nameRequired": "Ponle un nombre a tu planta",
+      "nameTooLong": "El nombre es demasiado largo (máximo 80 caracteres)",
+      "interval": "Riega cada 1 a 365 días"
+    }
+  },
+  "detail": {
+    "deleted": "Esta planta se eliminó.",
+    "notFound": "No se encontró la planta",
+    "every_one": "Cada {{count}} día",
+    "every_other": "Cada {{count}} días",
+    "waterNow": "Regar ahora",
+    "history": "Historial de riego",
+    "notWatered": "Aún sin regar.",
+    "undo": "Deshacer",
+    "undoLabel": "Quitar el riego del {{date}}",
+    "photos": "Fotos",
+    "photoFrom": "Foto del {{date}}",
+    "waitingUpload": "Esperando para subir",
+    "edit": "Editar planta",
+    "delete": "Eliminar planta",
+    "deleteTitle": "¿Eliminar la planta?",
+    "deleteBody": "{{name}} y su historial se eliminarán en todos tus dispositivos.",
+    "useAi": "Usar estos datos"
+  },
+  "ai": {
+    "button": "Identificar con IA",
+    "retry": "Intentar de nuevo con IA",
+    "busy": "Identificando…",
+    "offline": "Identificar con IA necesita conexión a internet. Igual puedes agregar la planta tú.",
+    "label": "Sugerido por IA. Revísalo, por favor.",
+    "waterEvery_one": "Regar cada {{count}} día aprox.",
+    "waterEvery_other": "Regar cada {{count}} días aprox.",
+    "unsure": "No estoy seguro de qué es. Prueba con una foto más cerca de las hojas.",
+    "report": "Reportar esta sugerencia",
+    "reportQuestion": "¿Qué tiene de malo?",
+    "reportWrong": "Planta equivocada",
+    "reportOffensive": "Ofensiva",
+    "reportThanksTitle": "Gracias",
+    "reportThanks": "Gracias por avisarnos. Revisaremos esta sugerencia.",
+    "reportTitle": "Reportar",
+    "noticeTitle": "Identificar con IA",
+    "noticeBody": "PlantPal envía esta foto al servicio de IA de Anthropic para identificar la planta. No guardamos la foto.",
+    "noticePrivacy": "Política de privacidad",
+    "noticeContinue": "Continuar"
+  },
+  "guide": {
+    "intro": "Esto es todo lo que puedes hacer con PlantPal.",
+    "start": "Empezar a usar PlantPal",
+    "features": {
+      "add": {
+        "title": "Agrega tus plantas",
+        "body": "Ponle nombre a cada planta, indica cada cuánto necesita agua y agrega una foto de tu cámara o galería."
+      },
+      "ai": {
+        "title": "Identifica con IA",
+        "body": "¿No sabes qué planta es? Toma una foto y toca \"Identificar con IA\" para recibir un nombre y una frecuencia de riego sugeridos. Revísalos siempre antes de guardar."
+      },
+      "water": {
+        "title": "Riega con un toque",
+        "body": "Toca \"Regar\" cuando riegues una planta. La lista muestra cuándo necesita agua cada una y puedes deshacer un toque desde su historial."
+      },
+      "reminders": {
+        "title": "Recibe recordatorios",
+        "body": "Activa los recordatorios en Configuración y PlantPal te avisa la mañana en que toca regar una planta, más un aviso diario si alguna está atrasada. Toca un recordatorio para abrir esa planta."
+      },
+      "offline": {
+        "title": "Funciona sin internet",
+        "body": "Todo funciona sin conexión. Tus cambios se guardan en el teléfono y se sincronizan solos cuando vuelves a tener internet; el indicador de arriba muestra el estado."
+      },
+      "devices": {
+        "title": "Las mismas plantas en todos tus dispositivos",
+        "body": "Inicia sesión en otro teléfono y ahí estarán tus plantas, riegos y fotos. Los cambios en un teléfono aparecen en los demás."
+      },
+      "photos": {
+        "title": "Historial de fotos",
+        "body": "Mira cómo crece una planta con una línea de tiempo de fotos. Las cuentas gratis guardan una foto por planta."
+      },
+      "premium": {
+        "title": "Premium",
+        "body": "El plan gratis incluye {{plants}} plantas y {{aiFree}} identificaciones con IA al día. Premium desbloquea plantas ilimitadas, historial de fotos y {{aiPremium}} identificaciones con IA al día. ¿Ya te suscribiste en otro teléfono? Usa \"Restaurar compras\"."
+      },
+      "control": {
+        "title": "Tú tienes el control",
+        "body": "Cierra sesión cuando quieras, o elimina tu cuenta y todos sus datos desde Configuración. Al cerrar sesión también se borran tus plantas de este teléfono."
+      }
+    }
+  },
+  "settings": {
+    "account": "Cuenta",
+    "noEmail": "No compartiste tu correo",
+    "signedInWith": "Sesión iniciada con: {{providers}}",
+    "plan": "Plan: {{plan}}",
+    "planFree": "Gratis",
+    "planPremium": "Premium",
+    "sync": "Sincronización",
+    "syncStatus": "Estado: {{status}} · {{pending}} pendientes",
+    "syncStates": {
+      "idle": "al día",
+      "syncing": "sincronizando",
+      "offline": "sin conexión",
+      "error": "con error"
+    },
+    "lastSynced": "Última sincronización: {{when}}",
+    "never": "nunca",
+    "syncNow": "Sincronizar ahora",
+    "analytics": "Estadísticas de uso",
+    "analyticsSwitch": "Compartir eventos de uso anónimos",
+    "analyticsOff": "Desactivado en esta versión",
+    "analyticsNote": "Conteos como \"se agregó una planta\" nos ayudan a mejorar PlantPal. Nunca nombres de plantas, fotos ni tu correo. Sin anuncios ni rastreo entre apps.",
+    "diagnostics": "Diagnóstico",
+    "health": "API {{status}} · base de datos {{db}} · v{{version}}",
+    "unreachable": "No se puede conectar con la API",
+    "checking": "Comprobando…",
+    "privacy": "Política de privacidad",
+    "help": "Ayuda",
+    "signOut": "Cerrar sesión",
+    "deleteAccount": "Eliminar cuenta",
+    "unsyncedTitle": "Cambios sin sincronizar",
+    "unsyncedBody_one": "{{count}} cambio todavía no llega al servidor. Si cierras sesión ahora, se perderá.",
+    "unsyncedBody_other": "{{count}} cambios todavía no llegan al servidor. Si cierras sesión ahora, se perderán.",
+    "signOutAnyway": "Cerrar sesión de todos modos",
+    "deleteTitle": "¿Eliminar la cuenta?",
+    "deleteBody": "Esto elimina para siempre tu cuenta y todas tus plantas en todos tus dispositivos. No se puede deshacer."
+  },
+  "plan": {
+    "title": "Plan",
+    "premium": "Premium",
+    "premiumUntil": "Premium · se renueva o termina el {{date}}",
+    "free": "Gratis · {{count}} de {{limit}} plantas",
+    "manage": "Administrar suscripción",
+    "upgrade": "Mejorar a Premium"
+  },
+  "reminders": {
+    "title": "Recordatorios",
+    "status": "Recordatorios de riego: {{state}}",
+    "on": "Activados",
+    "off": "Desactivados",
+    "blocked": "Bloqueados en la configuración del sistema",
+    "about": "Un recordatorio la mañana en que una planta necesita agua, más un aviso diario si alguna está atrasada. Nunca publicidad.",
+    "push": "Notificaciones del servidor: {{status}}",
+    "turnOn": "Activar recordatorios",
+    "openSettings": "Abrir configuración del sistema",
+    "test": "Probar recordatorio",
+    "testPush": "Probar notificación",
+    "testBody": "Bloquea el teléfono o sal de la app: llega en unos 10 segundos.",
+    "testPushResult": "Enviado a {{devices}} dispositivo(s): {{accepted}} aceptados, {{failed}} fallidos.",
+    "testPushFailed": "Falló",
+    "softAskTitle": "¿Quieres recordatorios de riego?",
+    "softAskBody": "PlantPal puede avisarte la mañana en que {{name}} necesite agua.",
+    "remindMe": "Recordarme",
+    "channel": "Recordatorios de riego"
+  },
+  "sync": {
+    "syncing": "Sincronizando…",
+    "offline": "Sin conexión",
+    "offlinePending": "Sin conexión · {{count}} por sincronizar",
+    "failed": "Error al sincronizar · reintentar",
+    "pending": "{{count}} por sincronizar",
+    "synced": "Sincronizado",
+    "label": "Estado de sincronización: {{status}}. Toca para sincronizar ahora."
+  },
+  "limit": {
+    "title": "Premium ya no está activo",
+    "items_one": "1 elemento nuevo",
+    "items_other": "{{count}} elementos nuevos",
+    "body": "No se pudo guardar {{items}}: el plan gratis incluye {{limit}} plantas y una foto por planta. Mejora tu plan para seguir agregando, o restaura una suscripción que ya tengas."
+  },
+  "paywall": {
+    "reasons": {
+      "plants": "El plan gratis incluye {{limit}} plantas.",
+      "photos": "El plan gratis incluye una foto por planta.",
+      "ai": "El plan gratis incluye {{free}} identificaciones con IA al día; Premium incluye {{premium}}."
+    },
+    "control": {
+      "title": "PlantPal Premium",
+      "b1": "Plantas ilimitadas",
+      "b2": "Historial de fotos de cada planta",
+      "b3": "{{count}} identificaciones de plantas con IA al día",
+      "b4": "Apoyas una app independiente"
+    },
+    "plantsFirst": {
+      "title": "Espacio para todas tus plantas",
+      "b1": "Agrega todas las plantas que tengas",
+      "b2": "Lleva un diario de fotos de cada una",
+      "b3": "Identifica hasta {{count}} plantas al día con IA",
+      "b4": "Apoyas una app independiente"
+    },
+    "period": {
+      "MONTHLY": "al mes",
+      "ANNUAL": "al año",
+      "LIFETIME": "pago único"
+    },
+    "subscribeLabel": "Suscribirse por {{price}} {{period}}",
+    "welcomeTitle": "Bienvenido a Premium 🌿",
+    "welcomeBody": "Desbloqueaste plantas ilimitadas, historial de fotos y más identificaciones con IA.",
+    "purchaseFailed": "No se pudo completar la compra",
+    "restoreTitle": "Restaurar",
+    "restored": "Premium restaurado.",
+    "nothingToRestore": "No se encontró ninguna suscripción activa.",
+    "restoreFailed": "No se pudo restaurar",
+    "notSetUp": "Las compras todavía no están configuradas en esta versión.",
+    "loading": "Cargando planes",
+    "loadFailed": "No se pudieron cargar los planes. Revisa tu conexión.",
+    "restore": "Restaurar compras",
+    "testOnly": "Solo compras de prueba: no se cobra dinero real. ",
+    "renewal": "Las suscripciones se renuevan automáticamente hasta que las canceles en la configuración de tu cuenta de la tienda."
+  },
+  "notifications": {
+    "dueTitle": "🪴 Hora de regar {{name}}",
+    "dueBody": "Hoy toca regar {{name}}. Toca para marcarla como regada.",
+    "testTitle": "🪴 Recordatorio de prueba",
+    "testBody": "Toca para abrir tu planta."
+  },
+  "update": {
+    "development": "desarrollo (código de Metro)",
+    "noChannel": "sin canal",
+    "builtIn": "paquete incluido",
+    "update": "actualización {{id}}"
+  },
+  "errors": {
+    "fallback": {
+      "signIn": "No pudimos iniciar tu sesión. Inténtalo de nuevo.",
+      "sync": "No se pudo sincronizar. Tus cambios están a salvo en este teléfono y se sincronizarán después.",
+      "purchase": "La compra no se completó. No se te cobró nada. Inténtalo de nuevo.",
+      "restore": "No se pudieron restaurar las compras. Inténtalo de nuevo.",
+      "photo": "No se pudo agregar la foto. Inténtalo de nuevo.",
+      "deleteAccount": "No se pudo eliminar tu cuenta. No se borró nada. Inténtalo de nuevo.",
+      "identify": "No se pudo identificar la planta en este momento. Igual puedes agregarla tú.",
+      "report": "No se pudo enviar el reporte. Inténtalo de nuevo."
+    },
+    "network": "No hay conexión a internet. Revisa tu conexión e inténtalo de nuevo.",
+    "timeout": "PlantPal está tardando demasiado en responder. Inténtalo de nuevo.",
+    "session": "Tu sesión expiró. Vuelve a iniciar sesión.",
+    "rateLimited": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+    "server": "El servidor de PlantPal tuvo un problema. Inténtalo de nuevo en un momento. (ref: server-{{status}})",
+    "playServices": "Los servicios de Google Play no están instalados o están desactualizados en este teléfono. Actualízalos desde Play Store e inténtalo de nuevo.",
+    "googleDeveloper": "El inicio de sesión con Google no funciona en esta versión de PlantPal. Actualiza la app o inténtalo más tarde.",
+    "purchaseNotAllowed": "Las compras no están permitidas en este dispositivo o cuenta.",
+    "paymentPending": "Tu pago está pendiente. Premium se desbloquea en cuanto Google Play lo confirme.",
+    "alreadyPurchased": "Ya tienes esta compra. Toca \"Restaurar compras\" para desbloquearla en este teléfono.",
+    "storeProblem": "Google Play tuvo un problema. No se te cobró nada. Inténtalo más tarde.",
+    "identifyMonthly": "Ya usaste las identificaciones con IA de este mes. Igual puedes agregar plantas tú.",
+    "identifyDailyFree": "Ya usaste las identificaciones con IA gratis de hoy. Premium te da más, o inténtalo mañana.",
+    "identifyDaily": "Ya usaste las identificaciones con IA de hoy. Inténtalo mañana.",
+    "aiResting": "La identificación con IA está descansando por hoy. Inténtalo mañana o agrega la planta tú.",
+    "aiTimeout": "La IA tardó demasiado en responder. Inténtalo de nuevo."
+  }
+}

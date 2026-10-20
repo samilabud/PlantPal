@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Alert, StyleSheet, TextInput, View } from 'react-native';
 
 import { toUserMessage } from '@/errors/user-message';
+import { t, useT } from '@/i18n';
 import { capturePhoto, type CapturedPhoto } from '@/photos/capture';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
@@ -24,11 +25,12 @@ type Props = {
   onSubmit: (values: PlantFormValues) => Promise<void>;
 };
 
+/** Returns the problem, translated at call time, or null. */
 export function validatePlantForm(name: string, interval: string): string | null {
-  if (!name.trim()) return 'Give your plant a name';
-  if (name.trim().length > 80) return 'Name is too long (80 characters max)';
+  if (!name.trim()) return t('form.errors.nameRequired');
+  if (name.trim().length > 80) return t('form.errors.nameTooLong');
   const n = Number(interval);
-  if (!Number.isInteger(n) || n < 1 || n > 365) return 'Water every 1 to 365 days';
+  if (!Number.isInteger(n) || n < 1 || n > 365) return t('form.errors.interval');
   return null;
 }
 
@@ -40,6 +42,7 @@ export function PlantForm({
   onSubmit,
 }: Props) {
   const colors = useColors();
+  const t = useT();
   const [name, setName] = useState(initial?.name ?? '');
   const [interval, setInterval] = useState(String(initial?.wateringIntervalDays ?? 7));
   const [photo, setPhoto] = useState<CapturedPhoto | null>(null);
@@ -64,7 +67,7 @@ export function PlantForm({
       const captured = await capturePhoto(source);
       if (captured) setPhoto(captured);
     } catch (e) {
-      Alert.alert('Photo', toUserMessage(e, 'photo'));
+      Alert.alert(t('form.photoTitle'), toUserMessage(e, 'photo'));
     }
   }
 
@@ -88,11 +91,19 @@ export function PlantForm({
             photoId={photo?.photoId ?? null}
             localUri={photo?.uri}
             size={96}
-            label="Plant photo preview"
+            label={t('form.photoPreview')}
           />
           <View style={styles.photoButtons}>
-            <Button label="Take photo" variant="secondary" onPress={() => pick('camera')} />
-            <Button label="Choose photo" variant="secondary" onPress={() => pick('library')} />
+            <Button
+              label={t('form.takePhoto')}
+              variant="secondary"
+              onPress={() => pick('camera')}
+            />
+            <Button
+              label={t('form.choosePhoto')}
+              variant="secondary"
+              onPress={() => pick('library')}
+            />
           </View>
         </View>
       )}
@@ -100,28 +111,28 @@ export function PlantForm({
 
       {fromAi && (
         <Text testID="ai-prefilled" variant="caption" style={{ color: colors.primary }}>
-          Name and watering were suggested by AI. Please check them.
+          {t('form.aiPrefilled')}
         </Text>
       )}
-      <Text nativeID="name-label">Name</Text>
+      <Text nativeID="name-label">{t('form.name')}</Text>
       <TextInput
         testID="plant-name-input"
         accessibilityLabelledBy="name-label"
-        accessibilityLabel="Plant name"
+        accessibilityLabel={t('form.nameLabel')}
         value={name}
         onChangeText={setName}
-        placeholder="e.g. Monstera"
+        placeholder={t('form.namePlaceholder')}
         placeholderTextColor={colors.textMuted}
         style={input}
         maxLength={80}
         returnKeyType="next"
       />
 
-      <Text nativeID="interval-label">Water every (days)</Text>
+      <Text nativeID="interval-label">{t('form.interval')}</Text>
       <TextInput
         testID="plant-interval-input"
         accessibilityLabelledBy="interval-label"
-        accessibilityLabel="Water every how many days"
+        accessibilityLabel={t('form.intervalLabel')}
         value={interval}
         onChangeText={setInterval}
         keyboardType="number-pad"

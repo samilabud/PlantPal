@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 
 import { getDb } from '@/db/database';
+import { t } from '@/i18n';
 
 import { getPermissionState, requestPermission, syncLocalReminders } from './notifications';
 import { registerForPush } from './push-registration';
@@ -23,20 +24,16 @@ export async function softAskForReminders(plantName: string) {
     [],
   );
 
-  Alert.alert(
-    'Get watering reminders?',
-    `PlantPal can remind you the morning ${plantName} needs water.`,
-    [
-      { text: 'Not now', style: 'cancel' },
-      {
-        text: 'Remind me',
-        onPress: async () => {
-          if ((await requestPermission()) === 'granted') {
-            await syncLocalReminders(db);
-            await registerForPush();
-          }
-        },
+  Alert.alert(t('reminders.softAskTitle'), t('reminders.softAskBody', { name: plantName }), [
+    { text: t('common.notNow'), style: 'cancel' },
+    {
+      text: t('reminders.remindMe'),
+      onPress: async () => {
+        if ((await requestPermission()) === 'granted') {
+          await syncLocalReminders(db);
+          await registerForPush();
+        }
       },
-    ],
-  );
+    },
+  ]);
 }

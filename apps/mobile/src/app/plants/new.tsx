@@ -5,14 +5,16 @@ import { PlantForm } from '@/components/plant-form';
 import { mutate } from '@/data/mutations';
 import { addPhoto, createPlant } from '@/data/plants';
 import { softAskForReminders } from '@/notifications/soft-ask';
+import { useT } from '@/i18n';
 import { Screen } from '@/ui';
 
 export default function NewPlantScreen() {
+  const t = useT();
   return (
     <Screen>
       <PlantForm
         allowPhoto
-        submitLabel="Save plant"
+        submitLabel={t('form.save')}
         onSubmit={async ({ name, wateringIntervalDays, photo }) => {
           await mutate(async (db) => {
             const id = await createPlant(db, { name, wateringIntervalDays });

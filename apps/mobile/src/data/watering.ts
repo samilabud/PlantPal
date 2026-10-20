@@ -1,3 +1,5 @@
+import { t } from '@/i18n';
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type WateringStatus =
@@ -32,12 +34,12 @@ export function wateringStatus(
 export function describeStatus(status: WateringStatus): string {
   switch (status.state) {
     case 'never':
-      return 'Not watered yet';
+      return t('status.never');
     case 'today':
-      return 'Water today';
+      return t('status.today');
     case 'overdue':
-      return status.days === 1 ? 'Overdue by 1 day' : `Overdue by ${status.days} days`;
+      return t('status.overdue', { count: status.days });
     case 'ok':
-      return status.days === 1 ? 'Water tomorrow' : `Water in ${status.days} days`;
+      return status.days === 1 ? t('status.tomorrow') : t('status.inDays', { count: status.days });
   }
 }

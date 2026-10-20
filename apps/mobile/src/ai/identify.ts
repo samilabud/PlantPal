@@ -5,7 +5,8 @@ import { Alert, Linking } from 'react-native';
 
 import { hasSeen, markSeen } from '@/data/first-run';
 import { getDb } from '@/db/database';
-import { PRIVACY_URL } from '@/config/site';
+import { privacyUrl } from '@/config/site';
+import { currentLanguage, t } from '@/i18n';
 
 /** Long edge sent to the AI: ⌈1024/28⌉² = 1,369 image tokens for a square photo. */
 const AI_MAX_SIZE = 1024;
@@ -29,8 +30,8 @@ export async function prepareForAi(uri: string): Promise<string> {
   return saved.base64;
 }
 
-/** The language Claude answers in. M9.3 makes this the app's active language. */
-export const aiLanguage = (): AppLanguage => 'en';
+/** Claude answers in the language the app is showing. */
+export const aiLanguage = (): AppLanguage => currentLanguage();
 
 /**
  * The first time someone uses the feature, say in one sentence where the photo goes, with a
@@ -42,18 +43,18 @@ export async function confirmAiNotice(): Promise<boolean> {
   if (await hasSeen(db, AI_NOTICE_KEY)) return true;
   const accepted = await new Promise<boolean>((resolve) =>
     Alert.alert(
-      'Identify with AI',
-      "PlantPal sends this photo to Anthropic's AI service to identify the plant. We don't keep the photo.",
+      t('ai.noticeTitle'),
+      t('ai.noticeBody'),
       [
         {
-          text: 'Privacy policy',
+          text: t('ai.noticePrivacy'),
           onPress: () => {
-            Linking.openURL(PRIVACY_URL);
+            Linking.openURL(privacyUrl());
             resolve(false);
           },
         },
-        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-        { text: 'Continue', onPress: () => resolve(true) },
+        { text: t('common.cancel'), style: 'cancel', onPress: () => resolve(false) },
+        { text: t('ai.noticeContinue'), onPress: () => resolve(true) },
       ],
       { cancelable: true, onDismiss: () => resolve(false) },
     ),

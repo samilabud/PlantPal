@@ -7,16 +7,19 @@ import { toUserMessage } from '@/errors/user-message';
 import { useAnalyticsConsent } from '@/analytics/analytics';
 import { getHealth } from '@/api';
 import { deleteAccount, signOut, useAuthStore } from '@/auth';
+import { LanguageCard } from '@/components/language-card';
 import { PlanCard } from '@/components/plan-card';
 import { RemindersCard } from '@/components/reminders-card';
 import { env } from '@/config/env';
-import { PRIVACY_URL, SUPPORT_URL } from '@/config/site';
+import { privacyUrl, supportUrl } from '@/config/site';
+import { formatDateTime, useT } from '@/i18n';
 import { requestSync, useSyncStore } from '@/sync/sync-manager';
 import { describeUpdate } from '@/updates/describe-update';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 
 export default function SettingsScreen() {
   const colors = useColors();
+  const t = useT();
   const user = useAuthStore((s) => s.user);
   const [busy, setBusy] = useState<'signOut' | 'delete' | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,53 +35,51 @@ export default function SettingsScreen() {
   /** Sign-out wipes this phone's copy, so warn if some changes haven't reached the server. */
   function onSignOut() {
     if (!sync.pending) return void doSignOut();
-    Alert.alert(
-      'Unsynced changes',
-      `${sync.pending} change(s) haven't reached the server yet. If you sign out now they will be lost.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign out anyway', style: 'destructive', onPress: doSignOut },
-      ],
-    );
+    Alert.alert(t('settings.unsyncedTitle'), t('settings.unsyncedBody', { count: sync.pending }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('settings.signOutAnyway'), style: 'destructive', onPress: doSignOut },
+    ]);
   }
 
   function onDelete() {
-    Alert.alert(
-      'Delete account?',
-      'This permanently deletes your account and all your plants on every device. It cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            setBusy('delete');
-            setError(null);
-            try {
-              await deleteAccount();
-            } catch (e) {
-              setError(toUserMessage(e, 'deleteAccount'));
-            } finally {
-              setBusy(null);
-            }
-          },
+    Alert.alert(t('settings.deleteTitle'), t('settings.deleteBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          setBusy('delete');
+          setError(null);
+          try {
+            await deleteAccount();
+          } catch (e) {
+            setError(toUserMessage(e, 'deleteAccount'));
+          } finally {
+            setBusy(null);
+          }
         },
-      ],
-    );
+      },
+    ]);
   }
 
   return (
     <Screen>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text variant="heading">Account</Text>
-        <Text testID="account-email">{user?.email ?? 'No email shared'}</Text>
-        <Text muted>Signed in with: {user?.providers.join(', ')}</Text>
-        <Text muted>Plan: {user?.plan}</Text>
+        <Text variant="heading">{t('settings.account')}</Text>
+        <Text testID="account-email">{user?.email ?? t('settings.noEmail')}</Text>
+        <Text muted>{t('settings.signedInWith', { providers: user?.providers.join(', ') })}</Text>
+        <Text muted>
+          {t('settings.plan', {
+            plan: user?.plan === 'premium' ? t('settings.planPremium') : t('settings.planFree'),
+          })}
+        </Text>
       </View>
+
+      <LanguageCard />
 
       <Button
         testID="open-guide"
-        label="How PlantPal works"
+        label={t('nav.guide')}
         variant="secondary"
         onPress={() => router.push('/guide')}
       />
@@ -88,53 +89,57 @@ export default function SettingsScreen() {
       <RemindersCard />
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text variant="heading">Sync</Text>
+        <Text variant="heading">{t('settings.sync')}</Text>
         <Text testID="sync-status">
-          Status: {sync.status} · {sync.pending} pending
+          {t('settings.syncStatus', {
+            status: t(`settings.syncStates.${sync.status}`),
+            pending: sync.pending,
+          })}
         </Text>
         <Text muted>
-          Last synced: {sync.lastSyncedAt ? new Date(sync.lastSyncedAt).toLocaleString() : 'never'}
+          {t('settings.lastSynced', {
+            when: sync.lastSyncedAt ? formatDateTime(sync.lastSyncedAt) : t('settings.never'),
+          })}
         </Text>
         {sync.error && <Text style={{ color: colors.danger }}>{sync.error}</Text>}
         <Button
-          label="Sync now"
+          label={t('settings.syncNow')}
           variant="secondary"
           onPress={() => requestSync({ immediate: true })}
         />
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text variant="heading">Usage analytics</Text>
+        <Text variant="heading">{t('settings.analytics')}</Text>
         {analytics.available ? (
           <View style={styles.row}>
-            <Text style={styles.rowText}>Share anonymous usage events</Text>
+            <Text style={styles.rowText}>{t('settings.analyticsSwitch')}</Text>
             <Switch
               testID="analytics-switch"
-              accessibilityLabel="Share anonymous usage events"
+              accessibilityLabel={t('settings.analyticsSwitch')}
               value={analytics.enabled}
               onValueChange={analytics.set}
             />
           </View>
         ) : (
-          <Text testID="analytics-off">Off in this build</Text>
+          <Text testID="analytics-off">{t('settings.analyticsOff')}</Text>
         )}
         <Text muted variant="caption">
-          Counts such as &quot;a plant was added&quot; help improve PlantPal. Never plant names,
-          photos or your email. No ads, no tracking across apps.
+          {t('settings.analyticsNote')}
         </Text>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text variant="heading">Diagnostics</Text>
+        <Text variant="heading">{t('settings.diagnostics')}</Text>
         <Text muted variant="caption" selectable>
           {env.apiUrl} · {env.appVariant}
         </Text>
         <Text testID="health-status">
           {health.data
-            ? `API ${health.data.status} · database ${health.data.db} · v${health.data.version}`
+            ? t('settings.health', health.data)
             : health.isError
-              ? 'API unreachable'
-              : 'Checking…'}
+              ? t('settings.unreachable')
+              : t('settings.checking')}
         </Text>
         <Text muted variant="caption" selectable testID="update-info">
           {describeUpdate()}
@@ -143,22 +148,22 @@ export default function SettingsScreen() {
 
       <View style={styles.links}>
         <Button
-          label="Privacy policy"
+          label={t('settings.privacy')}
           variant="secondary"
-          accessibilityHint="Opens in your browser"
-          onPress={() => Linking.openURL(PRIVACY_URL)}
+          accessibilityHint={t('common.opensInBrowser')}
+          onPress={() => Linking.openURL(privacyUrl())}
         />
         <Button
-          label="Help"
+          label={t('settings.help')}
           variant="secondary"
-          accessibilityHint="Opens in your browser"
-          onPress={() => Linking.openURL(SUPPORT_URL)}
+          accessibilityHint={t('common.opensInBrowser')}
+          onPress={() => Linking.openURL(supportUrl())}
         />
       </View>
 
       <Button
         testID="sign-out"
-        label="Sign out"
+        label={t('settings.signOut')}
         variant="secondary"
         loading={busy === 'signOut'}
         disabled={busy !== null}
@@ -166,7 +171,7 @@ export default function SettingsScreen() {
       />
       <Button
         testID="delete-account"
-        label="Delete account"
+        label={t('settings.deleteAccount')}
         variant="danger"
         loading={busy === 'delete'}
         disabled={busy !== null}

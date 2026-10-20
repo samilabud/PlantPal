@@ -12,14 +12,19 @@ import {
   signInWithGoogle,
 } from '@/auth';
 import { toUserMessage } from '@/errors/user-message';
-import { PRIVACY_URL } from '@/config/site';
+import { privacyUrl } from '@/config/site';
+import { useT } from '@/i18n';
+import { LanguageToggle } from '@/components/language-toggle';
 import { Button, Logo, spacing, Text, useColors } from '@/ui';
 import { describeUpdate } from '@/updates/describe-update';
 
 type Provider = 'apple' | 'google' | 'dev';
+/** The test user's name, not a sentence: the same in every language. */
+const DEV_USER = 'dev';
 
 export default function SignInScreen() {
   const colors = useColors();
+  const t = useT();
   const [appleAvailable, setAppleAvailable] = useState(false);
   const [busy, setBusy] = useState<Provider | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,10 +49,11 @@ export default function SignInScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <LanguageToggle />
       <View style={styles.header}>
         <Logo variant="stacked" height={200} />
         <Text muted accessibilityRole="header">
-          Never forget to water a plant again.
+          {t('signIn.tagline')}
         </Text>
       </View>
 
@@ -64,7 +70,7 @@ export default function SignInScreen() {
         {isGoogleSignInConfigured() && (
           <Button
             testID="google-sign-in"
-            label="Sign in with Google"
+            label={t('signIn.google')}
             variant="secondary"
             loading={busy === 'google'}
             disabled={busy !== null}
@@ -74,7 +80,7 @@ export default function SignInScreen() {
         {isDevSignInEnabled && (
           <TextInput
             testID="dev-user-name"
-            accessibilityLabel="Test user name"
+            accessibilityLabel={t('signIn.devUserName')}
             value={devName}
             onChangeText={(t) =>
               setDevName(
@@ -84,7 +90,7 @@ export default function SignInScreen() {
                   .slice(0, 32),
               )
             }
-            placeholder="dev"
+            placeholder={DEV_USER}
             placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
             autoCorrect={false}
@@ -94,11 +100,11 @@ export default function SignInScreen() {
         {isDevSignInEnabled && (
           <Button
             testID="dev-sign-in"
-            label="Dev sign-in (test only)"
+            label={t('signIn.devSignIn')}
             variant="secondary"
             loading={busy === 'dev'}
             disabled={busy !== null}
-            onPress={() => run('dev', () => signInDev(devName || 'dev'))}
+            onPress={() => run('dev', () => signInDev(devName || DEV_USER))}
           />
         )}
         {error && (
@@ -110,15 +116,15 @@ export default function SignInScreen() {
 
       <View style={styles.footer}>
         <Text muted variant="caption" style={styles.center}>
-          By signing in you agree to the{' '}
+          {t('signIn.agreeBefore')}
           <Text
             variant="caption"
             accessibilityRole="link"
             style={{ color: colors.primary, textDecorationLine: 'underline' }}
-            onPress={() => Linking.openURL(PRIVACY_URL)}>
-            privacy policy
+            onPress={() => Linking.openURL(privacyUrl())}>
+            {t('signIn.privacyPolicy')}
           </Text>
-          . You can delete your account at any time in Settings.
+          {t('signIn.agreeAfter')}
         </Text>
         <Text muted variant="caption" style={styles.center} testID="app-version">
           {describeUpdate()}

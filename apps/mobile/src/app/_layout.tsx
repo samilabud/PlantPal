@@ -5,6 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
+// First: translations are ready before any screen or module reads them.
+import { useT } from '@/i18n';
 import { identifyUser } from '@/analytics/analytics';
 import { restoreSession, useAuthStore } from '@/auth';
 import '@/notifications/notifications'; // sets the foreground notification handler
@@ -17,6 +19,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const scheme = useColorScheme();
+  const t = useT(); // re-renders the titles when the language changes
   const [queryClient] = useState(createQueryClient);
   const status = useAuthStore((s) => s.status);
 
@@ -59,16 +62,16 @@ export default function RootLayout() {
             <Stack.Screen name="sign-in" options={{ headerShown: false }} />
           </Stack.Protected>
           <Stack.Protected guard={signedIn}>
-            <Stack.Screen name="index" options={{ title: 'My plants' }} />
-            <Stack.Screen name="plants/new" options={{ title: 'New plant' }} />
-            <Stack.Screen name="plants/[id]/index" options={{ title: 'Plant' }} />
-            <Stack.Screen name="plants/[id]/edit" options={{ title: 'Edit plant' }} />
-            <Stack.Screen name="settings" options={{ title: 'Settings' }} />
-            <Stack.Screen name="paywall" options={{ title: 'Premium', presentation: 'modal' }} />
+            <Stack.Screen name="index" options={{ title: t('nav.myPlants') }} />
+            <Stack.Screen name="plants/new" options={{ title: t('nav.newPlant') }} />
+            <Stack.Screen name="plants/[id]/index" options={{ title: t('nav.plant') }} />
+            <Stack.Screen name="plants/[id]/edit" options={{ title: t('nav.editPlant') }} />
+            <Stack.Screen name="settings" options={{ title: t('nav.settings') }} />
             <Stack.Screen
-              name="guide"
-              options={{ title: 'How PlantPal works', presentation: 'modal' }}
+              name="paywall"
+              options={{ title: t('nav.premium'), presentation: 'modal' }}
             />
+            <Stack.Screen name="guide" options={{ title: t('nav.guide'), presentation: 'modal' }} />
           </Stack.Protected>
         </Stack>
         <StatusBar style="auto" />

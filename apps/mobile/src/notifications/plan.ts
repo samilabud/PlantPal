@@ -1,4 +1,5 @@
 import type { PlantListItem } from '@/data/plants';
+import { t } from '@/i18n';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** iOS keeps at most 64 pending local notifications per app; stay under it. */
@@ -41,8 +42,9 @@ export function planReminders(plants: PlantListItem[], now: Date, hour = 9): Pla
     planned.push({
       identifier: `plant-${plant.id}`,
       date,
-      title: `🪴 Time to water ${plant.name}`,
-      body: `${plant.name} is due today. Tap to mark it as watered.`,
+      // In the app's language when scheduled; rescheduled when the language changes.
+      title: t('notifications.dueTitle', { name: plant.name }),
+      body: t('notifications.dueBody', { name: plant.name }),
       url: `/plants/${plant.id}`,
     });
   }

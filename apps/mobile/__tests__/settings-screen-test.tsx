@@ -67,7 +67,7 @@ describe('SettingsScreen', () => {
     await render(<SettingsScreen />);
     await fireEvent.press(screen.getByRole('button', { name: 'Sign out' }));
     expect(signOut).not.toHaveBeenCalled();
-    expect(alert.mock.calls[0]![1]).toMatch(/3 change\(s\)/);
+    expect(alert.mock.calls[0]![1]).toMatch(/3 changes haven't reached/);
   });
 
   it('asks for confirmation before deleting, and deletes on confirm', async () => {

@@ -4,9 +4,11 @@ import { PlantForm } from '@/components/plant-form';
 import { useLiveQuery } from '@/data/live';
 import { mutate } from '@/data/mutations';
 import { getPlant, updatePlant } from '@/data/plants';
+import { useT } from '@/i18n';
 import { Screen, Text } from '@/ui';
 
 export default function EditPlantScreen() {
+  const t = useT();
   const { id, suggestedName, suggestedInterval } = useLocalSearchParams<{
     id: string;
     /** From "Use these details" on the detail screen (an AI suggestion). */
@@ -16,7 +18,7 @@ export default function EditPlantScreen() {
   const { data: plant, loading } = useLiveQuery((db) => getPlant(db, id), [id]);
 
   if (loading) return null;
-  if (!plant) return <Text>Plant not found</Text>;
+  if (!plant) return <Text>{t('detail.notFound')}</Text>;
   const interval = Number(suggestedInterval);
   const hasInterval = Number.isInteger(interval) && interval > 0;
   const fromAi = Boolean(suggestedName) || hasInterval;
@@ -29,7 +31,7 @@ export default function EditPlantScreen() {
       <PlantForm
         initial={initial}
         initialFromAi={fromAi}
-        submitLabel="Save changes"
+        submitLabel={t('form.saveChanges')}
         onSubmit={async (values) => {
           await mutate((db) => updatePlant(db, id, values));
           router.back();

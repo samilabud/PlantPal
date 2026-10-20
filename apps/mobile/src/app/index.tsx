@@ -19,12 +19,14 @@ import { getDb } from '@/db/database';
 import { mutate } from '@/data/mutations';
 import { listPlants, waterPlant, type PlantListItem } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
+import { useT } from '@/i18n';
 import { canAddPlant, usePremium } from '@/purchases/limits';
 import { syncNow } from '@/sync/sync-manager';
 import { Button, Logo, radius, spacing, Text, useColors } from '@/ui';
 
 export default function PlantsScreen() {
   const colors = useColors();
+  const t = useT();
   const { data: plants, loading, error } = useLiveQuery(listPlants, []);
   const [refreshing, setRefreshing] = useState(false);
   const premium = usePremium();
@@ -51,17 +53,17 @@ export default function PlantsScreen() {
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
-          title: 'My plants', // still used as the back-button label on child screens
+          title: t('nav.myPlants'), // still used as the back-button label on child screens
           headerTitle: () => <Logo variant="horizontal" height={30} />,
           headerRight: () => (
             <Pressable
               onPress={() => router.push('/settings')}
               accessibilityRole="button"
-              accessibilityLabel="Open settings"
+              accessibilityLabel={t('plants.openSettings')}
               testID="open-settings"
               hitSlop={12}
               style={{ padding: spacing.xs }}>
-              <Text style={{ color: colors.primary }}>Settings</Text>
+              <Text style={{ color: colors.primary }}>{t('nav.settings')}</Text>
             </Pressable>
           ),
         }}
@@ -72,10 +74,10 @@ export default function PlantsScreen() {
       </View>
       {error ? (
         <Text accessibilityRole="alert" style={[styles.center, { color: colors.danger }]}>
-          Could not read your plants: {error.message}
+          {t('plants.readError', { message: error.message })}
         </Text>
       ) : loading ? (
-        <ActivityIndicator style={styles.center} accessibilityLabel="Loading your plants" />
+        <ActivityIndicator style={styles.center} accessibilityLabel={t('plants.loading')} />
       ) : (
         <FlatList
           testID="plant-list"
@@ -86,7 +88,7 @@ export default function PlantsScreen() {
           ListHeaderComponent={
             plants?.length ? (
               <Text variant="heading" accessibilityRole="header">
-                My plants ({plants.length})
+                {t('plants.count', { count: plants.length })}
               </Text>
             ) : null
           }
@@ -94,13 +96,11 @@ export default function PlantsScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Logo variant="stacked" height={150} />
-              <Text variant="heading">No plants yet</Text>
-              <Text muted>
-                Add your first plant and PlantPal will remind you when it needs water.
-              </Text>
+              <Text variant="heading">{t('plants.emptyTitle')}</Text>
+              <Text muted>{t('plants.emptyBody')}</Text>
               <Button
                 testID="empty-open-guide"
-                label="See what PlantPal can do"
+                label={t('plants.emptyGuide')}
                 variant="secondary"
                 onPress={() => router.push('/guide')}
               />
@@ -110,7 +110,7 @@ export default function PlantsScreen() {
       )}
       <View style={styles.footer}>
         <LimitNotice />
-        <Button testID="add-plant" label="Add plant" onPress={addPlant} />
+        <Button testID="add-plant" label={t('plants.add')} onPress={addPlant} />
       </View>
     </View>
   );
@@ -118,6 +118,7 @@ export default function PlantsScreen() {
 
 function PlantRow({ plant }: { plant: PlantListItem }) {
   const colors = useColors();
+  const t = useT();
   const status = wateringStatus(plant.lastWateredAt, plant.wateringIntervalDays);
   const statusText = describeStatus(status);
   const urgent = status.state === 'overdue' || status.state === 'today' || status.state === 'never';
@@ -127,13 +128,13 @@ function PlantRow({ plant }: { plant: PlantListItem }) {
       <Pressable
         style={styles.rowMain}
         accessibilityRole="button"
-        accessibilityLabel={`${plant.name}. ${statusText}. Open details.`}
+        accessibilityLabel={t('plants.rowLabel', { name: plant.name, status: statusText })}
         onPress={() => router.push({ pathname: '/plants/[id]', params: { id: plant.id } })}>
         <PlantPhoto
           photoId={plant.coverPhotoId}
           localUri={plant.coverLocalUri}
           size={56}
-          label={`Photo of ${plant.name}`}
+          label={t('common.photoOf', { name: plant.name })}
         />
         <View style={styles.rowText}>
           <Text variant="heading" numberOfLines={1}>
@@ -143,8 +144,8 @@ function PlantRow({ plant }: { plant: PlantListItem }) {
         </View>
       </Pressable>
       <Button
-        label="Water"
-        accessibilityLabel={`Mark ${plant.name} as watered`}
+        label={t('plants.water')}
+        accessibilityLabel={t('plants.waterLabel', { name: plant.name })}
         variant={urgent ? 'primary' : 'secondary'}
         onPress={() => {
           track('plant_watered', { from: 'list' });

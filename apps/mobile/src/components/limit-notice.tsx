@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { dismissLimitNotice, useSyncStore } from '@/sync/sync-manager';
+import { useT } from '@/i18n';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 /**
@@ -11,22 +12,21 @@ import { Button, radius, spacing, Text, useColors } from '@/ui';
  */
 export function LimitNotice() {
   const colors = useColors();
+  const t = useT();
   const refused = useSyncStore((s) => s.refusedByLimit);
   if (!refused) return null;
 
-  const items = refused === 1 ? '1 new item' : `${refused} new items`;
+  const items = t('limit.items', { count: refused });
   return (
     <View
       testID="limit-notice"
       accessibilityRole="alert"
       style={[styles.box, { backgroundColor: colors.surface, borderColor: colors.danger }]}>
-      <Text variant="heading">Premium is no longer active</Text>
-      <Text muted>
-        {`${items} couldn't be saved: the free plan includes ${FREE_PLANT_LIMIT} plants and one photo per plant. Upgrade to keep adding, or restore a subscription you already have.`}
-      </Text>
+      <Text variant="heading">{t('limit.title')}</Text>
+      <Text muted>{t('limit.body', { items, limit: FREE_PLANT_LIMIT })}</Text>
       <View style={styles.row}>
         <Button
-          label="Upgrade"
+          label={t('common.upgrade')}
           style={styles.flex}
           onPress={() => {
             dismissLimitNotice();
@@ -34,7 +34,7 @@ export function LimitNotice() {
           }}
         />
         <Button
-          label="Dismiss"
+          label={t('common.dismiss')}
           variant="secondary"
           style={styles.flex}
           onPress={dismissLimitNotice}

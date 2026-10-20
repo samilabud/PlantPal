@@ -8,48 +8,52 @@ import { toUserMessage } from '@/errors/user-message';
 import { track, usePaywallVariant, type PaywallVariant } from '@/analytics/analytics';
 import { buy, getPackages, isPurchasesAvailable, restore } from '@/purchases/purchases';
 import { FREE_PLANT_LIMIT, IDENTIFY_LIMITS } from '@plantpal/shared';
+import { t, useT } from '@/i18n';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 
-const REASON: Record<string, string> = {
-  plants: `The free plan includes ${FREE_PLANT_LIMIT} plants.`,
-  photos: 'The free plan includes one photo per plant.',
-  ai: `The free plan includes ${IDENTIFY_LIMITS.free.perDay} AI identifications a day; Premium includes ${IDENTIFY_LIMITS.premium.perDay}.`,
-};
+const REASONS = ['plants', 'photos', 'ai'] as const;
+const reasonText = (reason: string | undefined) =>
+  REASONS.find((r) => r === reason) &&
+  t(`paywall.reasons.${reason as (typeof REASONS)[number]}`, {
+    limit: FREE_PLANT_LIMIT,
+    free: IDENTIFY_LIMITS.free.perDay,
+    premium: IDENTIFY_LIMITS.premium.perDay,
+  });
 
 /** The `paywall-variant` flag (PostHog A/B test): same plans and prices, different framing. */
-const COPY: Record<PaywallVariant, { title: string; benefits: string[] }> = {
-  control: {
-    title: 'PlantPal Premium',
+const COPY_KEY: Record<PaywallVariant, 'control' | 'plantsFirst'> = {
+  control: 'control',
+  'plants-first': 'plantsFirst',
+};
+const copyFor = (variant: PaywallVariant) => {
+  const k = COPY_KEY[variant];
+  return {
+    title: t(`paywall.${k}.title`),
     benefits: [
-      'Unlimited plants',
-      'Photo history for every plant',
-      `${IDENTIFY_LIMITS.premium.perDay} AI plant identifications a day`,
-      'Supports an independent app',
+      t(`paywall.${k}.b1`),
+      t(`paywall.${k}.b2`),
+      t(`paywall.${k}.b3`, { count: IDENTIFY_LIMITS.premium.perDay }),
+      t(`paywall.${k}.b4`),
     ],
-  },
-  'plants-first': {
-    title: 'Room for every plant',
-    benefits: [
-      'Add as many plants as you own',
-      'Keep a photo diary of each one',
-      `Identify up to ${IDENTIFY_LIMITS.premium.perDay} plants a day with AI`,
-      'Supports an independent app',
-    ],
-  },
+  };
 };
 
-const PERIOD: Record<string, string> = {
-  MONTHLY: 'per month',
-  ANNUAL: 'per year',
-  LIFETIME: 'once',
-};
+const CHECK = '✓ ';
+
+const PERIODS = ['MONTHLY', 'ANNUAL', 'LIFETIME'] as const;
+const periodText = (packageType: string) =>
+  PERIODS.find((p) => p === packageType)
+    ? t(`paywall.period.${packageType as (typeof PERIODS)[number]}`)
+    : '';
 
 export default function PaywallScreen() {
   const colors = useColors();
+  useT(); // re-render when the language changes
   const { reason } = useLocalSearchParams<{ reason?: string }>();
   const [busy, setBusy] = useState<string | null>(null);
   const { variant, ready } = usePaywallVariant();
-  const copy = COPY[variant];
+  const copy = copyFor(variant);
+  const reasonLine = reasonText(reason);
 
   // Recorded once the flag is known, so the event carries the copy the user actually saw.
   useEffect(() => {
@@ -67,13 +71,10 @@ export default function PaywallScreen() {
       if (await buy(pkg)) {
         track('purchase_completed', { package_type: pkg.packageType, variant });
         router.back();
-        Alert.alert(
-          'Welcome to Premium 🌿',
-          'Unlimited plants, photo history and more AI identifications are unlocked.',
-        );
+        Alert.alert(t('paywall.welcomeTitle'), t('paywall.welcomeBody'));
       }
     } catch (e) {
-      Alert.alert('Purchase failed', toUserMessage(e, 'purchase'));
+      Alert.alert(t('paywall.purchaseFailed'), toUserMessage(e, 'purchase'));
     } finally {
       setBusy(null);
     }
@@ -83,10 +84,13 @@ export default function PaywallScreen() {
     setBusy('restore');
     try {
       const premium = await restore();
-      Alert.alert('Restore', premium ? 'Premium restored.' : 'No active subscription found.');
+      Alert.alert(
+        t('paywall.restoreTitle'),
+        premium ? t('paywall.restored') : t('paywall.nothingToRestore'),
+      );
       if (premium) router.back();
     } catch (e) {
-      Alert.alert('Restore failed', toUserMessage(e, 'restore'));
+      Alert.alert(t('paywall.restoreFailed'), toUserMessage(e, 'restore'));
     } finally {
       setBusy(null);
     }
@@ -97,29 +101,33 @@ export default function PaywallScreen() {
       <Text variant="title" accessibilityRole="header">
         {copy.title}
       </Text>
-      {reason && REASON[reason] && <Text muted>{REASON[reason]}</Text>}
+      {reasonLine && <Text muted>{reasonLine}</Text>}
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         {copy.benefits.map((b) => (
-          <Text key={b}>✓ {b}</Text>
+          <Text key={b}>
+            {CHECK}
+            {b}
+          </Text>
         ))}
       </View>
 
       {!isPurchasesAvailable() ? (
-        <Text muted>{"Purchases aren't set up in this build yet."}</Text>
+        <Text muted>{t('paywall.notSetUp')}</Text>
       ) : packages.isPending ? (
-        <ActivityIndicator accessibilityLabel="Loading plans" />
+        <ActivityIndicator accessibilityLabel={t('paywall.loading')} />
       ) : packages.isError || !packages.data?.length ? (
-        <Text style={{ color: colors.danger }}>
-          {"Plans couldn't be loaded. Check your connection."}
-        </Text>
+        <Text style={{ color: colors.danger }}>{t('paywall.loadFailed')}</Text>
       ) : (
         packages.data.map((pkg) => (
           <Button
             key={pkg.identifier}
             testID={`buy-${pkg.packageType.toLowerCase()}`}
-            label={`${pkg.product.priceString} ${PERIOD[pkg.packageType] ?? ''}`.trim()}
-            accessibilityLabel={`Subscribe for ${pkg.product.priceString} ${PERIOD[pkg.packageType] ?? ''}`}
+            label={`${pkg.product.priceString} ${periodText(pkg.packageType)}`.trim()}
+            accessibilityLabel={t('paywall.subscribeLabel', {
+              price: pkg.product.priceString,
+              period: periodText(pkg.packageType),
+            })}
             loading={busy === pkg.identifier}
             disabled={busy !== null}
             onPress={() => purchase(pkg)}
@@ -128,15 +136,15 @@ export default function PaywallScreen() {
       )}
 
       <Button
-        label="Restore purchases"
+        label={t('paywall.restore')}
         variant="secondary"
         loading={busy === 'restore'}
         disabled={busy !== null}
         onPress={onRestore}
       />
       <Text muted variant="caption">
-        {__DEV__ ? 'Test purchases only: no real money is charged. ' : ''}
-        Subscriptions renew automatically until cancelled in your store account settings.
+        {__DEV__ ? t('paywall.testOnly') : ''}
+        {t('paywall.renewal')}
       </Text>
     </Screen>
   );

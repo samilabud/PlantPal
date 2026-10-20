@@ -5,6 +5,7 @@ import { Linking, Platform } from 'react-native';
 
 import { listPlants } from '@/data/plants';
 import type { SqlDb } from '@/db/types';
+import { t } from '@/i18n';
 
 import { planReminders } from './plan';
 
@@ -27,7 +28,7 @@ Notifications.setNotificationHandler({
 export async function ensureChannel() {
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync(REMINDER_CHANNEL, {
-    name: 'Watering reminders',
+    name: t('reminders.channel'),
     importance: Notifications.AndroidImportance.HIGH,
   });
 }
@@ -85,8 +86,8 @@ export async function scheduleTestReminder(url: string, seconds = 10) {
   await ensureChannel();
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: '🪴 Test reminder',
-      body: 'Tap to open your plant.',
+      title: t('notifications.testTitle'),
+      body: t('notifications.testBody'),
       data: { url },
       sound: 'default',
     },
