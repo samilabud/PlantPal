@@ -2,6 +2,7 @@ import {
   bigint,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgSequence,
   pgTable,
@@ -178,4 +179,60 @@ export const webhookEvents = pgTable('webhook_events', {
   receivedAt: timestamp('received_at', { withTimezone: true }).notNull().defaultNow(),
   /** Null until processing finished: a crash mid-way lets the retry process it again. */
   processedAt: timestamp('processed_at', { withTimezone: true }),
+});
+
+/** How one "Identify with AI" call ended. `pending` while Claude is answering. */
+export const aiStatusEnum = pgEnum('ai_status', [
+  'pending',
+  'ok',
+  'low_confidence',
+  'not_plant',
+  'invalid_output',
+  'refused',
+  'timeout',
+  'error',
+]);
+
+/**
+ * One row per call to Claude: the source for per-user limits, the daily spending guard and
+ * cost per identification. Deliberately no photo and no answer text: only counts and usage.
+ */
+export const aiIdentifications = pgTable(
+  'ai_identifications',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** The model that answered (after any fallback), or the requested one while pending. */
+    model: text('model').notNull(),
+    status: aiStatusEnum('status').notNull().default('pending'),
+    inputTokens: integer('input_tokens').notNull().default(0),
+    outputTokens: integer('output_tokens').notNull().default(0),
+    /** Tokens × USD per million tokens = micro-dollars, so cost stays an integer. */
+    costMicroUsd: integer('cost_micro_usd').notNull().default(0),
+    latencyMs: integer('latency_ms'),
+    ...timestamps,
+  },
+  (t) => [index().on(t.userId, t.createdAt), index().on(t.createdAt)],
+);
+
+export const aiReportReasonEnum = pgEnum('ai_report_reason', ['wrong', 'offensive', 'other']);
+
+/**
+ * "Report this suggestion" (Google Play AI-Generated Content policy). Keeps only what the user
+ * chose to send: the AI's answer, a reason and an optional note.
+ */
+export const aiReports = pgTable('ai_reports', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  identificationId: uuid('identification_id')
+    .notNull()
+    .references(() => aiIdentifications.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  reason: aiReportReasonEnum('reason').notNull(),
+  note: text('note'),
+  suggestion: jsonb('suggestion').notNull(),
+  ...timestamps,
 });
