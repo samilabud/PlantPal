@@ -4,8 +4,13 @@ import type { z } from 'zod';
 import { HttpError } from './errors';
 
 /** Every error response uses the shared `ApiErrorBody` shape. */
-export function errorResponse(status: number, code: string, message: string) {
-  const body: ApiErrorBody = { error: { code, message } };
+export function errorResponse(
+  status: number,
+  code: string,
+  message: string,
+  details?: Record<string, unknown>,
+) {
+  const body: ApiErrorBody = { error: { code, message, ...(details && { details }) } };
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } });
 }
 
@@ -36,7 +41,8 @@ export function withErrors<Args extends unknown[]>(
     try {
       return await handler(request, ...args);
     } catch (error) {
-      if (error instanceof HttpError) return errorResponse(error.status, error.code, error.message);
+      if (error instanceof HttpError)
+        return errorResponse(error.status, error.code, error.message, error.details);
       console.error(error);
       return errorResponse(500, 'internal', 'Something went wrong');
     }
