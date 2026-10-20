@@ -1,5 +1,7 @@
 # Store listing (App Store and Google Play)
 
+Spanish (es-419): [`store-listing.es.md`](store-listing.es.md). Updated for M9 (AI identification, Spanish) on 2026-10-20.
+
 Draft text, ready to paste. Character counts were checked by script against each store's limit.
 Every claim matches a feature with evidence in `docs/evidence/`.
 
@@ -19,16 +21,20 @@ PlantPal remembers which plant needs water, so you don't have to.
 
 Add your plants, say how often each one needs water, and tap Water when you water it. Your list always shows what is due today, what is overdue and what can wait.
 
+• Not sure what plant it is? Take a photo and tap Identify with AI for a suggested name and watering interval. You check it before saving.
 • Reminders on the morning a plant is due, plus a daily nudge if one is overdue
 • Works without internet: everything is saved on your phone and syncs when you are back online
 • The same plants on all your devices: sign in with Apple or Google
 • A photo history for each plant
 • Undo a watering you tapped by mistake
+• In English and Spanish
 
-Free: up to 3 plants, with one photo each.
-Premium: unlimited plants and photo history. Monthly, yearly or a one-time lifetime purchase.
+Free: up to 3 plants, with one photo each, and 3 AI identifications a day.
+Premium: unlimited plants, photo history and up to 30 AI identifications a day. Monthly, yearly or a one-time lifetime purchase.
 
 No ads. No tracking. Delete your account and all your data from Settings at any time.
+
+AI suggestions can be wrong: always check them. The photo goes to Anthropic only when you tap Identify with AI, and PlantPal doesn't keep it.
 
 Privacy policy: https://plantpal-api.vercel.app/privacy
 
@@ -46,9 +52,10 @@ Payment is charged to your Apple ID or Google account at confirmation of purchas
 Google requires credentials, and reviewers may not use personal accounts for purchases. So a dedicated review Google account (no personal data, 2-step verification off) is entered in Play Console > **Sign in details**, never in this repo. It is a **license tester** (free test purchases) and was a test user on the Google consent screen while it was in Testing.
 
 ## Screenshots
-Alt text (≤ 140 characters): "Plant list showing which plants need water today", "Guide listing everything PlantPal can do", "Monstera detail with its watering history".
+Four per language in [`screenshots/`](screenshots/) (English) and [`screenshots/es/`](screenshots/es/), made as described in [`screenshots/README.md`](screenshots/README.md).
+Alt text (≤ 140 characters): "Plant list showing which plants need water today", "AI suggestion with the plant's name and how often to water it", "Guide listing everything PlantPal can do", "Monstera detail with its watering history".
 
 | Store | Required | Status |
 |---|---|---|
-| Google Play (phone) | 2–8; max side ≤ 2 × min side; no alpha; 4+ at 9:16 ≥ 1080 px for promotion | **3 ready** in `docs/release/screenshots/` (list, guide, detail): captured on the emulator with a clean demo status bar, fitted onto a 1440 × 2560 (9:16) brand-colored canvas because the raw 1440 × 3120 captures exceed 2:1. One more needed for promotion: the paywall, retaken from a store build (the dev build shows "Test purchases only") |
+| Google Play (phone) | 2–8; max side ≤ 2 × min side; no alpha; 4+ at 9:16 ≥ 1080 px for promotion | **4 ready per language (M9, 2026-10-20)**: list, AI suggestion, guide, detail; demo status bar; 1440 × 2560, no alpha. Earlier: **3 ready** in `docs/release/screenshots/` (list, guide, detail): captured on the emulator with a clean demo status bar, fitted onto a 1440 × 2560 (9:16) brand-colored canvas because the raw 1440 × 3120 captures exceed 2:1. One more needed for promotion: the paywall, retaken from a store build (the dev build shows "Test purchases only") |
 | App Store (6.9" iPhone, 1320 × 2868) | 1–10 | **Not yet:** needs an iOS build, which needs Xcode ≥ 26.4 (this Mac has 26.2) or an EAS cloud build installed on a simulator |

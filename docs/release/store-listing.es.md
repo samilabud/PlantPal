@@ -34,14 +34,12 @@ Las sugerencias de la IA pueden equivocarse: revísalas siempre. La foto se env�
 Política de privacidad: https://plantpal-api.vercel.app/es/privacy
 
 ## Screenshots (Spanish)
+Four in [`screenshots/es/`](screenshots/es/): list, AI suggestion, guide, detail (1440 × 2560, no alpha).
 Alt text (≤ 140 characters):
 - "Lista de plantas que muestra cuáles necesitan agua hoy"
 - "Sugerencia de la IA con el nombre de la planta y cada cuánto regarla"
+- "Guía con todo lo que puede hacer PlantPal"
 - "Detalle de una Monstera con su historial de riego"
-
-The Spanish screenshots are taken from the app in Spanish (see
-`docs/evidence/m9-ai-and-spanish.md`) and fitted onto the same 1440 × 2560 brand canvas as the
-English ones in M9.4.
 
 ## URLs
 | | URL |

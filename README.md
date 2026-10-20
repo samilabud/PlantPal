@@ -18,8 +18,10 @@ isn't proven.
 ## What it does
 Sign in with Google (Apple on iOS), add plants with a photo and a watering interval, and tap
 **Water**. The list shows what's due; reminders arrive the morning a plant needs water; everything
-works offline and syncs across devices. Premium unlocks unlimited plants and photo
-history. Account deletion lives in Settings.
+works offline and syncs across devices. Not sure what the plant is? **Identify with AI** suggests
+its name and watering interval from a photo, and you confirm before saving. The app is in
+**English and Spanish**. Premium unlocks unlimited plants, photo history and more AI
+identifications. Account deletion lives in Settings.
 
 ## Architecture
 
@@ -92,18 +94,20 @@ Each claim links to the evidence that proves it. ✅ proven · 🟡 partly prove
 | **EAS Update** (OTA) on a staging channel, received by an installed build | [M7](docs/evidence/m7-release.md#eas-update-on-the-staging-channel) | ✅ |
 | **EAS Submit** to Google Play | [M8](docs/evidence/m8-portfolio.md#eas-submit-gap-7) | ✅ |
 | **CI**: secret scan, lint, typecheck, tests with coverage report; manual EAS build workflow | [M6](docs/evidence/m6-quality.md#ci) | ✅ |
-| Unit, component and integration tests (Jest, React Native Testing Library, Vitest with real Postgres) | [M6](docs/evidence/m6-quality.md), [M8](docs/evidence/m8-portfolio.md#fresh-clone-definition-of-done) | ✅ 190 tests, also from a fresh clone |
-| **Maestro** end-to-end flows: sign in, add offline then sync, paywall | [M6](docs/evidence/m6-quality.md#end-to-end-maestro-android-emulator-api-33-development-build) | 🟡 each passes alone; back-to-back runs flaky on the dev build |
+| Unit, component and integration tests (Jest with the React Compiler on, React Native Testing Library, Vitest with real Postgres) | [M6](docs/evidence/m6-quality.md), [M8](docs/evidence/m8-portfolio.md#fresh-clone-definition-of-done), [M9.3](docs/evidence/m9-ai-and-spanish.md#tests-1) | ✅ 248 tests, also from a fresh clone |
+| **Maestro** end-to-end flows: sign in, add offline then sync, paywall, add a plant with AI, switch language | [M6](docs/evidence/m6-quality.md#end-to-end-maestro-android-emulator-api-33-development-build) | 🟡 each passes alone; back-to-back runs flaky on the dev build |
 | Accessibility labels, roles, large text | [M6](docs/evidence/m6-quality.md#accessibility) | ✅ |
 | Performance check of the list | [M6](docs/evidence/m6-quality.md#performance-check-the-plant-list) | 🟡 query measured (1.4 ms / 1,000 plants); scroll smoothness not measured on a device |
 | **Analytics and a feature flag** with PostHog (privacy-first, opt-out) | [M8](docs/evidence/m8-portfolio.md#analytics-and-feature-flag-posthog-gap-9) | ✅ events from the Play build; A/B data not yet meaningful (one tester) |
 | Privacy policy, support and data-deletion pages; store privacy answers | [M7](docs/evidence/m7-release.md#privacy-support-and-deletion-pages-live), [data safety](docs/release/data-safety.md) | ✅ |
+| **Identify with AI** (Claude, server-side): structured output validated on both sides, pre-fill only, daily limits, spending guard, report button | [M9.1](docs/evidence/m9-ai-and-spanish.md#m91-api-2026-10-19), [M9.2](docs/evidence/m9-ai-and-spanish.md#m92-app-2026-10-20) | 🟡 tested and run on the emulator against the local API; not yet in a store build |
+| AI **evaluation**: 25 photos, 3 configurations, accuracy, latency and cost measured; model chosen from the numbers | [M9.1 evaluation](docs/evidence/m9-ai-and-spanish.md#evaluation) | ✅ Sonnet 5.5: 37/40 plant photos right, $0.0058 per identification |
+| **English and Spanish**: every screen, errors, notifications (local and server push), web pages, store listing; switch in Settings and on sign-in | [M9.3](docs/evidence/m9-ai-and-spanish.md#m93-spanish-2026-10-20) | 🟡 on the emulator; not yet in a store build |
 
 ## Roadmap
 | Next | What | Plan |
 |---|---|---|
-| **M9** | **Identify with AI:** take a photo and Claude suggests the plant's name and watering interval (pre-filled, the user confirms). Server-side Claude API calls, daily limits, an evaluation set, privacy and Play AI-policy updates. | [docs/prompts/M9_AI_AND_SPANISH.md](docs/prompts/M9_AI_AND_SPANISH.md) |
-| **M9** | **Spanish:** the whole app, notifications, web pages and store listing in English and Spanish; follows the phone's language, with a switch in Settings and on the sign-in screen. | same |
+| **M9** | Identify with AI and Spanish: built and tested (see the claims above); waiting for build 7 and internal testing | [plan](docs/M9_PLAN.md), [evidence](docs/evidence/m9-ai-and-spanish.md) |
 | Later | iOS release (TestFlight, App Store) once the Apple developer account is approved | [release checklist](docs/release/RELEASE_CHECKLIST.md) |
 
 ## Run it locally

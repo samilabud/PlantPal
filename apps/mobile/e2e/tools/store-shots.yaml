@@ -1,0 +1,80 @@
+# Store screenshots for one language, from a demo account seeded with
+# `node apps/api/scripts/seed-store-demo.mjs <USER> <LANG>`. Before running, put Android's status
+# bar in demo mode (clean clock, full battery), see docs/release/screenshots/README.md.
+#   maestro test -e LANG=es -e USER=store-es-1 e2e/tools/store-shots.yaml
+# One real Claude call through the local API (~$0.006) for the AI screenshot.
+appId: com.samilabud.plantpal.dev
+name: Store screenshots
+---
+- addMedia:
+    - ../media/monstera.jpg
+# Starts on the sign-in screen with the development build's tools button already switched off
+# (dev menu > Tools button); clearing the app's data would bring it back, so this flow doesn't.
+- tapOn:
+    id: language-${LANG}
+- tapOn:
+    id: dev-user-name
+- inputText: ${USER}
+- pressKey: back
+- tapOn:
+    id: dev-sign-in
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: (Here is everything|Esto es todo).*
+    timeout: 30000
+- takeScreenshot: e2e/screenshots/store-${LANG}-3-guide
+- scrollUntilVisible:
+    element:
+      id: guide-done
+- tapOn:
+    id: guide-done
+- extendedWaitUntil:
+    visible: Monstera
+    timeout: 30000
+- extendedWaitUntil:
+    visible: (Synced|Sincronizado)
+    timeout: 30000
+- takeScreenshot: e2e/screenshots/store-${LANG}-1-list
+- tapOn: Monstera
+- extendedWaitUntil:
+    visible:
+      id: water-now
+    timeout: 20000
+- takeScreenshot: e2e/screenshots/store-${LANG}-4-detail
+- pressKey: back
+- tapOn:
+    id: add-plant
+- tapOn: (Choose photo|Elegir foto)
+- extendedWaitUntil:
+    visible: Recent
+    timeout: 20000
+- tapOn:
+    point: 15%,34%
+- tapOn: CROP
+- tapOn:
+    id: ai-identify-button
+- extendedWaitUntil:
+    visible: .*Anthropic.*
+    timeout: 20000
+- tapOn: (?i)(continue|continuar)
+- extendedWaitUntil:
+    visible:
+      id: ai-suggestion
+    timeout: 45000
+- takeScreenshot: e2e/screenshots/store-${LANG}-2-ai
+# Sign out, back to the sign-in screen for the next language (leave the form unsaved).
+- pressKey: back
+- tapOn:
+    id: open-settings
+- scrollUntilVisible:
+    element:
+      id: sign-out
+- tapOn:
+    id: sign-out
+- tapOn:
+    text: (Sign out anyway|Cerrar sesión de todos modos)
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: dev-sign-in
+    timeout: 30000
