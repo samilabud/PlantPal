@@ -1,0 +1,39 @@
+{
+  "about": "Evaluation set for 'Identify with AI'. Photos come from Wikimedia Commons (openly licensed; author and license are recorded in sources.json by eval:photos). Watering ranges: the water-needs category is from WVU Extension's 'Common Houseplant Care' table (https://extension.wvu.edu/lawn-gardening-pests/indoor-plants/common-houseplant-care); turning a category into a day range is our own judgment, listed in 'waterRanges' for review.",
+  "waterRanges": {
+    "evenly-moist": { "wvu": "Evenly moist", "days": [3, 10] },
+    "soak-then-dry": { "wvu": "Soak, and then let dry between waterings", "days": [5, 14] },
+    "drench-dry-completely": { "wvu": "Drench, then allow to dry completely", "days": [10, 30] },
+    "succulent": {
+      "wvu": "Soak occasionally and allow to completely dry out between waterings",
+      "days": [10, 30]
+    }
+  },
+  "cases": [
+    { "id": "monstera-1", "commons": "Monstera deliciosa DSC02605.jpg", "kind": "plant", "species": ["Monstera deliciosa"], "genera": ["Monstera"], "water": "evenly-moist" },
+    { "id": "monstera-2", "commons": "New Monstera Deliciosa Leaf.jpg", "kind": "plant", "species": ["Monstera deliciosa"], "genera": ["Monstera"], "water": "evenly-moist" },
+    { "id": "pothos-1", "commons": "Epipremnum aureum (pothos).jpg", "kind": "plant", "species": ["Epipremnum aureum"], "genera": ["Epipremnum"], "water": "soak-then-dry" },
+    { "id": "pothos-2", "commons": "Epipremnum aureum kz01.jpg", "kind": "plant", "species": ["Epipremnum aureum"], "genera": ["Epipremnum"], "water": "soak-then-dry" },
+    { "id": "snake-1", "commons": "Sansevieria Trifasciata .jpg", "kind": "plant", "species": ["Sansevieria trifasciata", "Dracaena trifasciata"], "genera": ["Sansevieria", "Dracaena"], "water": "drench-dry-completely" },
+    { "id": "snake-2", "commons": "Sansevieria trifasciata Plant 3264px.jpg", "kind": "plant", "species": ["Sansevieria trifasciata", "Dracaena trifasciata"], "genera": ["Sansevieria", "Dracaena"], "water": "drench-dry-completely" },
+    { "id": "peace-lily-1", "commons": "Peace Lily (Spathiphyllum chopin).jpg", "kind": "plant", "species": [], "genera": ["Spathiphyllum"], "water": "evenly-moist" },
+    { "id": "peace-lily-2", "commons": "Spathiphyllum in China.jpg", "kind": "plant", "species": [], "genera": ["Spathiphyllum"], "water": "evenly-moist" },
+    { "id": "fiddle-leaf-fig", "commons": "Ficus lyrata DSCN4457.jpg", "kind": "plant", "species": ["Ficus lyrata"], "genera": ["Ficus"], "water": "evenly-moist" },
+    { "id": "african-violet", "commons": "Saintpaulia ionantha kz01.jpg", "kind": "plant", "species": ["Saintpaulia ionantha", "Streptocarpus ionanthus"], "genera": ["Saintpaulia", "Streptocarpus"], "water": "evenly-moist" },
+    { "id": "philodendron-1", "commons": "Philodendron hederaceum kz01.jpg", "kind": "plant", "species": ["Philodendron hederaceum", "Philodendron scandens"], "genera": ["Philodendron"], "water": "evenly-moist" },
+    { "id": "philodendron-2", "commons": "Philodendron hederaceum var. Lemon Lime.jpg", "kind": "plant", "species": ["Philodendron hederaceum", "Philodendron scandens"], "genera": ["Philodendron"], "water": "evenly-moist" },
+    { "id": "rubber-plant", "commons": "Gummibaum (Ficus elastica Robusta).jpg", "kind": "plant", "species": ["Ficus elastica"], "genera": ["Ficus"], "water": "evenly-moist" },
+    { "id": "spider-plant-1", "commons": "Chlorophytum comosum in China.jpg", "kind": "plant", "species": ["Chlorophytum comosum"], "genera": ["Chlorophytum"], "water": "evenly-moist" },
+    { "id": "spider-plant-2", "commons": "Malamadre (Chlorophytum comosum).jpg", "kind": "plant", "species": ["Chlorophytum comosum"], "genera": ["Chlorophytum"], "water": "evenly-moist" },
+    { "id": "jade", "commons": "Among the branches of a potted jade plant.jpg", "kind": "plant", "species": ["Crassula ovata", "Crassula portulacea"], "genera": ["Crassula"], "water": "succulent" },
+    { "id": "echeveria", "commons": "Echeveria Compton Carousel.jpg", "kind": "plant", "species": [], "genera": ["Echeveria"], "water": "succulent" },
+    { "id": "aloe", "commons": "Aloe vera Lanzarote.jpg", "kind": "plant", "species": ["Aloe vera", "Aloe barbadensis"], "genera": ["Aloe"], "water": "succulent" },
+    { "id": "haworthia", "commons": "Succulent haworthia.jpg", "kind": "plant", "species": [], "genera": ["Haworthia", "Haworthiopsis"], "water": "succulent" },
+    { "id": "mammillaria", "commons": "Mammillaria prolifera in a pot.jpg", "kind": "plant", "species": ["Mammillaria prolifera"], "genera": ["Mammillaria"], "water": "succulent" },
+    { "id": "mug", "commons": "Coffee mug on table.jpg", "kind": "not-plant" },
+    { "id": "cat", "commons": "Cat in sofa at Cat Cafe Nyankoto.jpg", "kind": "not-plant" },
+    { "id": "chair", "commons": "Buerostuhl (fcm).jpg", "kind": "not-plant" },
+    { "id": "blurry-fiddle-leaf-fig", "commons": "Ficus lyrata 98162192.jpg", "kind": "blurry", "species": ["Ficus lyrata"], "genera": ["Ficus"], "water": "evenly-moist" },
+    { "id": "blurry-jade", "commons": "Crassula ovata 2012.jpg", "kind": "blurry", "species": ["Crassula ovata", "Crassula portulacea"], "genera": ["Crassula"], "water": "succulent" }
+  ]
+}
