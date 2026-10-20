@@ -199,3 +199,97 @@ Notes from the run:
 - "Report this suggestion" from the emulator (unit-tested in the app, integration-tested on the
   server).
 - The offline state on a device (unit-tested).
+
+## M9.3: Spanish (2026-10-20)
+
+### What was built
+| Piece | Where |
+|---|---|
+| i18next + react-i18next; every user-facing string in `en.json` / `es.json` (typed keys) | `apps/mobile/src/i18n/` |
+| Device language by default (`expo-localization`), choice stored on the device (SQLite key-value store, survives sign-out), re-read when the app returns to the front | `apps/mobile/src/i18n/index.ts` |
+| Language row in Settings (System default / English / Español); English \| Español switch on sign-in | `components/language-card.tsx`, `components/language-toggle.tsx` |
+| Plurals (`_one`/`_other`, `Intl.PluralRules` polyfilled only where missing), dates via `Intl` in `en-US` / `es-419` | `src/i18n`, `intl-pluralrules` |
+| Errors, alerts, paywall (both A/B variants), guide, notifications, accessibility labels | all screens and components |
+| Local reminders in the app's language, rescheduled when it changes | `notifications/plan.ts`, `use-notifications.ts` |
+| Server pushes in each phone's language: `devices.language` (migration 0005, default `en`), sent at registration and on language change; shared per-language push texts | `packages/shared/src/push-texts.ts`, `apps/api/src/push/reminders.ts` |
+| Spanish web pages `/es/privacy`, `/es/support`, `/es/delete-account` (own root layout, `<html lang="es">`); the app links to the page in its language | `apps/api/src/app/(es)`, `apps/api/src/site/` |
+| OS level: Android per-app language (`localeConfig`), iOS `CFBundleLocalizations` and Spanish permission texts (native: ships in build 7) | `apps/mobile/app.config.ts` |
+| Spanish store listing (es-419) with checked lengths and a list of terms to review | `docs/release/store-listing.es.md` |
+
+Library choice: i18next + react-i18next (plain JSON, no build step, the server can reuse texts,
+switch without restart). Versions pinned at least two weeks old (i18next 26.4.2, react-i18next
+17.0.15, eslint-plugin-i18next 6.1.5, intl-pluralrules 2.0.1). Docs used: Expo SDK 57
+[expo-localization](https://docs.expo.dev/versions/v57.0.0/sdk/localization/) and
+[Localization guide](https://docs.expo.dev/guides/localization/),
+[expo-sqlite key-value store](https://docs.expo.dev/versions/v57.0.0/sdk/sqlite/), Next.js 16's
+bundled docs (multiple root layouts), [i18next FAQ](https://www.i18next.com/how-to/faq) (plural
+rules on runtimes without `Intl.PluralRules`).
+
+### Guardrails
+- **Parity test** (`__tests__/i18n-test.tsx`): both files have exactly the same keys, the same
+  `{{variables}}` in every text, no empty texts, and every plural has both forms.
+- **Lint**: `i18next/no-literal-string` on screens and components (JSX text and the `label`,
+  `placeholder`, `title`, `accessibilityLabel`, `accessibilityHint` attributes) plus a rule against
+  literal texts in `Alert.alert`. Proven with a probe file: an alert, a `<Text>` and a `label`
+  with hard-coded English each fail lint.
+- **Typed keys**: `t('a.typo')` doesn't compile.
+
+### A bug found on the device, and why the tests missed it
+On the emulator, switching to Español on the sign-in screen translated every text but left
+**English highlighted**. Cause: the app runs the **React Compiler** (`experiments.reactCompiler`),
+which memoizes values computed during render; the toggle read the language through a plain
+function, so its first value was cached. The same pattern could leave plant statuses, dates and
+the guide and paywall texts in the old language until their data changed. Jest didn't run the
+compiler, so the unit test passed.
+
+Fix: render-time helpers take `t` from `useT()` and dates take `useLanguage()` (reactive state),
+so the language is a real dependency. **Jest now compiles with the React Compiler like the app**:
+it reproduced the bug before the fix, and a guide test fails if a text is computed from the
+non-reactive `t` (checked by temporarily reintroducing the bug).
+
+### Tests
+Whole repo: lint ✅, typecheck ✅, tests ✅ shared 2 · API 110 · mobile 136 = **248**.
+New: parity and switching (`i18n-test.tsx`, 11), guide switching while on screen, push
+re-registration on language change, Spanish server pushes (one user, an English phone and a
+Spanish tablet), older app versions without a language keep the stored one.
+
+Maestro (development build, emulator): **flow 5** adds a plant in English, switches to Español in
+Settings, sees the list already on screen in Spanish ("Aún sin regar", "Mis plantas (1)"),
+restarts the app (still Spanish), switches back: passed. Flow 4 (add a plant with AI) passed in
+M9.2.
+
+Also fixed on the way: a test-isolation gap in the API tests (push tickets weren't reset between
+tests; the cron test flaked once depending on file order).
+
+### Every screen in both languages
+Captured with `e2e/tools/screens-tour.yaml` (development build, so the dev tools button shows at
+the top right). The Spanish sign-in is from after the toggle fix.
+
+| Screen | English | Español |
+|---|---|---|
+| Sign-in (with the English | Español switch) | ![en](img/m9-lang/en-01-sign-in.png) | ![es](img/m9-lang/es-01-sign-in.png) |
+| Guide | ![en](img/m9-lang/en-02-guide.png) | ![es](img/m9-lang/es-02-guide.png) |
+| Empty list | ![en](img/m9-lang/en-03-empty.png) | ![es](img/m9-lang/es-03-empty.png) |
+| AI first-use notice | ![en](img/m9-lang/en-04-ai-notice.png) | ![es](img/m9-lang/es-04-ai-notice.png) |
+| AI suggestion, form pre-filled | ![en](img/m9-lang/en-05-ai-suggestion.png) | ![es](img/m9-lang/es-05-ai-suggestion.png) |
+| Plant list | ![en](img/m9-lang/en-06-list.png) | ![es](img/m9-lang/es-06-list.png) |
+| Plant detail | ![en](img/m9-lang/en-07-detail.png) | ![es](img/m9-lang/es-07-detail.png) |
+| Edit plant | ![en](img/m9-lang/en-08-edit.png) | ![es](img/m9-lang/es-08-edit.png) |
+| Settings (Language row) | ![en](img/m9-lang/en-09-settings.png) | ![es](img/m9-lang/es-09-settings.png) |
+| Settings, bottom | ![en](img/m9-lang/en-10-settings-bottom.png) | ![es](img/m9-lang/es-10-settings-bottom.png) |
+| Paywall | ![en](img/m9-lang/en-11-paywall.png) | ![es](img/m9-lang/es-11-paywall.png) |
+
+### Spanish style
+Neutral Latin American Spanish with "tú". Terms I wasn't sure about are listed at the end of
+[`store-listing.es.md`](../release/store-listing.es.md) for review (Configuración vs Ajustes,
+"Atrasada" for plants named in the masculine, "No estoy seguro" and "Bienvenido" which are
+gendered, Reportar vs Denunciar).
+
+### Not proven yet
+- Plural rules and Spanish dates on a **release** build (Hermes): the development build showed
+  "Mis plantas (3)", "Cada 7 días" and "20 oct 2026", but whether the polyfill is active there
+  wasn't checked.
+- Android's per-app language setting and the Spanish iOS permission texts: native, need build 7.
+- A Spanish server push received on a phone (unit- and integration-tested only).
+- The Spanish web pages on Vercel (built and served locally; go live with the push).
+- Review by a native speaker.
