@@ -77,6 +77,20 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'android.permission.USE_FINGERPRINT',
     ],
   },
+  // System texts per language: the app name and iOS permission prompts (Android's permission
+  // dialogs come from the OS, already translated).
+  locales: {
+    es: {
+      ios: {
+        CFBundleDisplayName: current.name,
+        NSCameraUsageDescription:
+          'PlantPal usa la cámara para que puedas tomarle una foto a tu planta.',
+        NSPhotoLibraryUsageDescription:
+          'PlantPal usa tus fotos para que puedas agregar una imagen de tu planta.',
+      },
+      android: { app_name: current.name },
+    },
+  },
   plugins: [
     'expo-router',
     // The dev-tools link (exp+plantpal://) only belongs in the development build; without this
@@ -85,6 +99,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     'expo-apple-authentication',
     'expo-secure-store',
     'expo-sqlite',
+    // English and Spanish: Android 13+ lists PlantPal in per-app language settings (and iOS in
+    // the app's Settings page). The in-app Language row and this setting share one source:
+    // "System default" in the app follows whatever the phone reports.
+    ['expo-localization', { supportedLocales: { ios: ['en', 'es'], android: ['en', 'es'] } }],
     ['expo-notifications', { color: '#2E7D32', defaultChannel: 'reminders' }],
     [
       'expo-image-picker',
