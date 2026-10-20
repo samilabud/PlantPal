@@ -13,9 +13,12 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "env:pull": "vercel env pull .env.development.local --environment=development --yes",
-    "test:ci": "vitest run --coverage --coverage.reporter=json-summary --coverage.reporter=text-summary --coverage.include=src/** --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml"
+    "test:ci": "vitest run --coverage --coverage.reporter=json-summary --coverage.reporter=text-summary --coverage.include=src/** --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml",
+    "eval:photos": "tsx scripts/eval-photos.ts",
+    "eval:identify": "tsx scripts/eval-identify.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "0.131.0",
     "@plantpal/shared": "workspace:*",
     "@vercel/blob": "^2.8.2",
     "drizzle-orm": "^0.45.4",
@@ -35,7 +38,8 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.1",
-    "typescript": "^5",
+    "tsx": "4.23.15",
+    "typescript": "~6.0.3",
     "vitest": "^5.0.5"
   },
   "packageManager": "pnpm@10.32.1"
