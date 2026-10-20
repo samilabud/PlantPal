@@ -137,4 +137,32 @@ describe('createApiClient with auth hooks', () => {
     expect(getAccessToken).not.toHaveBeenCalled();
     expect(authHeader(fetchFn, 0).Authorization).toBeUndefined();
   });
+
+  it("passes the error body's details through", async () => {
+    const fetchFn = jest
+      .fn()
+      .mockResolvedValue(
+        jsonResponse(
+          { error: { code: 'identify_limit', message: 'x', details: { limit: 3 } } },
+          429,
+        ),
+      );
+    const client = createApiClient({ baseUrl: 'http://api.test', fetchFn });
+    const error = await client.request('/x', { schema: Schema }).catch((e) => e);
+    expect(error).toMatchObject({ code: 'identify_limit', details: { limit: 3 } });
+  });
+
+  it('can be cancelled by the caller, which is not a timeout', async () => {
+    const fetchFn = jest.fn(
+      (_url: string, init: RequestInit) =>
+        new Promise<Response>((_, reject) =>
+          init.signal!.addEventListener('abort', () => reject(new Error('aborted'))),
+        ),
+    );
+    const client = createApiClient({ baseUrl: 'http://api.test', fetchFn: fetchFn as never });
+    const controller = new AbortController();
+    const pending = client.request('/x', { schema: Schema, signal: controller.signal });
+    controller.abort();
+    await expect(pending).rejects.toMatchObject({ kind: 'cancelled' });
+  });
 });

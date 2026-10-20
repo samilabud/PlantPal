@@ -32,4 +32,23 @@ describe('toUserMessage', () => {
     const msg = toUserMessage(new Error('TypeError: undefined is not a function'), 'deleteAccount');
     expect(msg).toBe("Couldn't delete your account. Nothing was deleted. Please try again.");
   });
+
+  it('identify: limits, resting and failures say what still works', () => {
+    const limit = (details: Record<string, unknown>) =>
+      new ApiError('http', 'x', 429, 'identify_limit', details);
+    expect(toUserMessage(limit({ plan: 'free', period: 'day' }), 'identify')).toMatch(
+      /today's free AI identifications/,
+    );
+    expect(toUserMessage(limit({ plan: 'premium', period: 'month' }), 'identify')).toMatch(
+      /this month's/,
+    );
+    expect(toUserMessage(new ApiError('http', 'x', 503, 'ai_resting'), 'identify')).toMatch(
+      /resting for today/,
+    );
+    expect(toUserMessage(new ApiError('http', 'x', 502, 'ai_unavailable'), 'identify')).toMatch(
+      /add it yourself.*ref: ai_unavailable/,
+    );
+    // Not an identify code: the usual handling still applies.
+    expect(toUserMessage(new ApiError('network', 'x'), 'identify')).toMatch(/No internet/);
+  });
 });

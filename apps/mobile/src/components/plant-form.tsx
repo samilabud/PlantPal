@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import type { IdentifyResult } from '@plantpal/shared';
+import { useCallback, useState } from 'react';
 import { Alert, StyleSheet, TextInput, View } from 'react-native';
 
 import { toUserMessage } from '@/errors/user-message';
 import { capturePhoto, type CapturedPhoto } from '@/photos/capture';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
+import { AiIdentify } from './ai-identify';
 import { PlantPhoto } from './plant-photo';
 
 export type PlantFormValues = {
@@ -15,6 +17,8 @@ export type PlantFormValues = {
 
 type Props = {
   initial?: { name: string; wateringIntervalDays: number };
+  /** The initial values came from an AI suggestion (the detail screen's "Use these details"). */
+  initialFromAi?: boolean;
   allowPhoto?: boolean;
   submitLabel: string;
   onSubmit: (values: PlantFormValues) => Promise<void>;
@@ -28,13 +32,27 @@ export function validatePlantForm(name: string, interval: string): string | null
   return null;
 }
 
-export function PlantForm({ initial, allowPhoto = false, submitLabel, onSubmit }: Props) {
+export function PlantForm({
+  initial,
+  initialFromAi = false,
+  allowPhoto = false,
+  submitLabel,
+  onSubmit,
+}: Props) {
   const colors = useColors();
   const [name, setName] = useState(initial?.name ?? '');
   const [interval, setInterval] = useState(String(initial?.wateringIntervalDays ?? 7));
   const [photo, setPhoto] = useState<CapturedPhoto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [fromAi, setFromAi] = useState(initialFromAi);
+
+  // Pre-fill only: the user can change anything, and nothing is saved until they tap Save.
+  const applySuggestion = useCallback((s: IdentifyResult) => {
+    if (s.commonName) setName(s.commonName.slice(0, 80));
+    if (s.wateringIntervalDays) setInterval(String(s.wateringIntervalDays));
+    setFromAi(true);
+  }, []);
 
   const input = [
     styles.input,
@@ -78,7 +96,13 @@ export function PlantForm({ initial, allowPhoto = false, submitLabel, onSubmit }
           </View>
         </View>
       )}
+      {allowPhoto && <AiIdentify photoUri={photo?.uri ?? null} onSuggestion={applySuggestion} />}
 
+      {fromAi && (
+        <Text testID="ai-prefilled" variant="caption" style={{ color: colors.primary }}>
+          Name and watering were suggested by AI. Please check them.
+        </Text>
+      )}
       <Text nativeID="name-label">Name</Text>
       <TextInput
         testID="plant-name-input"

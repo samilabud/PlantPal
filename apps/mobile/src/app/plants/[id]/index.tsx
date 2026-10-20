@@ -2,6 +2,7 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { toUserMessage } from '@/errors/user-message';
+import { AiIdentify } from '@/components/ai-identify';
 import { PlantPhoto } from '@/components/plant-photo';
 import { useLiveQuery } from '@/data/live';
 import { mutate } from '@/data/mutations';
@@ -16,7 +17,7 @@ import {
 } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
 import { track } from '@/analytics/analytics';
-import { capturePhoto } from '@/photos/capture';
+import { capturePhoto, localFileExists } from '@/photos/capture';
 import { canAddPhoto, usePremium } from '@/purchases/limits';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
@@ -43,6 +44,8 @@ export default function PlantDetailScreen() {
     wateringStatus(plant.lastWateredAt, plant.wateringIntervalDays),
   );
   const cover = photos?.find((p) => p.id === plant.coverPhotoId);
+  // The AI needs the file itself; a photo only synced from another phone isn't on this one.
+  const aiPhoto = cover?.localUri && localFileExists(cover.localUri) ? cover.localUri : null;
 
   async function addPhotoFrom(source: 'camera' | 'library') {
     if (!canAddPhoto(premium, photos?.length ?? 0)) {
@@ -95,6 +98,23 @@ export default function PlantDetailScreen() {
           {statusText}
         </Text>
       </View>
+
+      <AiIdentify
+        photoUri={aiPhoto}
+        action={{
+          label: 'Use these details',
+          // Opens the edit form pre-filled; the user still decides and taps Save.
+          onPress: (s) =>
+            router.push({
+              pathname: '/plants/[id]/edit',
+              params: {
+                id,
+                suggestedName: s.commonName ?? '',
+                suggestedInterval: String(s.wateringIntervalDays ?? ''),
+              },
+            }),
+        }}
+      />
 
       <Button
         testID="water-now"

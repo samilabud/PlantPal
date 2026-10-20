@@ -4,10 +4,12 @@ import type { z } from 'zod';
 /** One error type for every failure, so screens only handle `ApiError`. */
 export class ApiError extends Error {
   constructor(
-    public readonly kind: 'network' | 'timeout' | 'http' | 'invalid_response',
+    public readonly kind: 'network' | 'timeout' | 'cancelled' | 'http' | 'invalid_response',
     message: string,
     public readonly status?: number,
     public readonly code?: string,
+    /** Extra facts from the server's error body, e.g. a limit and when it resets. */
+    public readonly details?: Record<string, unknown>,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -23,6 +25,8 @@ type RequestOptions<T> = {
   schema: z.ZodType<T>;
   timeoutMs?: number;
   headers?: Record<string, string>;
+  /** Lets the caller cancel (e.g. a "Cancel" button); ends with ApiError kind 'cancelled'. */
+  signal?: AbortSignal;
 };
 
 /** How the client gets tokens. Kept as hooks so the client knows nothing about storage. */
@@ -56,6 +60,9 @@ export function createApiClient(config: {
       () => controller.abort(),
       options.timeoutMs ?? config.defaultTimeoutMs ?? 10_000,
     );
+    const cancel = () => controller.abort();
+    if (options.signal?.aborted) cancel();
+    options.signal?.addEventListener('abort', cancel);
 
     let response: Response;
     try {
@@ -71,10 +78,12 @@ export function createApiClient(config: {
         signal: controller.signal,
       });
     } catch (error) {
+      if (options.signal?.aborted) throw new ApiError('cancelled', 'The request was cancelled');
       if (controller.signal.aborted) throw new ApiError('timeout', 'The request timed out');
       throw new ApiError('network', error instanceof Error ? error.message : 'Network error');
     } finally {
       clearTimeout(timeout);
+      options.signal?.removeEventListener('abort', cancel);
     }
 
     return response;
@@ -90,6 +99,7 @@ export function createApiClient(config: {
         parsed.success ? parsed.data.error.message : `Request failed with ${response.status}`,
         response.status,
         parsed.success ? parsed.data.error.code : undefined,
+        parsed.success ? parsed.data.error.details : undefined,
       );
     }
 

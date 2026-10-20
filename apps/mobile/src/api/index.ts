@@ -1,10 +1,13 @@
 import {
   HealthResponse,
+  IdentifyResponse,
   Me,
   OkResponse,
   PushSendResult,
   SignedUrlResponse,
   SyncResponse,
+  type IdentifyReportRequest,
+  type IdentifyRequest,
   type SyncRequest,
 } from '@plantpal/shared';
 import { File } from 'expo-file-system';
@@ -68,3 +71,17 @@ export const sendTestPush = (plantId?: string) =>
 /** Ask the server to re-read my entitlement from RevenueCat (after a purchase or restore). */
 export const syncSubscription = () =>
   api.request('/api/subscription/sync', { method: 'POST', schema: Me, timeoutMs: 20_000 });
+
+/** "Identify with AI": the server asks Claude. The app gives up after 20 s (the server, 15 s). */
+export const identifyPlant = (body: IdentifyRequest, signal?: AbortSignal) =>
+  api.request('/api/plants/identify', {
+    method: 'POST',
+    body,
+    schema: IdentifyResponse,
+    timeoutMs: 20_000,
+    signal,
+  });
+
+/** "Report this suggestion" (Google Play's AI-Generated Content policy). */
+export const reportSuggestion = (body: IdentifyReportRequest) =>
+  api.request('/api/plants/identify/report', { method: 'POST', body, schema: OkResponse });

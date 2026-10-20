@@ -2,7 +2,8 @@ import { statusCodes } from '@react-native-google-signin/google-signin';
 
 import { ApiError } from '@/api/client';
 
-export type ErrorContext = 'signIn' | 'sync' | 'purchase' | 'restore' | 'photo' | 'deleteAccount';
+export type ErrorContext =
+  'signIn' | 'sync' | 'purchase' | 'restore' | 'photo' | 'deleteAccount' | 'identify' | 'report';
 
 const FALLBACK: Record<ErrorContext, string> = {
   signIn: "Couldn't sign you in. Please try again.",
@@ -11,7 +12,37 @@ const FALLBACK: Record<ErrorContext, string> = {
   restore: "Couldn't restore purchases. Please try again.",
   photo: "Couldn't add the photo. Please try again.",
   deleteAccount: "Couldn't delete your account. Nothing was deleted. Please try again.",
+  identify: "Couldn't identify the plant right now. You can still add it yourself.",
+  report: "Couldn't send the report. Please try again.",
 };
+
+/**
+ * "Identify with AI" answers with its own codes. The feature is optional, so every message ends
+ * with what still works: adding the plant by hand.
+ */
+function identifyMessage(error: ApiError): string | null {
+  switch (error.code) {
+    case 'identify_limit': {
+      const monthly = error.details?.period === 'month';
+      const free = error.details?.plan === 'free';
+      if (monthly)
+        return "You've used this month's AI identifications. You can still add plants yourself.";
+      return free
+        ? "You've used today's free AI identifications. Premium gives you more, or try again tomorrow."
+        : "You've used today's AI identifications. Try again tomorrow.";
+    }
+    case 'ai_resting':
+      return 'AI identification is resting for today. Try again tomorrow, or add the plant yourself.';
+    case 'ai_timeout':
+      return 'The AI took too long to answer. Please try again.';
+    case 'ai_not_configured':
+    case 'ai_unavailable':
+    case 'ai_invalid_output':
+      return withRef(FALLBACK.identify, error.code);
+    default:
+      return null;
+  }
+}
 
 /** Google Play Services' code for a sign-in client that doesn't match this build's signing key. */
 const GOOGLE_DEVELOPER_ERROR = '10';
@@ -41,6 +72,8 @@ export function toUserMessage(error: unknown, context: ErrorContext): string {
   if (__DEV__) console.warn(`[${context}]`, error);
 
   if (error instanceof ApiError) {
+    const special = context === 'identify' ? identifyMessage(error) : null;
+    if (special) return special;
     if (error.kind === 'network')
       return 'No internet connection. Check your connection and try again.';
     if (error.kind === 'timeout')

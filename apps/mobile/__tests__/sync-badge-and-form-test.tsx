@@ -11,6 +11,7 @@ jest.mock('@/sync/sync-manager', () => ({
 }));
 jest.mock('@/photos/capture', () => ({ capturePhoto: jest.fn(), localFileExists: () => false }));
 jest.mock('@/api', () => ({ getPhotoViewUrl: jest.fn() }));
+jest.mock('@/components/ai-identify', () => ({ AiIdentify: () => null }));
 
 describe('SyncBadge', () => {
   it.each([

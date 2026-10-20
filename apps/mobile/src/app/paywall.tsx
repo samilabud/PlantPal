@@ -7,12 +7,13 @@ import type { PurchasesPackage } from 'react-native-purchases';
 import { toUserMessage } from '@/errors/user-message';
 import { track, usePaywallVariant, type PaywallVariant } from '@/analytics/analytics';
 import { buy, getPackages, isPurchasesAvailable, restore } from '@/purchases/purchases';
-import { FREE_PLANT_LIMIT } from '@plantpal/shared';
+import { FREE_PLANT_LIMIT, IDENTIFY_LIMITS } from '@plantpal/shared';
 import { Button, radius, Screen, spacing, Text, useColors } from '@/ui';
 
 const REASON: Record<string, string> = {
   plants: `The free plan includes ${FREE_PLANT_LIMIT} plants.`,
   photos: 'The free plan includes one photo per plant.',
+  ai: `The free plan includes ${IDENTIFY_LIMITS.free.perDay} AI identifications a day; Premium includes ${IDENTIFY_LIMITS.premium.perDay}.`,
 };
 
 /** The `paywall-variant` flag (PostHog A/B test): same plans and prices, different framing. */
