@@ -316,3 +316,27 @@ Android's demo status bar (`docs/release/screenshots/README.md`).
 - Google's review result.
 - A real identification against the production API (production has no test sign-in; the first
   one will come from the app).
+
+### After release: photo not shown after taking it (Redmi Note), fixed over the air (2026-10-21)
+**Report (owner, build 7 from Play):** sometimes, after taking a photo and cropping it, the photo
+didn't appear; with a better connection it worked. Phone: Xiaomi Redmi Note.
+
+**Investigation:** not reproduced on the emulator (camera + crop, several retakes, also with
+Android's "Don't keep activities"). Two weaknesses found in the code, both fixed:
+1. Expo's docs: *"Android system sometimes kills the `MainActivity` after the `ImagePicker`
+   finishes. When this happens, we lose the data selected"*, and `launchCameraAsync` says to handle
+   it with `getPendingResultAsync`. We didn't. Xiaomi's Android is known for closing background
+   activities aggressively. The expo-image-picker source (57.0.20) stores a pending result only
+   when the activity was destroyed and clears it when read, so recovering it can't duplicate a
+   normal capture. The form and the plant screen now recover it when they open and when the app
+   returns to the front (squared, because the crop step never ran).
+2. The photo preview remembered a failed load forever, so one failure made every later photo in
+   that form show the placeholder. Now only the image that failed falls back.
+
+**Shipped:** commit `95377af`, tests in `__tests__/photo-recovery-test.tsx` (7). EAS Update on the
+`production` channel, update group `a028d3b2`, runtime `3b6bf88f…` (= build 7; checked with
+`eas fingerprint:compare` before publishing). No store review needed.
+
+**Not proven:** that this was the cause on the Redmi Note. The connection link isn't explained by
+either fix; if it happens again with the update, a screen recording or `adb logcat` from that
+phone is the next step.
