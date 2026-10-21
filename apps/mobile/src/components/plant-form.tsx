@@ -5,6 +5,7 @@ import { Alert, StyleSheet, TextInput, View } from 'react-native';
 import { toUserMessage } from '@/errors/user-message';
 import { t, useT } from '@/i18n';
 import { capturePhoto, type CapturedPhoto } from '@/photos/capture';
+import { usePendingPhoto } from '@/photos/use-pending-photo';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
 
 import { AiIdentify } from './ai-identify';
@@ -49,6 +50,8 @@ export function PlantForm({
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [fromAi, setFromAi] = useState(initialFromAi);
+  // A photo taken while Android had closed the app (common on Xiaomi phones) still arrives.
+  usePendingPhoto(setPhoto, allowPhoto);
 
   // Pre-fill only: the user can change anything, and nothing is saved until they tap Save.
   const applySuggestion = useCallback((s: IdentifyResult) => {

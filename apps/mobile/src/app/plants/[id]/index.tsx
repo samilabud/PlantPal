@@ -17,7 +17,8 @@ import {
 } from '@/data/plants';
 import { describeStatus, wateringStatus } from '@/data/watering';
 import { track } from '@/analytics/analytics';
-import { capturePhoto, localFileExists } from '@/photos/capture';
+import { capturePhoto, localFileExists, type CapturedPhoto } from '@/photos/capture';
+import { usePendingPhoto } from '@/photos/use-pending-photo';
 import { canAddPhoto, usePremium } from '@/purchases/limits';
 import { formatDateTime, useLanguage, useT } from '@/i18n';
 import { Button, radius, spacing, Text, useColors } from '@/ui';
@@ -31,6 +32,11 @@ export default function PlantDetailScreen() {
   const { data: waterings } = useLiveQuery((db) => listWaterings(db, id), [id]);
   const { data: photos } = useLiveQuery((db) => listPhotos(db, id), [id]);
   const premium = usePremium();
+  // A photo taken while Android had closed the app (common on Xiaomi phones) still arrives.
+  usePendingPhoto((captured: CapturedPhoto) => {
+    if (!canAddPhoto(premium, photos?.length ?? 0)) return; // checked before the camera opened
+    mutate((db) => addPhoto(db, id, captured.photoId, captured.uri)).catch(() => undefined);
+  }, Boolean(id));
 
   if (loading) return null;
   if (!plant) {

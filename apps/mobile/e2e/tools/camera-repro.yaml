@@ -1,0 +1,11 @@
+appId: com.samilabud.plantpal.dev
+---
+- runFlow: ../subflows/launch-clean.yaml
+- runFlow:
+    file: ../subflows/sign-in.yaml
+    env:
+      USER: camera-repro
+- tapOn:
+    id: add-plant
+    point: 15%,50%
+- tapOn: Take photo

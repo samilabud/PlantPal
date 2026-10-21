@@ -17,7 +17,8 @@ type Props = { photoId: string | null; localUri?: string | null; size: number; l
 export function PlantPhoto({ photoId, localUri, size, label }: Props) {
   const colors = useColors();
   const hasLocal = localFileExists(localUri ?? null);
-  const [failed, setFailed] = useState(false);
+  // Remembers which image failed, so a new photo gets a fresh try instead of the placeholder.
+  const [failedUri, setFailedUri] = useState<string | null>(null);
   const remote = useQuery({
     queryKey: ['photo-url', photoId],
     queryFn: () => getPhotoViewUrl(photoId!),
@@ -26,6 +27,7 @@ export function PlantPhoto({ photoId, localUri, size, label }: Props) {
   });
 
   const uri = hasLocal ? localUri! : remote.data?.url;
+  const failed = uri !== undefined && failedUri === uri;
   const box = {
     width: size,
     height: size,
@@ -47,13 +49,14 @@ export function PlantPhoto({ photoId, localUri, size, label }: Props) {
   }
   return (
     <Image
+      testID="plant-photo-image"
       source={{ uri, cacheKey: photoId }}
       cachePolicy="disk"
       style={box}
       contentFit="cover"
       transition={150}
       accessibilityLabel={label}
-      onError={() => setFailed(true)}
+      onError={() => setFailedUri(uri)}
     />
   );
 }

@@ -31,10 +31,40 @@ export async function capturePhoto(source: 'camera' | 'library'): Promise<Captur
       ? await ImagePicker.launchCameraAsync(options)
       : await ImagePicker.launchImageLibraryAsync(options);
   if (result.canceled) return null;
+  return savePickedAsset(result.assets[0]!);
+}
 
-  const asset = result.assets[0]!;
+/**
+ * Android can close PlantPal's activity while the camera or the crop screen is open (it reclaims
+ * memory; Xiaomi phones do it often). The photo is then lost to the call above, but the picker
+ * keeps it: this returns it, saved like any other photo, or null when there is nothing pending.
+ * Call it when a screen that takes photos opens and when the app comes back to the front.
+ */
+export async function recoverPendingPhoto(): Promise<CapturedPhoto | null> {
+  const pending = await ImagePicker.getPendingResultAsync();
+  if (!pending || !('canceled' in pending) || pending.canceled) return null;
+  const asset = pending.assets?.[0];
+  // If Android closed the app during the camera, the crop step never ran: square it here.
+  return asset ? savePickedAsset(asset, { square: true }) : null;
+}
+
+async function savePickedAsset(
+  asset: ImagePicker.ImagePickerAsset,
+  { square = false }: { square?: boolean } = {},
+): Promise<CapturedPhoto> {
   const context = ImageManipulator.manipulate(asset.uri);
-  if (!asset.width || asset.width > MAX_WIDTH) context.resize({ width: MAX_WIDTH });
+  if (square && asset.width && asset.height && asset.width !== asset.height) {
+    const side = Math.min(asset.width, asset.height);
+    context.crop({
+      originX: Math.floor((asset.width - side) / 2),
+      originY: Math.floor((asset.height - side) / 2),
+      width: side,
+      height: side,
+    });
+  }
+  const width =
+    square && asset.width && asset.height ? Math.min(asset.width, asset.height) : asset.width;
+  if (!width || width > MAX_WIDTH) context.resize({ width: MAX_WIDTH });
   const image = await context.renderAsync();
   const saved = await image.saveAsync({ compress: 0.7, format: SaveFormat.JPEG });
 
